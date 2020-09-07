@@ -33,10 +33,11 @@ The following services play a role in providing parts of the functionality:
 ### Hardware
 The primary components of this project are a [Plantower PMS5003](https://www.adafruit.com/product/3686) sensor and an ESP8266 such as a Wemos D1 Mini (but virtually any ESP8266 will work). You can optionally add a few WS2812 LEDs (commonly known as NeoPixels) for status readouts if you'd like.
 
-[To Do: Discuss PCB]
+A PCB is in development now. It is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Once the board is tested, I will post the [Gerber](https://en.wikipedia.org/wiki/Gerber_format) files so you can have your own fabricated. 
 
 ### 3D Model
-You can find a housing for this sensor here: [TO DO: Create a housing]
+
+A housing for `AQM` is in development and will be posted on thingiverse when complete.
 
  - [Original](https://www.thingiverse.com/thing:XYZ)
 
@@ -70,8 +71,7 @@ The available settings are:
 5. Blynk will send you an "Auth Token" via email. Enter this in the settings screen of the web interface in the field labeled "Blynk API Key". Hit save and restart the weather station.
 6. Use the Blynk app to see current and historical values.
 
-[To Do: provide correct QR code]
-Blynk QR Code:<br><img src="images/BlynkQRCode.jpg" width="250" /></img><br>
+Blynk QR Code:<br><img src="images/BlynkQRCode.png" width="250" /></img><br>
 
 
 
