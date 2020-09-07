@@ -1,0 +1,24 @@
+<h3>Readings</h3>
+<strong>Air Quality Index </strong>(Timestamp: %TMST%)
+<table class="w3-table-all w3-hoverable">
+  <tr> <td>Type</td> <td>PM 1.0</td>    <td>PM 2.5</td>    <td>PM 10</td>      </tr>
+  <tr> <td>Standard</td> <td>%PM10STD%</td> <td>%PM25STD%</td> <td>%PM100STD%</td> </tr>
+  <tr> <td>Environment</td> <td>%PM10ENV%</td> <td>%PM25ENV%</td> <td>%PM100ENV%</td> </tr>
+</table>
+<strong>Particulate Counts</strong>
+<table class="w3-table-all w3-hoverable">
+  <tr> <td>Particles > Size</td> <td>Count / 0.1L air</td> </tr>
+  <tr> <td>0.3um</td> <td>%P03%</td> </tr>
+  <tr> <td>0.5um</td> <td>%P05%</td> </tr>
+  <tr> <td>1.0um</td> <td>%P10%</td> </tr>
+  <tr> <td>2.5um</td> <td>%P25%</td> </tr>
+  <tr> <td>5.0um</td> <td>%P50%</td> </tr>
+  <tr> <td>50 um</td> <td>%P100%</td> </tr>
+</table>
+<strong>2.5um Moving Averages</strong>
+<table class="w3-table-all w3-hoverable">
+  <tr> <td>10 min</td> <td>30 min</td>    <td>1 hr</td>    <td>6 hrs</td>      </tr>
+  <tr> <td>%MA10%</td> <td>%MA30%</td> <td>%MA1H%</td> <td>%MA6H%</td> </tr>
+</table>
+<strong>Areas Readings </strong>(Lat/Lon: %LAT%, %LNG%)<br>
+<iframe height="340" src="https://widget.airnow.gov/aq-dial-widget/?latitude=%LAT%&longitude=%LNG%" style="border: none; border-radius: 25px;" width="230">&ly;/iframe>
