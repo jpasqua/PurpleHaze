@@ -74,7 +74,9 @@ namespace AQM {
       sensorIndicator.begin(indicators, 1);
       busyIndicator.begin(indicators, 2);
       qualityIndicator.setColor(0x969696);  // No data available yet
+    }
 
+    void prepSensor() {
       streamToSensor = new SoftwareSerial(SS_RX_PIN, SS_TX_PIN);
       streamToSensor->begin(9600);
 
@@ -169,6 +171,8 @@ void setup() {
 
   Internal::prepWebUI();            // Setup the WebUI, network, etc.
   busyIndicator.off();
+  Internal::prepSensor();           // Prep the sensor after we're connected to the web
+                                    // so we have time info for timestamps, etc.
 
   AQMBlynk::init();                 // Setup the Blynk Client
 
