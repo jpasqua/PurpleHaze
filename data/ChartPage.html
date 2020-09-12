@@ -1,0 +1,108 @@
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+  <style>
+    canvas {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+  <div style="width:75\%;">
+    <canvas id="hour_canvas"></canvas>
+    <canvas id="day_canvas"></canvas>
+    <canvas id="week_canvas"></canvas>
+  </div>
+  <br>
+  <br>
+
+  <script>
+    const colorBands = [
+      '#D9F8D2', '#FFFFD6', '#FBE0CE', '#FACCC9', '#EFB2C0',
+      '#E398B7', '#FA7FB7', '#FA63B1', '#FA4BA5', '#FA2BA5' ]
+
+    Chart.pluginService.register({
+      beforeDraw: function (chart, easing) {
+        if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
+          var helpers = Chart.helpers;
+          var ctx = chart.chart.ctx;
+          var chartArea = chart.chartArea;
+          var yScale = chart.scales["y-axis-0"];
+
+          ctx.save();
+          var done = false;
+          for (var y = 50; y <= 500 && !done; y += 50) {
+            var yPixel = yScale.getPixelForValue(y)
+            if (yPixel <= 0) { yPixel = chartArea.top; done = true; }
+            ctx.fillStyle = colorBands[y/50-1];
+            var lower = Math.min(yScale.getPixelForValue(y-50), chartArea.bottom)
+            var ht = yPixel - lower
+            ctx.fillRect(chartArea.left, lower, chartArea.right - chartArea.left, ht);
+          }
+          ctx.restore();
+        }
+      }
+    });
+
+    const color_pm10 = 'rgb(255, 0, 0)'
+    const color_pm25 = 'rgb(54, 162, 235)'
+    const color_pm100 = 'rgb(0, 255, 0)'
+    function createOptions(theTitle) {
+      return {
+        responsive: true, title: { display: true, text: theTitle, fontSize:16 },
+        chartArea: { backgroundColor: 'rgba(251, 85, 85, 0.4)' },
+        scales: {
+          xAxes: [{ display: true, scaleLabel: { display: true, labelString: 'Date' }, type: 'time' }],
+          yAxes: [{ display: true, scaleLabel: { display: true, labelString: 'Value' } }]
+        }
+      }
+    }
+    function createDatasets() {
+      return {
+          datasets: [
+            { label: 'PM10 ENV', borderColor: color_pm10, fill: false, lineTension: 0, data: [] },
+            { label: 'PM25 ENV', borderColor: color_pm25, fill: false, lineTension: 0, data: [] },
+            { label: 'PM100 ENV', borderColor: color_pm100, fill: false, lineTension: 0, data: [] }]
+        }
+    }
+
+    var hour_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Hour") };
+    var day_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Day") };
+    var week_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Week") };
+
+    function prepData(theConfig, theData) {
+      theConfig.data.datasets[0].data = [];
+      theConfig.data.datasets[1].data = [];
+      theConfig.data.datasets[2].data = [];
+      for (var i = 0; i < theData.data.length; i++) {
+        var timestamp = theData.data[i].ts*1000
+        theConfig.data.datasets[0].data.push({x: timestamp, y: theData.data[i].pm10_env})
+        theConfig.data.datasets[1].data.push( {x: timestamp, y: theData.data[i].pm25_env})
+        theConfig.data.datasets[2].data.push({x: timestamp, y: theData.data[i].pm100_env})
+      }
+    }  
+
+    console.log(hour_config)
+    $.when(
+      $.getJSON(
+        "http://192.168.1.170/getHistory?range=hour",
+        function(theData) { prepData(hour_config, theData) })).then(function() {
+          var ctx = document.getElementById('hour_canvas').getContext('2d');
+          var hourChart = new Chart(ctx, hour_config);
+        }); 
+    $.when(
+      $.getJSON(
+        "http://192.168.1.170/getHistory?range=day",
+        function(theData) { prepData(day_config, theData) })).then(function() {
+          var ctx = document.getElementById('day_canvas').getContext('2d');
+          var dayData = new Chart(ctx, day_config);
+      }); 
+    $.when(
+      $.getJSON(
+        "http://192.168.1.170/getHistory?range=week",
+        function(theData) { prepData(week_config, theData) })).then(function() {
+          var ctx = document.getElementById('week_canvas').getContext('2d');
+          var weekData = new Chart(ctx, week_config);
+      }); 
+
+  </script>

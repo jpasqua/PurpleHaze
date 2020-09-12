@@ -74,6 +74,17 @@ namespace AQMWebUI {
       WebUI::finishPage();
     }
 
+    void displayChartPage() {
+      Log.trace("Web Request: Display Chart Page");
+      if (!WebUI::authenticationOK()) { return; }
+
+      auto mapper =[](String &key) -> String { return ""; };
+
+      WebUI::startPage();
+      templateHandler->send("/ChartPage.html", mapper);
+      WebUI::finishPage();
+    }
+
     // Displays a form allowing the user to update the AQM settings.
     //
     // Form:
@@ -97,6 +108,23 @@ namespace AQMWebUI {
 
 
   namespace Endpoints {
+    void getHistory() {
+      String rangeArg = WebUI::arg("range");
+      AQIReader::HistoryRange range;
+
+      if (rangeArg.equalsIgnoreCase("hour")) range = AQIReader::HistoryRange::Range_1Hour;
+      else if (rangeArg.equalsIgnoreCase("day")) range = AQIReader::HistoryRange::Range_1Day;
+      else if (rangeArg.equalsIgnoreCase("week")) range = AQIReader::HistoryRange::Range_1Week;
+      else range = AQIReader::HistoryRange::Range_Combined;
+
+      auto provider = [range](Stream& s) -> void {
+        AQM::aqiReader.emitHistoryAsJson(range, s);
+      };
+
+      WebUI::sendArbitraryContent("application/json", -1, provider);
+    }
+
+
     // Handler for the "/updateAQMConfig" endpoint. This is invoked as the target
     // of the form presented by "/displayAQMConfig". It updates the values of the
     // corresponding settings and writes the settings to EEPROM.
@@ -128,9 +156,11 @@ namespace AQMWebUI {
     WebUI::addMenuItems(Internal::Actions);
 
     WebUI::registerHandler("/", Pages::displayHomePage);
+    WebUI::registerHandler("/ChartPage.html", Pages::displayChartPage);
     WebUI::registerHandler("/displayAQMConfig", Pages::displayAQMConfig);
 
-    WebUI::registerHandler("/updateAQMConfig", Endpoints::updateAQMConfig);
+    WebUI::registerHandler("/updateAQMConfig",  Endpoints::updateAQMConfig);
+    WebUI::registerHandler("/getHistory",       Endpoints::getHistory);
 
     templateHandler = WebUI::getTemplateHandler();
   }
