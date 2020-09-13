@@ -27,6 +27,11 @@ public:
   // ----- Settings
   String  description = "Air Quality Sensor"; // User's description of their AQ Sensor
   String  blynkAPIKey = "";                   // Your API Key from Blynk
+  struct {
+    String pm10 = "#e32400";
+    String pm25 = "#4e7a27";
+    String pm100 = "#0042aa";
+  } chartColors;
   bool showDevMenu = false;
 
 private:

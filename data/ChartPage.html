@@ -33,7 +33,7 @@
           var done = false;
           for (var y = 50; y <= 500 && !done; y += 50) {
             var yPixel = yScale.getPixelForValue(y)
-            if (yPixel <= 0) { yPixel = chartArea.top; done = true; }
+            if (yPixel <= chartArea.top) { yPixel = chartArea.top; done = true; }
             ctx.fillStyle = colorBands[y/50-1];
             var lower = Math.min(yScale.getPixelForValue(y-50), chartArea.bottom)
             var ht = yPixel - lower
@@ -44,9 +44,9 @@
       }
     });
 
-    const color_pm10 = 'rgb(255, 0, 0)'
-    const color_pm25 = 'rgb(54, 162, 235)'
-    const color_pm100 = 'rgb(0, 255, 0)'
+    const color_pm10 = '%PM10_CLR%'
+    const color_pm25 = '%PM25_CLR%'
+    const color_pm100 = '%PM100_CLR%'
     function createOptions(theTitle) {
       return {
         responsive: true, title: { display: true, text: theTitle, fontSize:16 },
@@ -82,24 +82,23 @@
       }
     }  
 
-    console.log(hour_config)
     $.when(
       $.getJSON(
-        "http://192.168.1.170/getHistory?range=hour",
+        "/getHistory?range=hour",
         function(theData) { prepData(hour_config, theData) })).then(function() {
           var ctx = document.getElementById('hour_canvas').getContext('2d');
           var hourChart = new Chart(ctx, hour_config);
         }); 
     $.when(
       $.getJSON(
-        "http://192.168.1.170/getHistory?range=day",
+        "/getHistory?range=day",
         function(theData) { prepData(day_config, theData) })).then(function() {
           var ctx = document.getElementById('day_canvas').getContext('2d');
           var dayData = new Chart(ctx, day_config);
       }); 
     $.when(
       $.getJSON(
-        "http://192.168.1.170/getHistory?range=week",
+        "/getHistory?range=week",
         function(theData) { prepData(week_config, theData) })).then(function() {
           var ctx = document.getElementById('week_canvas').getContext('2d');
           var weekData = new Chart(ctx, week_config);

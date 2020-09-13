@@ -81,7 +81,12 @@ namespace AQMWebUI {
       Log.trace("Web Request: Display Chart Page");
       if (!WebUI::authenticationOK()) { return; }
 
-      auto mapper =[](String &key) -> String { (void)key; return ""; };
+      auto mapper =[](String &key) -> String {
+        if (key == "PM10_CLR")  return AQM::settings.chartColors.pm10;
+        if (key == "PM25_CLR")  return AQM::settings.chartColors.pm25;
+        if (key == "PM100_CLR")  return AQM::settings.chartColors.pm100;
+        return "";
+      };
 
       WebUI::startPage();
       templateHandler->send("/ChartPage.html", mapper);
@@ -100,6 +105,9 @@ namespace AQMWebUI {
       auto mapper =[](String &key) -> String {
         if (key == "DESC") return WebThing::encodeAttr(AQM::settings.description);
         if (key == "BLYNK_KEY")  return AQM::settings.blynkAPIKey;
+        if (key == "PM10_CLR")  return AQM::settings.chartColors.pm10;
+        if (key == "PM25_CLR")  return AQM::settings.chartColors.pm25;
+        if (key == "PM100_CLR")  return AQM::settings.chartColors.pm100;
         return "";
       };
 
@@ -144,6 +152,9 @@ namespace AQMWebUI {
 
       AQM::settings.description = WebUI::arg("description");
       AQM::settings.blynkAPIKey = WebUI::arg("blynkAPIKey");
+      AQM::settings.chartColors.pm10 = WebUI::arg("pm10Color");
+      AQM::settings.chartColors.pm25 = WebUI::arg("pm25Color");
+      AQM::settings.chartColors.pm100 = WebUI::arg("pm100Color");
       AQM::settings.write();
 
       // The description MAY have changed. Update the title just in case
