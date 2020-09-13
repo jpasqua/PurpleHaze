@@ -53,26 +53,26 @@ public:
 
 class NeoPixelIndicator : public Indicator {
 public:
-  void begin(NeoPixelIndicators& parent, uint8_t which) {
+  void begin(NeoPixelIndicators* parent, uint8_t which) {
     _parent = parent;
     _which = which;
   }
 
   virtual void setColor(uint32_t c) {
-    _parent.leds->setPixelColor(_which, c);
-    _parent.leds->show();
+    _parent->leds->setPixelColor(_which, c);
+    _parent->leds->show();
   }
   
   void setColor(uint8_t r, uint8_t g, uint8_t b) {
-    _parent.leds->setPixelColor(_which, r, g, b);
-    _parent.leds->show();
+    _parent->leds->setPixelColor(_which, r, g, b);
+    _parent->leds->show();
   }
 
   void on() { setColor(255, 255, 255); }
   void off() { setColor(0, 0, 0); }
 
 private:
-  NeoPixelIndicators _parent;
+  NeoPixelIndicators* _parent;
   uint8_t _which;
 };
 

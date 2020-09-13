@@ -32,10 +32,10 @@ namespace AQM {
    *
    *----------------------------------------------------------------------------*/
   AQIReader aqiReader;
-  NeoPixelIndicators indicators(D2, 3);
-  NeoPixelIndicator sensorIndicator;
-  NeoPixelIndicator qualityIndicator;
-  NeoPixelIndicator busyIndicator;
+  Indicator* sensorIndicator;
+  Indicator* qualityIndicator;
+  Indicator* busyIndicator;
+  NeoPixelIndicators* indicators;
   SoftwareSerial* streamToSensor;
   AQMSettings settings;
   AQIReadings latestData;
@@ -68,23 +68,32 @@ namespace AQM {
     void flushBeforeSleep() { AQMBlynk::disconnect(); }
 
     void prepIO() {
-      indicators.begin();
-      indicators.setBrightness(128);
-      qualityIndicator.begin(indicators, 0);
-      sensorIndicator.begin(indicators, 1);
-      busyIndicator.begin(indicators, 2);
-      qualityIndicator.setColor(0x969696);  // No data available yet
+      if (NEOPIXEL_PIN == -1) {
+        qualityIndicator = new Indicator();
+        sensorIndicator = new Indicator();
+        busyIndicator = new Indicator();
+      } else {
+        indicators = new NeoPixelIndicators(NEOPIXEL_PIN, 3);
+        indicators->begin();
+        indicators->setBrightness(128);
+        NeoPixelIndicator* npi;
+        npi = new NeoPixelIndicator(); npi->begin(indicators, 0); qualityIndicator = npi;
+        npi = new NeoPixelIndicator(); npi->begin(indicators, 1); sensorIndicator = npi;
+        npi = new NeoPixelIndicator(); npi->begin(indicators, 2); busyIndicator = npi;
+
+      }
+      qualityIndicator->setColor(0x969696);  // No data available yet
     }
 
     void prepSensor() {
       streamToSensor = new SoftwareSerial(SS_RX_PIN, SS_TX_PIN);
       streamToSensor->begin(9600);
 
-      if (!aqiReader.init(streamToSensor, &sensorIndicator)) {
+      if (!aqiReader.init(streamToSensor, sensorIndicator)) {
         Log.error("Unable to connect to Air Quality Sensor!");
-        qualityIndicator.setColor(255, 0, 0);
-        sensorIndicator.setColor(255, 0, 0);
-        busyIndicator.setColor(255, 0, 0);
+        qualityIndicator->setColor(255, 0, 0);
+        sensorIndicator->setColor(255, 0, 0);
+        busyIndicator->setColor(255, 0, 0);
       }
     }
 
@@ -98,7 +107,7 @@ namespace AQM {
 
     void configModeCallback(String &ssid, String &ip) {
       (void)ssid; (void)ip;
-      busyIndicator.setColor(255, 0, 0);
+      busyIndicator->setColor(255, 0, 0);
     }
 
     void processReadings() {
@@ -108,13 +117,13 @@ namespace AQM {
       latestData = aqiReader.getLastReadings();
       if (latestData.timestamp == lastTimestamp) return;
 
-      busyIndicator.setColor(0, 255, 0);
+      busyIndicator->setColor(0, 255, 0);
       uint16_t quality = latestData.pm25_env;
       int bracketIndex;
       for (bracketIndex = 0; bracketIndex < nBrackets; bracketIndex++) {
         if (quality < QualityBrackets[bracketIndex]) break;
       }
-      qualityIndicator.setColor(QualityColors[bracketIndex]);
+      qualityIndicator->setColor(QualityColors[bracketIndex]);
       if (millis() > nextHistoryLog) {
         aqiReader.logHistory();
         nextHistoryLog = millis() + 6 * 60 * 1000L;
@@ -122,7 +131,7 @@ namespace AQM {
 
       AQMBlynk::update();
       lastTimestamp = latestData.timestamp;
-      busyIndicator.off();
+      busyIndicator->off();
     }
   } // ----- END: AQM::Internal namespace
 
@@ -170,7 +179,7 @@ void setup() {
                                     // If the WebThing config changes, let us know
 
   Internal::prepWebUI();            // Setup the WebUI, network, etc.
-  busyIndicator.off();
+  busyIndicator->off();
   Internal::prepSensor();           // Prep the sensor after we're connected to the web
                                     // so we have time info for timestamps, etc.
 
@@ -186,7 +195,7 @@ void loop() {
   // static uint32_t qi = 0;
   // if (millis()-l > 500) {
   //   l = millis();
-  //   qualityIndicator.setColor(Internal::QualityColors[qi]);
+  //   qualityIndicator->setColor(Internal::QualityColors[qi]);
   //   qi = (qi+1)%8;
   // }
   WebThing::loop();
