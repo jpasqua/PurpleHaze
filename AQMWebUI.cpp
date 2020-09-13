@@ -30,6 +30,9 @@ namespace AQMWebUI {
     String Actions =
       "<a class='w3-bar-item w3-button' href='/displayAQMConfig'>"
       "<i class='fa fa-cog'></i> Configure AQM</a>";
+    String DEV_ACTION =
+      "<a class='w3-bar-item w3-button' href='/dev'>"
+      "<i class='fa fa-gears'></i> Dev Settings</a>";
   }
   // ----- END: AQMWebUI::Internal
 
@@ -78,7 +81,7 @@ namespace AQMWebUI {
       Log.trace("Web Request: Display Chart Page");
       if (!WebUI::authenticationOK()) { return; }
 
-      auto mapper =[](String &key) -> String { return ""; };
+      auto mapper =[](String &key) -> String { (void)key; return ""; };
 
       WebUI::startPage();
       templateHandler->send("/ChartPage.html", mapper);
@@ -150,10 +153,67 @@ namespace AQMWebUI {
     }
   }   // ----- END: AQMWebUI::Endpoints
 
+  namespace Dev {
+    void updateSettings() {
+      if (!WebUI::authenticationOK()) { return; }
+      Log.trace("Web Request: /dev/updateSettings");
+
+      AQM::settings.showDevMenu = WebUI::hasArg("showDevMenu");
+      AQM::settings.write();
+
+      WebUI::redirectHome();
+    }
+
+    void displayDevPage() {
+      Log.trace(F("Web Request: /dev/displayDevPage"));
+      if (!WebUI::authenticationOK()) { return; }
+
+      auto mapper =[](String &key) -> String {
+        if (key == "SHOW_DEV_MENU") return checkedOrNot[AQM::settings.showDevMenu];
+        return "";
+      };
+
+      WebUI::startPage();
+      templateHandler->send("/DevPage.html", mapper);
+      WebUI::finishPage();
+    }
+
+    void reboot() {
+      if (!WebUI::authenticationOK()) { return; }
+      ESP.restart();
+    }
+
+    void yieldSettings() {
+      Log.trace(F("Web Request: /dev/settings"));
+      if (!WebUI::authenticationOK()) { return; }
+
+      DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
+                                                         AQM::settings.asJSON();
+      WebUI::sendJSONContent(doc);
+      doc->clear();
+      delete doc;
+    }
+
+    void yieldHistory() {
+      Log.trace(F("Web Request: /dev/settings"));
+      if (!WebUI::authenticationOK()) { return; }
+
+      DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
+                                                         AQM::settings.asJSON();
+      WebUI::sendJSONContent(doc);
+      doc->clear();
+      delete doc;
+    }
+  }   // ----- END: AQMWebUI::Dev
+
 
   void init() {
     WebUI::setTitle(AQM::settings.description+" ("+WebThing::settings.hostname+")");
-    WebUI::addMenuItems(Internal::Actions);
+    String actions = Internal::Actions;
+    if (AQM::settings.showDevMenu) {
+      actions += Internal::DEV_ACTION;
+    }
+    WebUI::addMenuItems(actions);
 
     WebUI::registerHandler("/", Pages::displayHomePage);
     WebUI::registerHandler("/ChartPage.html", Pages::displayChartPage);
@@ -161,6 +221,11 @@ namespace AQMWebUI {
 
     WebUI::registerHandler("/updateAQMConfig",  Endpoints::updateAQMConfig);
     WebUI::registerHandler("/getHistory",       Endpoints::getHistory);
+
+    WebUI::registerHandler("/dev",                Dev::displayDevPage);
+    WebUI::registerHandler("/dev/reboot",         Dev::reboot);
+    WebUI::registerHandler("/dev/settings",       Dev::yieldSettings);
+    WebUI::registerHandler("/dev/updateSettings", Dev::updateSettings);
 
     templateHandler = WebUI::getTemplateHandler();
   }
