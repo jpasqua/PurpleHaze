@@ -27,6 +27,7 @@ public:
   // ----- Settings
   String  description = "Air Quality Sensor"; // User's description of their AQ Sensor
   String  blynkAPIKey = "";                   // Your API Key from Blynk
+  bool showDevMenu = false;
 
 private:
   // ----- Constants -----
