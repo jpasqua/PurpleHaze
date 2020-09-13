@@ -107,7 +107,7 @@ namespace AQM {
 
     void configModeCallback(String &ssid, String &ip) {
       (void)ssid; (void)ip;
-      busyIndicator->setColor(255, 0, 0);
+      busyIndicator->setColor(0, 0, 255);
     }
 
     void processReadings() {
