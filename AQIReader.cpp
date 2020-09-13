@@ -64,6 +64,13 @@ Serial.println("Waking up the Sensor");
 }
 
 void AQIReader::emitHistoryAsJson(HistoryRange r, Stream& s) {
+  if (r == Range_Combined) {
+    s.print("{ \"hour\":"); emitHistoryAsJson(Range_1Hour, s); s.println(",");
+    s.print("  \"day\":");  emitHistoryAsJson(Range_1Day, s);  s.println(",");
+    s.print("  \"week\":"); emitHistoryAsJson(Range_1Week, s); s.println("}");
+    return;
+  }
+
   int32_t tzOffset = WebThing::getGMTOffset();
   uint16_t size = sizeOfRange(r);
   bool needsComma = false;
@@ -212,9 +219,7 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
   JsonArrayConst hourData = doc[F("hour")]["data"];
   for (JsonObjectConst reading : hourData) {
     data.timestamp = reading["ts"];
-Serial.print("tz: "); Serial.print(tzOffset); Serial.print(", dt: "); Serial.println(data.timestamp);
     data.timestamp += tzOffset;
- Serial.print("updated dt: "); Serial.println(data.timestamp);
     data.pm10_env = reading["pm10_env"];
     data.pm25_env = reading["pm25_env"];
     data.pm100_env = reading["pm100_env"];
@@ -239,10 +244,10 @@ Serial.print("tz: "); Serial.print(tzOffset); Serial.print(", dt: "); Serial.pri
     readings_1day.push(data);
   }
 
-Log.verbose("History as read from file:");
-emitHistoryAsJson(Range_1Hour, Serial);
-emitHistoryAsJson(Range_1Day, Serial);
-emitHistoryAsJson(Range_1Week, Serial);
+// Log.verbose("History as read from file:");
+// emitHistoryAsJson(Range_1Hour, Serial);
+// emitHistoryAsJson(Range_1Day, Serial);
+// emitHistoryAsJson(Range_1Week, Serial);
 }
 
 void AQIReader::storeHistoricalData(String historyFilePath) {
