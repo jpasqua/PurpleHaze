@@ -183,13 +183,13 @@ Internally this has the effect of changing the value of the `showDevMenu` settin
 
 **Viewing your settings**
 
-It can sometimes be useful to see all the settings in their JSON representation. The `/dev` page has a `View Settings` button which will return a page with the JSON representation of the settings. You can also get to this page directly with the url `http://[MultiMon_Adress]/dev/settings`. If you save these settings as a file named `settings.json` and place it in your `data` directory, it can be uploaded to your device using `ESP8266 Sketch Data Uploader`. There is no need to do this, but developers may find it useful to easily switch between batches of settings.
+It can sometimes be useful to see all the settings in their JSON representation. The `/dev` page has a `View Settings` button which will return a page with the JSON representation of the settings. You can also get to this page directly with the url `http://[AQM_Adress]/dev/settings`. If you save these settings as a file named `settings.json` and place it in your `data` directory, it can be uploaded to your device using `ESP8266 Sketch Data Uploader`. There is no need to do this, but developers may find it useful to easily switch between batches of settings.
 
 The `/dev` page also has a `View WebThing Settings` button which will return a page with the JSON representation of the WebThing settings. This includes things such as the hostname, API keys, and the web color scheme.
 
 **History**
 
-As mentioned above, *AQM* periodically saves historical information to flash memory. You can see that data in JSON format by pressing the `View History` button. You can also get to this data directly with the url `http://[MultiMon_Adress]/getHistory?range=combined`. You can also get just the hour-data, day data, or week data by substituting `hour`, `day`, or `week` as the range.
+As mentioned above, *AQM* periodically saves historical information to flash memory. You can see that data in JSON format by pressing the `View History` button. You can also get to this data directly with the url `http://[AQM_Adress]/getHistory?range=combined`. You can also get just the hour-data, day data, or week data by substituting `hour`, `day`, or `week` as the range.
 
 **Rebooting**
 
