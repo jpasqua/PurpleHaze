@@ -288,7 +288,7 @@ void AQIReader::logData(AQIReadings& data) {
   Log.verbose(F("---------------------------------------"));
   Log.verbose(F("PM 1.0: %d\t\tPM 2.5: %d\t\tPM 10: %d"), data.pm10_standard ,data.pm25_standard, data.pm100_standard);
   Log.verbose(F("---------------------------------------"));
-  Log.verbose(F("PM 1.0: %d\t\tPM 1.0: %d\t\tPM 10: %d"), data.pm10_env ,data.pm25_env, data.pm100_env);
+  Log.verbose(F("PM 1.0: %d\t\tPM 2.5: %d\t\tPM 10: %d"), data.pm10_env ,data.pm25_env, data.pm100_env);
   Log.verbose(F("---------------------------------------"));
   Log.verbose(F("Particles > 0.3um / 0.1L air:"), data.particles_03um);
   Log.verbose(F("Particles > 0.5um / 0.1L air:"), data.particles_05um);
