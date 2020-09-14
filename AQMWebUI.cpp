@@ -29,7 +29,9 @@ namespace AQMWebUI {
   namespace Internal {
     String Actions =
       "<a class='w3-bar-item w3-button' href='/displayAQMConfig'>"
-      "<i class='fa fa-cog'></i> Configure AQM</a>";
+      "<i class='fa fa-cog'></i> Configure AQM</a>"
+      "<a class='w3-bar-item w3-button' href='/ChartPage.html'>"
+      "<i class='fa fa-bar-chart'></i> Charts</a>";
     String DEV_ACTION =
       "<a class='w3-bar-item w3-button' href='/dev'>"
       "<i class='fa fa-gears'></i> Dev Settings</a>";
