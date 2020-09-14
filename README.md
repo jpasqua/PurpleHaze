@@ -151,7 +151,7 @@ Now that the General Settings are out of the way, you can adjust settings that a
 
 - **Description**: A description that is useful to the user. For example, the location of the device like "Back Yard" or "Inside".
 - **Blynk API Key**: An API key established by the user when configuring the Blynk app.
-- **Chart Colors**: The charts page shows historical data in the form of line charts. Each chart shows three readings and you can customize the colors of the lines. The background of the chart displays color bands that correspond to the air quality (green, yellow, and various shades of red). These can be changed in `data/ChartPage.html`, but not in the Web UI.
+- **Chart Colors**: The [charts page](#charts) shows historical data in the form of line charts. Each chart shows three readings and you can customize the colors of the lines. The background of the chart displays color bands that correspond to the air quality (green, yellow, and various shades of red). These can be changed in `data/ChartPage.html`, but not in the Web UI.
 
 
 ## Using AQM
@@ -165,7 +165,7 @@ Now that the General Settings are out of the way, you can adjust settings that a
 | 🟠 Orange|Unhealthy for Sensitive Groups|101 - 150|Members of sensitive groups may experience health effects. The general public is less likely to be affected.|
 | 🔴 Red|Unhealthy|151 - 200|Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects.|
 | 🟣 Purple|Very Unhealthy|201 - 300|Health alert: The risk of health effects is increased for everyone.|
-| 🟣 Maroon|Hazardous|301+|Health warning of emergency conditions: everyone is more likely to be affected.|
+| ⚫ Maroon|Hazardous|301+|Health warning of emergency conditions: everyone is more likely to be affected.|
 
 
 ### Viewing AQM data on your phone
@@ -189,17 +189,18 @@ You're already familiar with the Web UI since you used it to configure *AQM*. Wh
 
 Below that you'll see a widget from [AirNow.gov](airnow.gov) that shows data for your area. Note that this data does not reflect the reading of your device.
 
-At the top of the page you'll see two links right next to the title of the AirQuality Index table. The links are labeled "charts" and "Satellite Image".
+At the top of the page you'll see two links right next to the title of the `Air Quality Index` table. The links are labeled "charts" and "Satellite Image". You can also access charts [via the menu](#charts). If you click the "Satellite Image" link, a new window or tab will open with a satellite image centered over your location. That is, the location you entered in the *AQM* Web UI. This page does not contain any information from your sensor. It is useful to visualize any major events (e.g. fires) that may be impacting your air quality.
 
-#### Charts
-Click the first will take you to a page with several charts displaying AQM historical data. In each chart you will see a line for PM10, PM25, and PM100 data. The charts cover different time frames: the last hour, the last day, and the last week. Hover your mouse over a dot on the chart to see the precise value and time it was recorded. Note that when you first turn on your device, there will be no historical data so the charts won't be very interesting. Over time they will fill up with data.
+<a name="charts"></a>
+![](doc/images/Charts.png)
 
-#### Satellite Image
+The Charts page displays several charts displaying AQM historical data. In each chart you will see a line for PM10, PM25, and PM100 data. The charts cover different time frames: the last hour, the last day, and the last week. Hover your mouse over a dot on the chart to see the precise value and time it was recorded. Note that when you first turn on your device, there will be no historical data so the charts won't be very interesting. Over time they will fill up with data.
 
-If you click on the Satellite Image link a new window will open with a satellite image centered over your location. That is, the location you entered in the *AQM* Web UI. This page does not contain any information from your sensor. It is useful to visualize any major events (e.g. fires) that may be impacting your air quality.
+[<img src="doc/images/ChartPage.png" width="250">](doc/images/ChartPage.png)
+
 
 <a name="indicators"></a>
-### Understanding the Indicator LEDs
+### Viewing the Indicator LEDs
 
 If you have added indicator LEDs, they will display information as follows:
 
@@ -244,19 +245,23 @@ Finally, the `/dev` page also has a `Request Reboot` button. If you press the bu
 
 ### Tips
 
-#### Settings
+**Settings**
 
 During development you may be uploading sketch data from time to time. When you do this, it overwrites the entire SPIFFS file system on the ESP8266. This means any settings that you have customized through the web interface will be wiped out. This gets annoying, but you can work around it in two ways:
 
 1. [Not Recommnded] Change the *AQM* code and the WebThing library to hard-wire your default settings.
 2. [Recommended] Configure *AQM* the way you like it. From the developer menu, click on the `View Settings` button to get your settings as JSON. Save the text into a file named `settings.json` and put it into your data directory. Do the same thing by pressing the `View WebThing Settings` button and save that text into `data/wt/settings.json` From that point forward, any time you upload sketch data, your preferred settings will be uploaded also.
 
-#### History
+**History**
 
 The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *AQM* saves the historical data for the last hour (with readings every 10 minutes), the last day (with readings every hour), and the last week (with readings every day).
 
 Uploading new versions of the code will not overwrite the history, but uploading new data files will. You can preserve your history in similar way as just described for settings. From the developer menu, click on the `View History` button. This will return your history as JSON. Save the text into a file named `history.json` and put it into your data directory. When you upload sketch data, the history will also be uploaded.
 
-#### Indicators
+**Indicators**
 
 You can use the indicator LEDs to help you debug if you are not connected to the serial monitor. You can give limited status information by setting any of the indicators to a specific color to indicate what state the device is in.
+
+**Rebooting**
+
+When you need to restart the device, it is best to power cycle your ESP8266 and PMS5003 rather than just hitting the reset button. I've noticed situations where the ESP has a hard time resyncing with the sensor after a reset (as opposed to a power-cycle).
