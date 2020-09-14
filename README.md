@@ -2,7 +2,7 @@
 
 This is a simple Air Quality Monitor based on the [Plantower PMS5003](https://www.adafruit.com/product/3686). You build some electronics, 3D-print a case, load this software, configure an app on your phone, and you're all set. What could be simpler? This software relies on the [Blynk](https://blynk.io) service to collect data in the cloud and make it available to the app on your phone. In the future, other services may be supported.
 
-The weather station is configured using a Web User Interface where the user will specify information such as:
+The air quality monitor is configured using a Web User Interface where the user will specify information such as:
 
 * The location of the air quality monitor
 * API keys for the underlying services (like Blynk)
@@ -30,7 +30,7 @@ The following libraries are used in the browser. you do not need to download or 
 ### Services
 The following services play a role in providing parts of the functionality:
 
- - [Blynk](https://blynk.io): Provides a repository of weather data and the ability to view using a mobile app. Without this you will only be able to see current values via the we interface.
+ - [Blynk](https://blynk.io): Provides a repository of air quality data and the ability to view it using a mobile app. Whether or not you use Blynk, you can still view data directly using a web browser.
  - Services used by WebThing
 	 - [Google Maps](https://developers.google.com/maps/documentation): Used for geocoding and reverse geocoding. Though not absolutely necessary, it does make using the system a bit more convenient.
 	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data. This is used to timestamp data.
@@ -50,6 +50,7 @@ The directory structure of the project is shown below. You don't need to know th
                 [HTML page templates for WebThing]
         /doc
             /images
+                [images used in the documentation, not by the code]
 ````
 
 ### Code Structure
@@ -78,15 +79,18 @@ The primary components of this project are a [Plantower PMS5003](https://www.ada
 
 In its simplest form, *AQM* is simply an ESP8266 connected to the PMS5003 sensor with 2 pins used for serial communications along with power (5V and ground). Logic levels between the PMS5003 and the ESP8266 are 3.3V.
 
-A PCB is in development now. It is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Once the board is tested, I will post the [Gerber](https://en.wikipedia.org/wiki/Gerber_format) files so you can have your own fabricated.
+A PCB is in development now. It is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Here is the prototype (bare and populated):
+
+[<img src="doc/images/PCB_Bare.jpg" width="250">](doc/images/PCB_Bare.jpg)
+[<img src="doc/images/PCB_Populated.jpg" width="250">](doc/images/PCB_Populated.jpg)
+
+Once the board is tested, I will post the [Gerber](https://en.wikipedia.org/wiki/Gerber_format) files so you can have your own fabricated.
 
 If you are not using a PCB, the wiring is still very simple. The [attached schematic](doc/images/Schematic.svg) shows the wiring. The NeoPixel LEDs are optional. If you are *not* using the LEDs, set `NEOPIXEL_PIN` to `-1` in `HWConfig.h`.
 
 ### 3D Model
 
-A housing for `AQM` is in development and will be posted on thingiverse when complete.
-
- - [Original](https://www.thingiverse.com/thing:XYZ)
+A housing for `AQM` is in development and will be posted on [thingiverse](http://thingiverse.com) when complete.
 
 <a name="software"></a>
 ### Software
@@ -108,14 +112,14 @@ Before you get started, you will need API keys for the services mentioned above 
 
 <a name="connecting-to-your-network"></a>
 ### Connecting to your network
-Once you have assembled your hardware and loaded the firmware, the weather station will boot and create its own WiFi access point. Connect to the new access point you will see on your phone or computer's wifi connection list. It will have an SSID of the form `aqmnnnnnn`. Once you do, you will enter a "captive portal" where you can configure the weather station for your actual WiFi base station. When you've done that, you can reset the weather station and it will connect to your wifi network.
+Once you have assembled your hardware and loaded the firmware, the monitor will boot and create its own WiFi access point. Connect to the new access point you will see on your phone or computer's wifi connection list. It will have an SSID of the form `aqmnnnnnn`. Once you do, you will enter a "captive portal" where you can configure the device for your actual WiFi base station. Shortly after you've done that, *AQM* will automatically connect to your wifi network. If it does not, then power cycle the device.
 
 At this point it will make a web interface available. You can connect using either an IP address or a hostname:
 
-- **IP Access**: You need to determine the IP Address used by the weather station. You have a couple of choices here:
+- **IP Access**: You need to determine the IP Address used by the device. You have a couple of choices here:
     - If you are still connected via USB, you will see the IP address in the Arduino Serial Monitor
     - You can use a scanning tool or your router to look for the device on your network
-- **Hostname**: If your system supports mDNS (e.g. a Mac or a Raspberry Pi running avahi) you can connect to hostname.local in your browser. Hostname will either be a name that you set in Settings.h or a name of the form `aqmnnnnnn `.
+- **Hostname**: If your system supports mDNS (e.g. a Mac or a Raspberry Pi running avahi) you can connect to hostname.local in your browser. Hostname will be of the form `aqmnnnnnn`.
 
 
 ### Configuring AQM
@@ -134,24 +138,35 @@ These settings are common to many network connected devices and are encapsulated
 * Web Server Settings:
 	* **Hostname**: A network name for your *AQM* device. If you configure a name such as `AQM`, then you can access your device from a browser using the address `http://AQM.local` rather than using the IP address. This only works on systems that have support for mDNS. This is native on Macs but can be added to Linux and Windows with software such as [Avahi](https://github.com/lathiat/avahi).
 	* **Port**: The port that *AQM* will listen on. Usually 80 unless you've got a good reason.
-* Location Settings: For * AQM* the location settings are used to determine the proper time zone. The city for which weather is shown may be anywhere and is not required to be the same location as you enter here.
+* Location Settings:
 	* **Latitude, Longitude, Elevation**: In *AQM*, these are only used to determine your time zone (for this purpose elevation is not important).
-	* **Address** / Geocode: Since you probably don't know your lat/lon and elevation, enter an address in the Address field and press the Geocode button. Assuming you have already saved your Google Maps API key, the address will be translated to lat/lon and elevation. If you prefer not to create a Google Maps key, you can find your lat/lon manually as [described here](https://support.google.com/maps/answer/18539?co=GENIE.Platform%3DDesktop&hl=en).
+	* **Address** / Geocode: Since you probably don't know your lat/lon and elevation, enter an address in the Address field and press the Geocode button. Assuming you have already saved your Google Maps API key, the address will be translated to lat/lon and elevation. If you prefer not to create a Google Maps key, you can find your lat/lon manually as [described here](https://support.google.com/maps/answer/18539).
 * **Theme Color**: Choose a theme for the Web UI that suits your style. The themes are all from the [W3.CSS](https://www.w3schools.com/w3css/w3css_color_themes.asp) set.
-* **Indicator LED**: Ignore this section. *AQM* has a more flexible indicator LED capability.
+* **Indicator LED**: Ignore this section. *AQM* has a more flexible [indicator LED capability](#indicators).
 
 <a name="configure-AQM"></a>
 ![](doc/images/ConfigureAQM.png) 
 
 Now that the General Settings are out of the way, you can adjust settings that are specfic to *AQM*:
 
-- **Description**: A description that is useful to the user. For example, the location of the weather station like "Back Yard" or "Garden".
+- **Description**: A description that is useful to the user. For example, the location of the device like "Back Yard" or "Inside".
 - **Blynk API Key**: An API key established by the user when configuring the Blynk app.
+- **Chart Colors**: The charts page shows historical data in the form of line charts. Each chart shows three readings and you can customize the colors of the lines. The background of the chart displays color bands that correspond to the air quality (green, yellow, and various shades of red). These can be changed in `data/ChartPage.html`, but not in the Web UI.
 
 
 ## Using AQM
 
-*AQM* lets you view your air quality data on your phone or with a web browser. The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *AQM* saves the historical data for the last hour (with readings every 10 minutes), the last day (with readings every hour), and the last week (with readings every day). Uploading new versions of the code will not overwrite the history, but uploading new data files will.
+*AQM* lets you view your air quality data on your phone or with a web browser. But what do all these numbers mean? There are many resources available to help you understand the data; for example, [this page](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics) on the US EPA website. The following table summarizes the air quality index values at a high level (adapted from [AirNow.gov](https://www.airnow.gov/aqi/aqi-basics/))
+
+|Color|Concern|Range|Description of Air Quality|
+|--- |--- |--- |--- |
+| 🟢 Green|Good|0 to 50|Air quality is satisfactory, and air pollution poses little or no risk.|
+| 🟡 Yellow |Moderate|51 - 100|Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution.|
+| 🟠 Orange|Unhealthy for Sensitive Groups|101 - 150|Members of sensitive groups may experience health effects. The general public is less likely to be affected.|
+| 🔴 Red|Unhealthy|151 - 200|Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects.|
+| 🟣 Purple|Very Unhealthy|201 - 300|Health alert: The risk of health effects is increased for everyone.|
+| 🟣 Maroon|Hazardous|301+|Health warning of emergency conditions: everyone is more likely to be affected.|
+
 
 ### Viewing AQM data on your phone
 
@@ -160,15 +175,47 @@ To use your phone, you'll need the Blynk App for [iPhone](https://itunes.apple.c
 1. Download the appropriate app using the links above.
 2. Open the Blynk app and create a new Blynk account if you don't have one already.
 3. Touch the QR code icon at the top of the screen.
-4. Scan the QR code below. This will load the Solar Weather Station app which you may customize if you wish using the Blynk app (no coding required).
-5. Blynk will send you an "Auth Token" via email. Enter this in the settings screen of the web interface in the field labeled "Blynk API Key". Hit save and restart the weather station.
+4. Scan the QR code below. This will load the AirQuality Monitoring configuration which you may customize if you wish using the Blynk app (no coding required).
+5. Blynk will send you an "Auth Token" via email. Enter this in the settings screen of the web interface in the field labeled "Blynk API Key". Hit save and restart the device.
 6. Use the Blynk app to see current and historical values.
 
 Blynk QR Code:<br><img src="doc/images/BlynkQRCode.png" width="250" /></img><br>
 
 ### Viewing AQM data in your browser
 
-You're already familiar with the Web UI since you used it to configure *AQM*. Whenever you go to the *AQM*'s address in your browser, you will be presented with a home page that shows a variety of current and historical data from your monitor. You'll also see a link to a *charts* page. Click on this link to see historical graphs for the last hour, the last day, and the last week.
+![](doc/images/Home.png)
+
+You're already familiar with the Web UI since you used it to configure *AQM*. Whenever you navigate to *AQM* in your browser, you will be presented with a home page that shows a variety of current and historical data from your monitor. Refer to the resources above to understand what all these values mean. All of the readings show you the values as of the time displayed at the top of the page, except for the table of moving averages. These will, as the name implies, show you the average PM25 Environmental values for the last 10 minutes, 30 minutes, hour, and 6 hour periods.
+
+Below that you'll see a widget from [AirNow.gov](airnow.gov) that shows data for your area. Note that this data does not reflect the reading of your device.
+
+At the top of the page you'll see two links right next to the title of the AirQuality Index table. The links are labeled "charts" and "Satellite Image".
+
+#### Charts
+Click the first will take you to a page with several charts displaying AQM historical data. In each chart you will see a line for PM10, PM25, and PM100 data. The charts cover different time frames: the last hour, the last day, and the last week. Hover your mouse over a dot on the chart to see the precise value and time it was recorded. Note that when you first turn on your device, there will be no historical data so the charts won't be very interesting. Over time they will fill up with data.
+
+#### Satellite Image
+
+If you click on the Satellite Image link a new window will open with a satellite image centered over your location. That is, the location you entered in the *AQM* Web UI. This page does not contain any information from your sensor. It is useful to visualize any major events (e.g. fires) that may be impacting your air quality.
+
+<a name="indicators"></a>
+### Understanding the Indicator LEDs
+
+If you have added indicator LEDs, they will display information as follows:
+
+| LED        	| Color              	| Description
+|------------	|--------------------	|-------------------------------------
+| 1: Quality 	| Off                	| No power to the device
+|            	| Gray               	| No data has been read yet 
+|            	| Green, Yellow, Red 	| The shade indicates the air quality
+| 2: Sensor  	| Off                	| Sensor is asleep
+|            	| Yellow             	| Sensor is waking up
+|            	| Green              	| Sensor is awake
+|            	| Purple             	| Stabilizing                         
+| 3: Status  	| Off                	| No activity
+|            	| Red                	| Problem initializing
+|            	| Blue               	| No wifi has been configured
+|            	| Green              	| Processing readings
 
 <a name="dev-info"></a>
 ## Operational Info for Developers
@@ -195,6 +242,21 @@ As mentioned above, *AQM* periodically saves historical information to flash mem
 
 Finally, the `/dev` page also has a `Request Reboot` button. If you press the button you will be presented with a popup in your browser asking if you are sure. If you confirm, your *AQM* device will immediately reboot as if the reset button had been pressed.
 
+### Tips
 
+#### Settings
 
+During development you may be uploading sketch data from time to time. When you do this, it overwrites the entire SPIFFS file system on the ESP8266. This means any settings that you have customized through the web interface will be wiped out. This gets annoying, but you can work around it in two ways:
 
+1. [Not Recommnded] Change the *AQM* code and the WebThing library to hard-wire your default settings.
+2. [Recommended] Configure *AQM* the way you like it. From the developer menu, click on the `View Settings` button to get your settings as JSON. Save the text into a file named `settings.json` and put it into your data directory. Do the same thing by pressing the `View WebThing Settings` button and save that text into `data/wt/settings.json` From that point forward, any time you upload sketch data, your preferred settings will be uploaded also.
+
+#### History
+
+The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *AQM* saves the historical data for the last hour (with readings every 10 minutes), the last day (with readings every hour), and the last week (with readings every day).
+
+Uploading new versions of the code will not overwrite the history, but uploading new data files will. You can preserve your history in similar way as just described for settings. From the developer menu, click on the `View History` button. This will return your history as JSON. Save the text into a file named `history.json` and put it into your data directory. When you upload sketch data, the history will also be uploaded.
+
+#### Indicators
+
+You can use the indicator LEDs to help you debug if you are not connected to the serial monitor. You can give limited status information by setting any of the indicators to a specific color to indicate what state the device is in.
