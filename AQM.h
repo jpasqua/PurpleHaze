@@ -20,6 +20,7 @@ namespace AQM {
   extern AQIReader aqiReader;
   
   char* formattedTime(time_t theTime);
+  void setIndicatorBrightness(uint8_t b); // 0-100%
 }
 
 #endif  // AQM_h

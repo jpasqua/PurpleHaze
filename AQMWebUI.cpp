@@ -107,6 +107,7 @@ namespace AQMWebUI {
       auto mapper =[](String &key) -> String {
         if (key == "DESC") return WebThing::encodeAttr(AQM::settings.description);
         if (key == "BLYNK_KEY")  return AQM::settings.blynkAPIKey;
+        if (key == "I_BRIGHT")  return String(AQM::settings.iBright);
         if (key == "PM10_CLR")  return AQM::settings.chartColors.pm10;
         if (key == "PM25_CLR")  return AQM::settings.chartColors.pm25;
         if (key == "PM100_CLR")  return AQM::settings.chartColors.pm100;
@@ -146,7 +147,7 @@ namespace AQMWebUI {
     //        so that it can take any appropriate actions
     //
     // Form:
-    //    GET /updateAQMConfig?description=DESC&useMetric=BOOL&...
+    //    GET /updateAQMConfig?description=DESC&iBright=INT&...
     //
     void updateAQMConfig() {
       if (!WebUI::authenticationOK()) { return; }
@@ -154,6 +155,7 @@ namespace AQMWebUI {
 
       AQM::settings.description = WebUI::arg("description");
       AQM::settings.blynkAPIKey = WebUI::arg("blynkAPIKey");
+      AQM::settings.iBright = (constrain(WebUI::arg("iBright").toInt(), 0, 100));
       AQM::settings.chartColors.pm10 = WebUI::arg("pm10Color");
       AQM::settings.chartColors.pm25 = WebUI::arg("pm25Color");
       AQM::settings.chartColors.pm100 = WebUI::arg("pm100Color");
@@ -161,6 +163,7 @@ namespace AQMWebUI {
 
       // The description MAY have changed. Update the title just in case
       WebUI::setTitle(AQM::settings.description+" ("+WebThing::settings.hostname+")");
+      AQM::setIndicatorBrightness(AQM::settings.iBright);
 
       WebUI::redirectHome();
     }

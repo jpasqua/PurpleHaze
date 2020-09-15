@@ -69,13 +69,14 @@ namespace AQM {
 
     void prepIO() {
       if (NEOPIXEL_PIN == -1) {
+        indicators = NULL;
         qualityIndicator = new Indicator();
         sensorIndicator = new Indicator();
         busyIndicator = new Indicator();
       } else {
         indicators = new NeoPixelIndicators(NEOPIXEL_PIN, 3);
         indicators->begin();
-        indicators->setBrightness(128);
+        indicators->setBrightness(settings.iBright);
         NeoPixelIndicator* npi;
         npi = new NeoPixelIndicator(); npi->begin(indicators, 0); qualityIndicator = npi;
         npi = new NeoPixelIndicator(); npi->begin(indicators, 1); sensorIndicator = npi;
@@ -141,6 +142,10 @@ namespace AQM {
    * Exported Functions
    *
    *----------------------------------------------------------------------------*/
+
+  void setIndicatorBrightness(uint8_t b) {
+    if (indicators) indicators->setBrightness((b*255L)/100);
+  }
 
   char *formattedTime(time_t theTime) {
     static char dateTime[19];
