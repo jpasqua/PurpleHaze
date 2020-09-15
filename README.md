@@ -151,6 +151,7 @@ Now that the General Settings are out of the way, you can adjust settings that a
 
 - **Description**: A description that is useful to the user. For example, the location of the device like "Back Yard" or "Inside".
 - **Blynk API Key**: An API key established by the user when configuring the Blynk app.
+- **Indicator Brightness**: If your device incorporates indicator LEDs, this sets their brightness in the range from 0-100%.
 - **Chart Colors**: The [charts page](#charts) shows historical data in the form of line charts. Each chart shows three readings and you can customize the colors of the lines. The background of the chart displays color bands that correspond to the air quality (green, yellow, and various shades of red). These can be changed in `data/ChartPage.html`, but not in the Web UI.
 
 
