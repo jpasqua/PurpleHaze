@@ -32,6 +32,7 @@ public:
     String pm25 = "#4e7a27";
     String pm100 = "#0042aa";
   } chartColors;
+  uint8_t iBright = 50;                       // Brightness of indicators (0-100%)
   bool showDevMenu = false;
 
 private:
