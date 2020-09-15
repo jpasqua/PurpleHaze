@@ -36,7 +36,10 @@ public:
     }
   }
 
-  void setBrightness(uint8_t b) { leds->setBrightness(b); }
+  void setBrightness(uint8_t b) {
+    leds->setBrightness(b);
+    leds->show();
+  }
 
 private:
   uint8_t _pin = 0;
