@@ -30,9 +30,9 @@ void AQMSettings::fromJSON(JsonDocument &doc) {
   blynkAPIKey = doc["blynkAPIKey"].as<String>();
   showDevMenu = doc[F("showDevMenu")];
   iBright = doc[F("iBright")];
-  chartColors.pm10 = doc["pm10Color"].as<String>();
-  chartColors.pm25 = doc["pm25Color"].as<String>();
-  chartColors.pm100 = doc["pm100Color"].as<String>();
+  chartColors.pm10 = doc["chartColors"]["pm10"].as<String>();
+  chartColors.pm25 = doc["chartColors"]["pm25"].as<String>();
+  chartColors.pm100 = doc["chartColors"]["pm100"].as<String>();
   logSettings();
 }
 
@@ -41,9 +41,9 @@ void AQMSettings::toJSON(JsonDocument &doc) {
   doc["blynkAPIKey"] = blynkAPIKey;
   doc[F("showDevMenu")] = showDevMenu;
   doc[F("iBright")] = iBright;
-  doc["pm10Color"] = chartColors.pm10;
-  doc["pm25Color"] = chartColors.pm25;
-  doc["pm100Color"] = chartColors.pm100;
+  doc["chartColors"]["pm10"] = chartColors.pm10;
+  doc["chartColors"]["pm25"] = chartColors.pm25;
+  doc["chartColors"]["pm100"] = chartColors.pm100;
 
 }
 
