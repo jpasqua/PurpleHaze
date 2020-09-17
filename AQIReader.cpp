@@ -6,7 +6,7 @@
 
 const uint32_t AQIReader::ColorForState[] = {
   0x00FF00, // awake
-  0x8634EB, // awakeButPending
+  0x8634EB, // retrying
   0xFFA500, // waking
   0x000000  // asleep
 };
@@ -32,33 +32,6 @@ bool AQIReader::init(Stream* streamToSensor, Indicator* indicator) {
   }
   loadHistoricalData(HistoryFilePath);
 
-//#define MOCK_HISTORY
-#ifdef MOCK_HISTORY
-  AQIReadings data;
-  data.pm10_standard = 26;
-  data.pm25_standard = 42;
-  data.pm100_standard = 50;
-  data.pm10_env = 23;
-  data.pm25_env = 37;
-  data.pm100_env = 48;
-  data.particles_03um = 4668;
-  data.particles_05um = 1335;
-  data.particles_10um = 282;
-  data.particles_25um = 30;
-  data.particles_50um = 8;
-  data.particles_100um = 8;
-
-  data.timestamp = 1599755402L - (1 * 7 * 24 * 65 * 60L);  // A week ago (+ 5 minutes)
-  for (int i = 0; i < 7*24*6; i++) {
-    updateHistoricalData(data);
-    data.timestamp += 10 * 60L;
-    data.pm10_env = max(data.pm10_env+random(-1, 2), 5);
-    data.pm25_env = max(data.pm25_env+random(-1, 2), 5);
-    data.pm100_env = max(data.pm100_env+random(-1, 2), 5);
-  }
-#endif  // MOCK_HISTORY
-
-Serial.println("Waking up the Sensor");
   enterState(waking);
   return true;
 }
@@ -95,11 +68,7 @@ void AQIReader::process(time_t wallClock) {
 
   switch (state) {
     case asleep:
-      if (elapsed > (4*60+30)*1000L) {
-        aqi->wakeUp();
-        enterState(waking);
-        Log.verbose("Hey, wake up!");
-      }
+      if (elapsed > (4*60+30)*1000L) { enterState(waking); }
       return;
     case waking:
       if (elapsed > 30*1000L) {
@@ -107,10 +76,9 @@ void AQIReader::process(time_t wallClock) {
         Log.verbose("Ok, OK, I'm awake");
       }
       return;
-    case awakeButPending:
+    case retrying:
       if (elapsed < 500L) return;
       enterState(awake);
-      // Log.verbose("OK, let's try again...");
       // NOTE: No break or return. Fall through!!!
     case awake:
       // Log.verbose("About to read");
@@ -121,7 +89,7 @@ void AQIReader::process(time_t wallClock) {
     data.timestamp = wallClock;
     logData(data);
   } else {
-    enterState(awakeButPending);
+    enterState(retrying);
 Serial.print('.');
     return;
   }
@@ -130,9 +98,7 @@ Serial.print('.');
   updateHistoricalData(data);
   logAvgs();
 
-  aqi->sleep();
   enterState(asleep);
-  Log.verbose("\nGood night...");
 }
 
 uint16_t AQIReader::sizeOfRange(HistoryRange r) {
@@ -164,6 +130,13 @@ void AQIReader::enterState(State newState) {
   state = newState;
   enteredStateAt = millis();
   _indicator->setColor(ColorForState[state]);
+  if (state == waking) {
+    Log.verbose("Hey, wake up!");
+    aqi->wakeUp();
+  } else if (state == asleep) {
+    Log.verbose("\nGood night...");
+    aqi->sleep();
+  }
 }
 
 void AQIReader::updateHistoricalData(AQIReadings& newSample) {
@@ -303,12 +276,9 @@ void AQIReader::logAvgs() {
   Log.verbose("-- %s --", WebThing::formattedInterval(
     hour(data.timestamp), minute(data.timestamp), second(data.timestamp), true, true).c_str());
   Log.verbose(F("Last 30 Minutes: %F"), pm25_env_30min.getAverage());
-  Log.verbose(F("Last 30 Minutes: %F"), pm25_env_1hr.getAverage());
-  Log.verbose(F("Last 30 Minutes: %F"), pm25_env_6hr.getAverage());
-  Log.verbose(F("Last 30 Minutes: %F"), pm25_env_1day.getAverage());
-  Log.verbose(F("Last 30 Minutes: %F"), pm25_env_1week.getAverage());
+  Log.verbose(F("Last 1 hour: %F"), pm25_env_1hr.getAverage());
+  Log.verbose(F("Last 6 hours: %F"), pm25_env_6hr.getAverage());
+  Log.verbose(F("Last 1 day: %F"), pm25_env_1day.getAverage());
+  Log.verbose(F("Last 1 week: %F"), pm25_env_1week.getAverage());
 }
 
-void AQIReader::logHistory() {
-  // TO DO: Implement Me!!
-}

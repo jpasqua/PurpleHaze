@@ -10,10 +10,7 @@
 
 class AQIReader {
 public:
-  enum State {awake, awakeButPending, waking, asleep};
-
   AQIReader();
-  State getState() { return state; }
   AQIReadings getLastReadings() { return data; }
   
   // Moving averages
@@ -35,10 +32,10 @@ public:
 
   void logData(AQIReadings& data);
   void logAvgs();
-  void logHistory();
 
 
 private:
+  enum State {awake, retrying, waking, asleep};
   static const uint32_t ColorForState[];
 
   PMS5003* aqi;
