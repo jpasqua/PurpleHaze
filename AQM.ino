@@ -113,7 +113,6 @@ namespace AQM {
 
     void processReadings() {
       static uint32_t lastTimestamp = 0;
-      static uint32_t nextHistoryLog = millis() + 6 * 60 * 1000L;
 
       latestData = aqiReader.getLastReadings();
       if (latestData.timestamp == lastTimestamp) return;
@@ -125,10 +124,6 @@ namespace AQM {
         if (quality < QualityBrackets[bracketIndex]) break;
       }
       qualityIndicator->setColor(QualityColors[bracketIndex]);
-      if (millis() > nextHistoryLog) {
-        aqiReader.logHistory();
-        nextHistoryLog = millis() + 6 * 60 * 1000L;
-      }
 
       AQMBlynk::update();
       lastTimestamp = latestData.timestamp;
