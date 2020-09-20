@@ -1,6 +1,6 @@
 # AQM - Air Quality Monitor
 
-This is a simple Air Quality Monitor based on the [Plantower PMS5003](https://www.adafruit.com/product/3686). You build some electronics, 3D-print a case, load this software, configure an app on your phone, and you're all set. What could be simpler? This software relies on the [Blynk](https://blynk.io) service to collect data in the cloud and make it available to the app on your phone. In the future, other services may be supported.
+This is a simple Air Quality Monitor based on the [Plantower PMS5003](https://www.adafruit.com/product/3686). You build some electronics, 3D-print a case, load this software, configure an app on your phone, and you're all set. What could be simpler? This software relies on the [Blynk](https://blynk.io) service to collect data in the cloud and make it available to the app on your phone. If you don't want to use Blynk, you can get the readings directly from *AQM* in your web browser. In the future, other services may be supported.
 
 The air quality monitor is configured using a Web User Interface where the user will specify information such as:
 
@@ -195,7 +195,9 @@ At the top of the page you'll see two links right next to the title of the `Air 
 <a name="charts"></a>
 ![](doc/images/Charts.png)
 
-The Charts page displays several charts displaying AQM historical data. In each chart you will see a line for PM10, PM25, and PM100 data. The charts cover different time frames: the last hour, the last day, and the last week. Hover your mouse over a dot on the chart to see the precise value and time it was recorded. Note that when you first turn on your device, there will be no historical data so the charts won't be very interesting. Over time they will fill up with data.
+The Charts page displays several charts displaying AQM historical data. In each chart you will see a line for PM10, PM25, and PM100 data. The charts cover three different time frames: the last hour, the last day, and the last week. Hover your mouse over a dot on the chart to see the precise value and time it was recorded. For any of the charts, if you click on the legend of one of the lines, it will toggle that line's visibility in the graph. For example, if you just want to see the PM25 day, click on the legend items for PM10 and PM100 and those lines will disappear. Click them again and they will return.
+
+Note that when you first turn on your device, there will be no historical data so the charts won't be very interesting. Over time they will fill up with data.
 
 [<img src="doc/images/ChartPage.png" width="250">](doc/images/ChartPage.png)
 

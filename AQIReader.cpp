@@ -12,7 +12,7 @@ const uint32_t AQIReader::ColorForState[] = {
 };
 
 static const String HistoryFilePath = "/history.json";
-static const uint32_t MaxHistoryFileSize = 4096;
+static const uint32_t MaxHistoryFileSize = 8192;
 
 AQIReader::AQIReader() {
   aqi = new PMS5003();
@@ -164,10 +164,11 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
   File historyFile = SPIFFS.open(historyFilePath, "r");
 #pragma GCC diagnostic pop
 
+  size_t size = 0;
   if (!historyFile) {
     Log.error(F("Failed to open history file for read: %s"), historyFilePath.c_str());
   } else {
-    size_t size = historyFile.size();
+    size = historyFile.size();
     if (size > MaxHistoryFileSize) {
       Log.warning(F("History file is too big: %d"), size);
       return;
@@ -178,7 +179,7 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
   auto error = deserializeJson(doc, historyFile);
   historyFile.close();
   if (error) {
-    Log.warning(F("Failed to parse history file: %s"), error.c_str());
+    Log.warning(F("Failed to parse history file: %s. Size: %d"), error.c_str(), size);
     return;
   }
 
