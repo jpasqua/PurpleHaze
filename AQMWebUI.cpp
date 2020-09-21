@@ -210,16 +210,6 @@ namespace AQMWebUI {
       delete doc;
     }
 
-    void yieldHistory() {
-      Log.trace(F("Web Request: /dev/settings"));
-      if (!WebUI::authenticationOK()) { return; }
-
-      DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
-                                                         AQM::settings.asJSON();
-      WebUI::sendJSONContent(doc);
-      doc->clear();
-      delete doc;
-    }
   }   // ----- END: AQMWebUI::Dev
 
 
@@ -232,7 +222,7 @@ namespace AQMWebUI {
     WebUI::addMenuItems(actions);
 
     WebUI::registerHandler("/", Pages::displayHomePage);
-    WebUI::registerHandler("/ChartPage.html", Pages::displayChartPage);
+    WebUI::registerHandler("/ChartPage.html",   Pages::displayChartPage);
     WebUI::registerHandler("/displayAQMConfig", Pages::displayAQMConfig);
 
     WebUI::registerHandler("/updateAQMConfig",  Endpoints::updateAQMConfig);
