@@ -87,10 +87,12 @@ All of the components can be wired together point-to-point, or assembled onto a 
 
 [<img src="doc/images/Protoboard.jpg" width="250">](doc/images/Protoboard.jpg)
 
-A PCB design is also available in the resources directory. As can be see in the images below, it is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Be careful - there are LEDs that look the same but whose pins are in a different order. Also note that the D1 Mini can be mounted on the top of the board as shown in the image, or below the board with the heards on the top if the D1 rather than the bottom. In the 3D model you'll find that the D1 is mounted on the bottom. The same is true for the sensor header.
+A PCB design is also available in the resources directory. As can be see in the images below, it is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Be careful - there are LEDs that look the same but whose pins are in a different order. Also note that the D1 Mini can be mounted on the top of the board as shown in the image, or below the board with the headers on the top if the D1 rather than the bottom. In the 3D model you'll find that the D1 is mounted on the bottom. The same is true for the sensor header.
 
 [<img src="doc/images/PCB_Bare.jpg" width="250">](doc/images/PCB_Bare.jpg)
 [<img src="doc/images/PCB_Populated.jpg" width="250">](doc/images/PCB_Populated.jpg)
+
+Speaking of the sensor header, it is there for use with the adapter board that comes with the Adafruit sensor and is also available form [aliexpress](https://www.aliexpress.com/item/33040162499.html). You can bypass that board completely by cutting the connector off one end of the cable and soldering the wires directly to the board in place of the sensor header. Only four wires from the cable are needed: `VCC`, `GND`, `TX`, and `RX`.
 
 The 3D Model for the housing has a bracket that is designed to work with this PCB. You can use a service like [OSH Park](https://oshpark.com/) or [JLCPCB](https://jlcpcb.com) to fabricate the board by uploading the design which is a single zip file containing the [Gerber](https://en.wikipedia.org/wiki/Gerber_format) files.
 
@@ -103,7 +105,7 @@ A housing for `AQM` is [available on thingiverse](https://www.thingiverse.com/th
 [<img src="doc/images/Housing/H1.jpg" width="200">](doc/images/Housing/H1.jpg)
 [<img src="doc/images/Housing/H3.png" width="200">](doc/images/Housing/H3.png)
 
-
+**NOTE**: If you use the [Adafruit version of the PMS5003](https://www.adafruit.com/product/3686) with their adapter board, you will probably want to bend the pins on the that board 90° to make it work well in this housing. The adapter that is available from [aliexpress](https://www.aliexpress.com/item/33040162499.html) is already in this orientation.
 
 <a name="software"></a>
 ### Software
