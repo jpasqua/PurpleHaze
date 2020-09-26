@@ -52,6 +52,9 @@ The directory structure of the project is shown below. You don't need to know th
         /doc
             /images
                 [images used in the documentation, not by the code]
+        /resources
+            [Other resources such as a PCB design]
+
 ````
 
 ### Code Structure
@@ -80,18 +83,27 @@ The primary components of this project are a [Plantower PMS5003](https://www.ada
 
 In its simplest form, *AQM* is simply an ESP8266 connected to the PMS5003 sensor with 2 pins used for serial communications along with power (5V and ground). Logic levels between the PMS5003 and the ESP8266 are 3.3V.
 
-A PCB is in development now. It is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Here is the prototype (bare and populated):
+All of the components can be wired together point-to-point, or assembled onto a protoboard as shown in the image below. The [attached schematic](doc/images/Schematic.svg) shows the wiring. The NeoPixel LEDs are optional. If you are *not* using the LEDs, set `NEOPIXEL_PIN` to `-1` in `HWConfig.h`.
+
+[<img src="doc/images/Protoboard.jpg" width="250">](doc/images/Protoboard.jpg)
+
+A PCB design is also available in the resources directory. As can be see in the images below, it is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Be careful - there are LEDs that look the same but whose pins are in a different order. Also note that the D1 Mini can be mounted on the top of the board as shown in the image, or below the board with the heards on the top if the D1 rather than the bottom. In the 3D model you'll find that the D1 is mounted on the bottom. The same is true for the sensor header.
 
 [<img src="doc/images/PCB_Bare.jpg" width="250">](doc/images/PCB_Bare.jpg)
 [<img src="doc/images/PCB_Populated.jpg" width="250">](doc/images/PCB_Populated.jpg)
 
-Once the board is tested, I will post the [Gerber](https://en.wikipedia.org/wiki/Gerber_format) files so you can have your own fabricated.
+The 3D Model for the housing has a bracket that is designed to work with this PCB. You can use a service like [OSH Park](https://oshpark.com/) or [JLCPCB](https://jlcpcb.com) to fabricate the board by uploading the design which is a single zip file containing the [Gerber](https://en.wikipedia.org/wiki/Gerber_format) files.
 
-If you are not using a PCB, the wiring is still very simple. The [attached schematic](doc/images/Schematic.svg) shows the wiring. The NeoPixel LEDs are optional. If you are *not* using the LEDs, set `NEOPIXEL_PIN` to `-1` in `HWConfig.h`.
 
 ### 3D Model
 
-A housing for `AQM` is in development and will be posted on [thingiverse](http://thingiverse.com) when complete.
+A housing for `AQM` is [available on thingiverse](https://www.thingiverse.com/thing:4607364). It contains an internal mounting system that is designed to work with the PCB mentioned above. The 3D model is included so it can be modified to hold other configurations of the electronics.
+
+[<img src="doc/images/Housing/H2.jpg" width="250">](doc/images/Housing/H2.jpg)
+[<img src="doc/images/Housing/H1.jpg" width="250">](doc/images/Housing/H1.jpg)
+[<img src="doc/images/Housing/H3.png" width="250">](doc/images/Housing/H3.png)
+
+
 
 <a name="software"></a>
 ### Software
