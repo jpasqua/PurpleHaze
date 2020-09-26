@@ -99,9 +99,9 @@ The 3D Model for the housing has a bracket that is designed to work with this PC
 
 A housing for `AQM` is [available on thingiverse](https://www.thingiverse.com/thing:4607364). It contains an internal mounting system that is designed to work with the PCB mentioned above. The 3D model is included so it can be modified to hold other configurations of the electronics.
 
-[<img src="doc/images/Housing/H2.jpg" width="250">](doc/images/Housing/H2.jpg)
-[<img src="doc/images/Housing/H1.jpg" width="250">](doc/images/Housing/H1.jpg)
-[<img src="doc/images/Housing/H3.png" width="250">](doc/images/Housing/H3.png)
+[<img src="doc/images/Housing/H2.jpg" width="200">](doc/images/Housing/H2.jpg)
+[<img src="doc/images/Housing/H1.jpg" width="200">](doc/images/Housing/H1.jpg)
+[<img src="doc/images/Housing/H3.png" width="200">](doc/images/Housing/H3.png)
 
 
 
