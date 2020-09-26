@@ -18,6 +18,7 @@ The following third party libraries are used within this project:
 * [Arduino-Log](https://github.com/thijse/Arduino-Log)
 * [ArduinoJson (v6)](https://github.com/bblanchon/ArduinoJson)
 * [BlynkSimpleEsp8266](https://github.com/blynkkk/blynk-library)
+* [CircularBuffer](https://github.com/rlogiacco/CircularBuffer)
 * [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor)
 * [TimeLib](https://github.com/PaulStoffregen/Time.git)
 * [WebThing](https://github.com/jpasqua/WebThing)
@@ -30,10 +31,10 @@ The following libraries are used in the browser. you do not need to download or 
 ### Services
 The following services play a role in providing parts of the functionality:
 
- - [Blynk](https://blynk.io): Provides a repository of air quality data and the ability to view it using a mobile app. Whether or not you use Blynk, you can still view data directly using a web browser.
+ - [Blynk](https://blynk.io): Provides a repository of air quality data and the ability to view it using a mobile app. If you decide not to use Blynk, you can still view data directly using a web browser.
  - Services used by WebThing
 	 - [Google Maps](https://developers.google.com/maps/documentation): Used for geocoding and reverse geocoding. Though not absolutely necessary, it does make using the system a bit more convenient.
-	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data. This is used to timestamp data.
+	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data. This is used to timestamp data. This service is necessary for the operation of *AQM*.
 
 <a name="organization"></a>
 ## Organization
@@ -112,14 +113,14 @@ Before you get started, you will need API keys for the services mentioned above 
 
 <a name="connecting-to-your-network"></a>
 ### Connecting to your network
-Once you have assembled your hardware and loaded the firmware, the monitor will boot and create its own WiFi access point. Connect to the new access point you will see on your phone or computer's wifi connection list. It will have an SSID of the form `aqmnnnnnn`. Once you do, you will enter a "captive portal" where you can configure the device for your actual WiFi base station. Shortly after you've done that, *AQM* will automatically connect to your wifi network. If it does not, then power cycle the device.
+Once you have assembled your hardware and loaded the firmware, the monitor will boot and create its own WiFi access point. Connect to the new access point you will see on your phone or computer's wifi connection list. It will have an SSID of the form `aqmNNNNNN`. Once you do, you will enter a "captive portal" where you can configure the device for your actual WiFi base station. Shortly after you've done that, *AQM* will automatically connect to your wifi network. If it does not, then power cycle the device.
 
 At this point it will make a web interface available. You can connect using either an IP address or a hostname:
 
 - **IP Access**: You need to determine the IP Address used by the device. You have a couple of choices here:
     - If you are still connected via USB, you will see the IP address in the Arduino Serial Monitor
     - You can use a scanning tool or your router to look for the device on your network
-- **Hostname**: If your system supports mDNS (e.g. a Mac or a Raspberry Pi running avahi) you can connect to hostname.local in your browser. Hostname will be of the form `aqmnnnnnn`.
+- **Hostname**: If your system supports mDNS (e.g. a Mac or a Raspberry Pi running avahi) you can connect to hostname.local in your browser. Hostname will be of the form `aqmNNNNNN`.
 
 
 ### Configuring AQM
