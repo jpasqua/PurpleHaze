@@ -21,7 +21,7 @@ The following third party libraries are used within this project:
 * [CircularBuffer](https://github.com/rlogiacco/CircularBuffer)
 * [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor)
 * [TimeLib](https://github.com/PaulStoffregen/Time.git)
-* [WebThing](https://github.com/jpasqua/WebThing)
+* [WebThing](https://github.com/jpasqua/WebThing) [version 0.2.0 or later]
 
 The following libraries are used in the browser. you do not need to download or install them. They are listed here because if you are doing further development of the browser code, you may need to understand their usage:
 
