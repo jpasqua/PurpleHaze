@@ -15,6 +15,7 @@ Some of this configuration information is specific to *PurpleHaze* while other i
 ### Libraries
 The following third party libraries are used within this project:
 
+* [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
 * [Arduino-Log](https://github.com/thijse/Arduino-Log)
 * [ArduinoJson (v6)](https://github.com/bblanchon/ArduinoJson)
 * [BlynkSimpleEsp8266](https://github.com/blynkkk/blynk-library)
