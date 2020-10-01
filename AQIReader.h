@@ -1,12 +1,24 @@
+/*
+ * AQIReader
+ *    Read data realited to the Air Quality Index from an underlying device and
+ *    store historical information and averages.
+ *
+ */
+
 #ifndef AQIReader_h
 #define AQIReader_h
 
-
+//--------------- Begin:  Includes ---------------------------------------------
+//                                  Core Libraries
+//                                  Third Party Libraries
 #include <CircularBuffer.h>
 #include <TimeLib.h>
+//                                  Local Includes
 #include "PMS5003.h"
 #include "MovingAverage.h"
 #include "Indicators.h"
+//--------------- End:    Includes ---------------------------------------------
+
 
 class AQIReader {
 public:

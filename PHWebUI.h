@@ -1,6 +1,6 @@
 /*
  * PHWebUI:
- *    Implements the WebUI additions for PurpleHaze
+ *    Implements the WebUI for PurpleHaze
  *
  */
 

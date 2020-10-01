@@ -1,5 +1,5 @@
 /*
- * PH - Monitor an air quality sensor and upload data to the Blynk Service
+ * PurpleHaze - Monitor an air quality sensor and upload data to the Blynk Service
  *                    
  * NOTES:
  *

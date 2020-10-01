@@ -1,8 +1,22 @@
+/*
+ * AQIReader
+ *    Read data realited to the Air Quality Index from an underlying device and
+ *    store historical information and averages.
+ *
+ */
+
+
+//--------------- Begin:  Includes ---------------------------------------------
+//                                  Core Libraries
 #include <Arduino.h>
 #include <FS.h>
+//                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <WebThing.h>
+//                                  Local Includes
 #include "AQIReader.h"
+//--------------- End:    Includes ---------------------------------------------
+
 
 const uint32_t AQIReader::ColorForState[] = {
   0x00FF00, // awake

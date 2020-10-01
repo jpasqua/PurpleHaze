@@ -1,9 +1,49 @@
+/*
+ * Indicators
+ *    Indicators are a way of communicating to users through (potentially)
+ *    multi-color LEDs. Particular Indicator implementations may use
+ *    the LED built onto a microcontroller board, or perhaps external
+ *    NeoPixels.
+ *
+ * NOTE: In the future we may wish to add functionality like pulsing, fading,
+ *       or blinking so clients don't need to do that on their own.
+ *
+ */
+
 #ifndef Indicators_h
 #define Indicators_h
 
+//--------------- Begin:  Includes ---------------------------------------------
+//                                  Core Libraries
+//                                  Third Party Libraries
 #include <Adafruit_NeoPixel.h>
+//                                  Local Includes
+//--------------- End:    Includes ---------------------------------------------
 
 
+/*------------------------------------------------------------------------------
+ *
+ * The base Indicator class with an empty implementation. Use instances of this
+ * class if you have no indicator, but still need to provide an Indicator to
+ * some system.
+ *
+ *----------------------------------------------------------------------------*/
+
+class Indicator {
+public:
+  virtual void setColor(uint32_t c) { (void)c;  }
+  virtual void setColor(uint8_t r, uint8_t g, uint8_t b) { (void)r; (void)g; (void)b;  }
+  virtual void on() {  }
+  virtual void off() {  }
+};
+
+
+/*------------------------------------------------------------------------------
+ *
+ * If you have one or more NeoPixel Indicators, create a NeoPixelIndicators
+ * instance that does all of the heavy lifting for them.
+ *
+ *----------------------------------------------------------------------------*/
 
 class NeoPixelIndicators {
 public:
@@ -46,13 +86,12 @@ private:
   uint8_t _count = 0;;
 };
 
-class Indicator {
-public:
-  virtual void setColor(uint32_t c) { (void)c;  }
-  virtual void setColor(uint8_t r, uint8_t g, uint8_t b) { (void)r; (void)g; (void)b;  }
-  virtual void on() {  }
-  virtual void off() {  }
-};
+
+/*------------------------------------------------------------------------------
+ *
+ * A NeoPixel Indicator whose parent is an instance of NeoPixelIndicators 
+ *
+ *----------------------------------------------------------------------------*/
 
 class NeoPixelIndicator : public Indicator {
 public:

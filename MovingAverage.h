@@ -1,5 +1,23 @@
+/*
+ * MovingAverage
+ *    A very simple class for tracking moving averages.
+ *
+ */
+
 #ifndef MovingAverage_h
 #define MovingAverage_h
+
+//--------------- Begin:  Includes ---------------------------------------------
+//                                  Core Libraries
+//                                  Third Party Libraries
+#include <CircularBuffer.h>
+#include <TimeLib.h>
+//                                  Local Includes
+#include "PMS5003.h"
+#include "MovingAverage.h"
+#include "Indicators.h"
+//--------------- End:    Includes ---------------------------------------------
+
 
 class MovingAverage {
 public:

@@ -1,5 +1,5 @@
-#ifndef PH_h
-#define PH_h
+#ifndef PurpleHaze_h
+#define PurpleHaze_h
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
@@ -23,4 +23,4 @@ namespace PH {
   void setIndicatorBrightness(uint8_t b); // 0-100%
 }
 
-#endif  // PH_h
+#endif  // PurpleHaze_h

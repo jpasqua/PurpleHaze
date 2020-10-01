@@ -1,8 +1,20 @@
+/*
+ * PHBlynk
+ *    Write PurpleHaze data to the Blynk service
+ *
+ */
+
 #ifndef PHBlynk_h
 #define PHBlynk_h
 
+//--------------- Begin:  Includes ---------------------------------------------
+//                                  Core Libraries
+//                                  Third Party Libraries
+//                                  Local Includes
 #include "PurpleHaze.h"
 #include "PMS5003.h"
+//--------------- End:    Includes ---------------------------------------------
+
 
 namespace PHBlynk {
   // ----- Constants

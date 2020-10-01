@@ -1,7 +1,6 @@
 /*
- * WebUI:
- *    Implements a simple WebUI for a WebThing. It contains the basic
- *    structure that can be extended to incorporate "thing-specific" UI
+ * PHWebUI:
+ *    Implements a simple WebUI for PurpleHaze
  *                    
  * NOTES:
  *
