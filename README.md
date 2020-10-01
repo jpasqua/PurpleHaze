@@ -127,14 +127,14 @@ Before you get started, you will need API keys for the services mentioned above 
 
 <a name="connecting-to-your-network"></a>
 ### Connecting to your network
-Once you have assembled your hardware and loaded the firmware, the monitor will boot and create its own WiFi access point. Connect to the new access point you will see on your phone or computer's wifi connection list. It will have an SSID of the form `aqmNNNNNN`. Once you do, you will enter a "captive portal" where you can configure the device for your actual WiFi base station. Shortly after you've done that, *PurpleHaze* will automatically connect to your wifi network. If it does not, then power cycle the device.
+Once you have assembled your hardware and loaded the firmware, the monitor will boot and create its own WiFi access point. Connect to the new access point you will see on your phone or computer's wifi connection list. It will have an SSID of the form `ph_NNNNNN`. Once you do, you will enter a "captive portal" where you can configure the device for your actual WiFi base station. Shortly after you've done that, *PurpleHaze* will automatically connect to your wifi network. If it does not, then power cycle the device.
 
 At this point it will make a web interface available. You can connect using either an IP address or a hostname:
 
 - **IP Access**: You need to determine the IP Address used by the device. You have a couple of choices here:
     - If you are still connected via USB, you will see the IP address in the Arduino Serial Monitor
     - You can use a scanning tool or your router to look for the device on your network
-- **Hostname**: If your system supports mDNS (e.g. a Mac or a Raspberry Pi running avahi) you can connect to hostname.local in your browser. Hostname will be of the form `aqmNNNNNN`.
+- **Hostname**: If your system supports mDNS (e.g. a Mac or a Raspberry Pi running avahi) you can connect to hostname.local in your browser. Hostname will be of the form `ph_NNNNNN`.
 
 
 ### Configuring PurpleHaze
@@ -160,7 +160,7 @@ These settings are common to many network connected devices and are encapsulated
 * **Indicator LED**: Ignore this section. *PurpleHaze* has a more flexible [indicator LED capability](#indicators).
 
 <a name="configure-PH"></a>
-![](doc/images/ConfigureAQM.png) 
+![](doc/images/ConfigurePH.png) 
 
 Now that the General Settings are out of the way, you can adjust settings that are specfic to *PurpleHaze*:
 

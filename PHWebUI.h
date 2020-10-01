@@ -1,17 +1,17 @@
 /*
- * AQMWebUI:
- *    Implements the WebUI additions for AQM
+ * PHWebUI:
+ *    Implements the WebUI additions for PurpleHaze
  *
  */
 
-#ifndef AQMWebUI_h
-#define AQMWebUI_h
+#ifndef PHWebUI_h
+#define PHWebUI_h
 
 #include <WebUI.h>
 
-namespace AQMWebUI {
+namespace PHWebUI {
   // ----- Setup functions
   void init();
 }
 
-#endif  // AQMWebUI_h
+#endif  // PHWebUI_h
