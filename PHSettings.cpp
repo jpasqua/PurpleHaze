@@ -27,7 +27,7 @@ PHSettings::PHSettings() {
 
 void PHSettings::fromJSON(JsonDocument &doc) {
   description = doc["description"].as<String>();
-  blynkAPIKey = doc["blynkAPIKey"].as<String>();
+  blynkAPIKey = String(doc["blynkAPIKey"]|"");
   showDevMenu = doc[F("showDevMenu")];
   iBright = doc[F("iBright")];
   chartColors.pm10 = doc["chartColors"]["pm10"].as<String>();
