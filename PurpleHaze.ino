@@ -1,5 +1,5 @@
 /*
- * AQM - Monitor an air quality sensor and upload data to the Blynk Service
+ * PH - Monitor an air quality sensor and upload data to the Blynk Service
  *                    
  * NOTES:
  *
@@ -16,16 +16,16 @@
 #include <TimeLib.h>
 #include <WebUI.h>
 //                                  Local Includes
-#include "AQM.h"
+#include "PurpleHaze.h"
 #include "HWConfig.h"
 #include "AQIReader.h"
 #include "Indicators.h"
-#include "AQMWebUI.h"
-#include "AQMBlynk.h"
+#include "PHWebUI.h"
+#include "PHBlynk.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
-namespace AQM {
+namespace PH {
   /*------------------------------------------------------------------------------
    *
    * Global State
@@ -37,7 +37,7 @@ namespace AQM {
   Indicator* busyIndicator;
   NeoPixelIndicators* indicators;
   SoftwareSerial* streamToSensor;
-  AQMSettings settings;
+  PHSettings settings;
   AQIReadings latestData;
 
   namespace Internal {
@@ -56,16 +56,16 @@ namespace AQM {
     static const String   SettingsFileName = "/settings.json";
 
     void ensureWebThingSettings() {
-      // AQM has a fixed hardware configuration so some of the settings need to have
+      // PH has a fixed hardware configuration so some of the settings need to have
       // specific values. Rather than make the user configure them, set them to the
       // right values here.
       WebThing::displayPowerOptions(false);
       WebThing::settings.sleepOverridePin = -1;
       WebThing::settings.hasVoltageSensing = false;
-      if (WebThing::settings.hostname.isEmpty()) WebThing::settings.hostname = ("aqm" + String(ESP.getChipId(), HEX));
+      if (WebThing::settings.hostname.isEmpty()) WebThing::settings.hostname = ("ph_" + String(ESP.getChipId(), HEX));
     }
 
-    void flushBeforeSleep() { AQMBlynk::disconnect(); }
+    void flushBeforeSleep() { PHBlynk::disconnect(); }
 
     void prepIO() {
       if (NEOPIXEL_PIN == -1) {
@@ -101,7 +101,7 @@ namespace AQM {
     void prepWebUI() {
       WebThing::setup();
       WebThing::notifyBeforeDeepSleep(flushBeforeSleep);
-      AQMWebUI::init();
+      PHWebUI::init();
     }
 
     void baseConfigChange() { WebUI::setTitle(settings.description+" ("+WebThing::settings.hostname+")"); }
@@ -125,11 +125,11 @@ namespace AQM {
       }
       qualityIndicator->setColor(QualityColors[bracketIndex]);
 
-      AQMBlynk::update();
+      PHBlynk::update();
       lastTimestamp = latestData.timestamp;
       busyIndicator->off();
     }
-  } // ----- END: AQM::Internal namespace
+  } // ----- END: PH::Internal namespace
 
 
   /*------------------------------------------------------------------------------
@@ -149,7 +149,7 @@ namespace AQM {
     return dateTime;
   }
 
-} // ----- END: AQM namespace
+} // ----- END: PH namespace
 
 
 /*------------------------------------------------------------------------------
@@ -157,12 +157,12 @@ namespace AQM {
  * GLOBAL SCOPE: setup() and loop()
  *
  * The setup() and loop() functions need to be in the global scope, but are logically
- * part of the AQM namespace. Use a "using" directive for JUST THESE 2 functions
+ * part of the PH namespace. Use a "using" directive for JUST THESE 2 functions
  * to treat them as if they were in that namespace.
  *
  *----------------------------------------------------------------------------*/
 
-using namespace AQM;
+using namespace PH;
 
 void setup() {
   WebThing::preSetup();             // Setup the WebThing - Must be first
@@ -183,7 +183,7 @@ void setup() {
   Internal::prepSensor();           // Prep the sensor after we're connected to the web
                                     // so we have time info for timestamps, etc.
 
-  AQMBlynk::init();                 // Setup the Blynk Client
+  PHBlynk::init();                 // Setup the Blynk Client
 
   Internal::processReadings();      // Get our first set of readings!
 
@@ -199,7 +199,7 @@ void loop() {
   //   qi = (qi+1)%8;
   // }
   WebThing::loop();
-  AQMBlynk::run();
+  PHBlynk::run();
   aqiReader.process(now());
   Internal::processReadings();
 }

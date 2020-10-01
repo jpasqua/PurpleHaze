@@ -1,11 +1,11 @@
 /*
- * Settings.h
+ * PHSettings.h
  *    Defines the values that can be set through the web UI and sets their initial values
  *
  */
 
-#ifndef AQMSettings_h
-#define AQMSettings_h
+#ifndef PHSettings_h
+#define PHSettings_h
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
@@ -16,10 +16,10 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-class AQMSettings: public BaseSettings {
+class PHSettings: public BaseSettings {
 public:
   // ----- Constructors and methods
-  AQMSettings();
+  PHSettings();
   void fromJSON(JsonDocument &doc) override;
   void toJSON(JsonDocument &doc);
   void logSettings();
@@ -39,4 +39,4 @@ private:
   // ----- Constants -----
   static const uint32_t CurrentVersion;
 };
-#endif // AQMSettings_h
+#endif // PHSettings_h

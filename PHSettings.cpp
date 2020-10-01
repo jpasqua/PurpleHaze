@@ -1,5 +1,5 @@
 /*
- * AQMSettings
+ * PHSettings
  *    Handle reading and writing settings information to the file system
  *    in JSON format.
  *
@@ -15,19 +15,19 @@
 #include <ArduinoLog.h>
 #include <ArduinoJson.h>
 //                                  Local Includes
-#include "AQMSettings.h"
+#include "PHSettings.h"
 //--------------- End:    Includes ---------------------------------------------
 
-const uint32_t  AQMSettings::CurrentVersion = 0x0001;
+const uint32_t  PHSettings::CurrentVersion = 0x0001;
 
-AQMSettings::AQMSettings() {
-  version = AQMSettings::CurrentVersion;
+PHSettings::PHSettings() {
+  version = PHSettings::CurrentVersion;
   maxFileSize = 1024;
 }
 
-void AQMSettings::fromJSON(JsonDocument &doc) {
+void PHSettings::fromJSON(JsonDocument &doc) {
   description = doc["description"].as<String>();
-  blynkAPIKey = doc["blynkAPIKey"].as<String>();
+  blynkAPIKey = String(doc["blynkAPIKey"]|"");
   showDevMenu = doc[F("showDevMenu")];
   iBright = doc[F("iBright")];
   chartColors.pm10 = doc["chartColors"]["pm10"].as<String>();
@@ -36,7 +36,7 @@ void AQMSettings::fromJSON(JsonDocument &doc) {
   logSettings();
 }
 
-void AQMSettings::toJSON(JsonDocument &doc) {
+void PHSettings::toJSON(JsonDocument &doc) {
   doc["description"] = description;
   doc["blynkAPIKey"] = blynkAPIKey;
   doc[F("showDevMenu")] = showDevMenu;
@@ -47,8 +47,8 @@ void AQMSettings::toJSON(JsonDocument &doc) {
 
 }
 
-void AQMSettings::logSettings() {
-  Log.verbose(F("AQM Settings"));
+void PHSettings::logSettings() {
+  Log.verbose(F("PurpleHaze Settings"));
   Log.verbose(F("  description = %s"), description.c_str());
   Log.verbose(F("  blynkAPIKey = %s"), blynkAPIKey.c_str());
   Log.verbose(F("  show dev menu: %T"), showDevMenu);
