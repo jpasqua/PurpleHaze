@@ -47,6 +47,7 @@
     const color_pm10 = '%PM10_CLR%'
     const color_pm25 = '%PM25_CLR%'
     const color_pm100 = '%PM100_CLR%'
+    const color_aqi = '%AQI_CLR%'
     function createOptions(theTitle) {
       return {
         responsive: true, title: { display: true, text: theTitle, fontSize:16 },
@@ -62,7 +63,8 @@
           datasets: [
             { label: 'PM10 ENV', borderColor: color_pm10, fill: false, lineTension: 0, data: [] },
             { label: 'PM25 ENV', borderColor: color_pm25, fill: false, lineTension: 0, data: [] },
-            { label: 'PM100 ENV', borderColor: color_pm100, fill: false, lineTension: 0, data: [] }]
+            { label: 'PM100 ENV', borderColor: color_pm100, fill: false, lineTension: 0, data: [] },
+            { label: 'AQI', borderColor: color_aqi, fill: false, lineTension: 0, data: [] } ]
         }
     }
 
@@ -70,15 +72,38 @@
     var day_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Day") };
     var week_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Week") };
 
+
+    const AQITable = [
+      {pMin:   0.0, pRange:  15.4, aqMin:   0, aqRange: 50},
+      {pMin:  15.5, pRange:  24.9, aqMin:  51, aqRange: 49},
+      {pMin:  40.5, pRange:  24.9, aqMin: 101, aqRange: 49},
+      {pMin:  65.5, pRange:  84.9, aqMin: 151, aqRange: 49},
+      {pMin: 150.5, pRange:  99.9, aqMin: 201, aqRange: 99},
+      {pMin: 250.5, pRange: 249.9, aqMin: 301, aqRange: 199}
+    ]
+
+    function calcAQI(reading) {
+      var i
+      for (i = 0; i < AQITable.length; i++) {
+        if (reading < AQITable[i].pMin) break;
+      }
+      if (i == AQITable.length) return 500;
+      else i--;
+      var aqi = ((reading -  AQITable[i].pMin)*(AQITable[i].aqRange))/AQITable[i].pRange + AQITable[i].aqMin
+      return Math.floor(aqi)
+    }
+
     function prepData(theConfig, theData) {
       theConfig.data.datasets[0].data = [];
       theConfig.data.datasets[1].data = [];
       theConfig.data.datasets[2].data = [];
+      theConfig.data.datasets[3].data = [];
       for (var i = 0; i < theData.data.length; i++) {
         var timestamp = theData.data[i].ts*1000
         theConfig.data.datasets[0].data.push({x: timestamp, y: theData.data[i].pm10_env})
         theConfig.data.datasets[1].data.push( {x: timestamp, y: theData.data[i].pm25_env})
         theConfig.data.datasets[2].data.push({x: timestamp, y: theData.data[i].pm100_env})
+        theConfig.data.datasets[3].data.push({x: timestamp, y: calcAQI(theData.data[i].pm25_env)})
       }
     }  
 

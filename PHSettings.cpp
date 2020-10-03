@@ -30,9 +30,10 @@ void PHSettings::fromJSON(JsonDocument &doc) {
   blynkAPIKey = String(doc["blynkAPIKey"]|"");
   showDevMenu = doc[F("showDevMenu")];
   iBright = doc[F("iBright")];
-  chartColors.pm10 = doc["chartColors"]["pm10"].as<String>();
-  chartColors.pm25 = doc["chartColors"]["pm25"].as<String>();
-  chartColors.pm100 = doc["chartColors"]["pm100"].as<String>();
+  chartColors.pm10 = String(doc["chartColors"]["pm10"]|"#e32400");
+  chartColors.pm25 = String(doc["chartColors"]["pm25"]|"#4e7a27");
+  chartColors.pm100 = String(doc["chartColors"]["pm100"]|"#0042aa");
+  chartColors.aqi = String(doc["chartColors"]["aqi"]|"#f00f88");
   logSettings();
 }
 
@@ -44,6 +45,7 @@ void PHSettings::toJSON(JsonDocument &doc) {
   doc["chartColors"]["pm10"] = chartColors.pm10;
   doc["chartColors"]["pm25"] = chartColors.pm25;
   doc["chartColors"]["pm100"] = chartColors.pm100;
+  doc["chartColors"]["aqi"] = chartColors.aqi;
 
 }
 
@@ -56,5 +58,6 @@ void PHSettings::logSettings() {
   Log.verbose(F("  chartColors.pm10 = %s"), chartColors.pm10.c_str());
   Log.verbose(F("  chartColors.pm25 = %s"), chartColors.pm25.c_str());
   Log.verbose(F("  chartColors.pm100 = %s"), chartColors.pm100.c_str());
+  Log.verbose(F("  chartColors.aqi = %s"), chartColors.aqi.c_str());
 }
 

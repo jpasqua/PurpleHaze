@@ -24,7 +24,8 @@ class AQIReader {
 public:
   AQIReader();
   AQIReadings getLastReadings() { return data; }
-  
+  uint16_t derivedAQI(uint16_t reading);
+
   // Moving averages
   MovingAverage pm25_env_10min;
   MovingAverage pm25_env_30min;

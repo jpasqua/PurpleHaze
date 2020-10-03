@@ -9,10 +9,8 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 #include <SoftwareSerial.h>
-#include <ESP8266mDNS.h>
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
-#include <BlynkSimpleEsp8266.h>
 #include <TimeLib.h>
 #include <WebUI.h>
 //                                  Local Includes
@@ -118,7 +116,7 @@ namespace PH {
       if (latestData.timestamp == lastTimestamp) return;
 
       busyIndicator->setColor(0, 255, 0);
-      uint16_t quality = latestData.pm25_env;
+      uint16_t quality = aqiReader.derivedAQI(latestData.pm25_env);
       int bracketIndex;
       for (bracketIndex = 0; bracketIndex < nBrackets; bracketIndex++) {
         if (quality < QualityBrackets[bracketIndex]) break;
@@ -203,4 +201,3 @@ void loop() {
   aqiReader.process(now());
   Internal::processReadings();
 }
-

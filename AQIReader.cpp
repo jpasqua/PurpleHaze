@@ -25,6 +25,21 @@ const uint32_t AQIReader::ColorForState[] = {
   0x000000  // asleep
 };
 
+const struct {
+  float pMin;
+  float pRange;
+  uint16_t aqMin;
+  uint16_t aqRange;
+} AQITable[] = {
+      {  0.0,  15.4,   0, 50},
+      { 15.5,  24.9,  51, 49},
+      { 40.5,  24.9, 101, 49},
+      { 65.5,  84.9, 151, 49},
+      {150.5,  99.9, 201, 99},
+      {250.5, 249.9, 301, 199}
+};
+static const int AQITableLength= sizeof(AQITable)/sizeof(AQITable[0]);
+
 static const String HistoryFilePath = "/history.json";
 static const uint32_t MaxHistoryFileSize = 8192;
 
@@ -49,6 +64,17 @@ bool AQIReader::init(Stream* streamToSensor, Indicator* indicator) {
   enterState(waking);
   return true;
 }
+
+uint16_t AQIReader::derivedAQI(uint16_t reading) {
+  int i;
+  for (i = 0; i < AQITableLength; i++) {
+    if (reading < AQITable[i].pMin) break;
+  }
+  i--;
+  float aqi = ((reading -  AQITable[i].pMin)*(AQITable[i].aqRange))/AQITable[i].pRange + AQITable[i].aqMin;
+  return (uint16_t)aqi;
+}
+
 
 void AQIReader::emitHistoryAsJson(HistoryRange r, Stream& s) {
   if (r == Range_Combined) {

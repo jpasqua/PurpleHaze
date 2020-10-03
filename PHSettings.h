@@ -31,6 +31,7 @@ public:
     String pm10 = "#e32400";
     String pm25 = "#4e7a27";
     String pm100 = "#0042aa";
+    String aqi = "#f00f88";
   } chartColors;
   uint8_t iBright = 50;                       // Brightness of indicators (0-100%)
   bool showDevMenu = false;

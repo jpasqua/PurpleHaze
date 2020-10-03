@@ -9,7 +9,6 @@
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
-#include <ESP8266WebServer.h>
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 //                                  Local Includes
@@ -53,6 +52,7 @@ namespace PHWebUI {
       auto mapper =[](String &key) -> String {
         if (key == "LAT")  return WebThing::settings.latAsString();
         if (key == "LNG")  return WebThing::settings.lngAsString();
+        if (key == "AQI") return (String(PH::aqiReader.derivedAQI(PH::latestData.pm25_env)));
         if (key == "PM10STD") return (String(PH::latestData.pm10_standard));
         if (key == "PM25STD") return (String(PH::latestData.pm25_standard));
         if (key == "PM100STD") return (String(PH::latestData.pm100_standard));
@@ -86,6 +86,7 @@ namespace PHWebUI {
         if (key == "PM10_CLR")  return PH::settings.chartColors.pm10;
         if (key == "PM25_CLR")  return PH::settings.chartColors.pm25;
         if (key == "PM100_CLR")  return PH::settings.chartColors.pm100;
+        if (key == "AQI_CLR")  return PH::settings.chartColors.aqi;
         return "";
       };
 
@@ -110,6 +111,7 @@ namespace PHWebUI {
         if (key == "PM10_CLR")  return PH::settings.chartColors.pm10;
         if (key == "PM25_CLR")  return PH::settings.chartColors.pm25;
         if (key == "PM100_CLR")  return PH::settings.chartColors.pm100;
+        if (key == "AQI_CLR")  return PH::settings.chartColors.aqi;
         return "";
       };
 

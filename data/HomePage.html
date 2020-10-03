@@ -24,8 +24,37 @@
     }
 </script>
 
-<h3><strong>Readings</strong><small> (Timestamp: %TMST%)</small></h3>
-<strong>Air Quality Index </strong> (<a href="ChartPage.html">charts</a>, <a id="zl" target="_blank">Satellite Image</a>)
+
+<h3><strong>PurpleHaze Data</strong><small> (Timestamp: %TMST%)</small></h3>
+<style>
+  .dot {
+    height: 25px;
+    width: 25px;
+    background-color: #00ff00;
+    border-radius: 50\%;
+    display: inline-block;
+  }
+</style>
+<table><tr><td><span class="dot" id="aqiDot"></span></td><td style="vertical-align:top">AQI: %AQI%</td></tr></table>
+<script type="text/javascript">
+  const aqiColors = [
+    {max:  50, color: "#00ff00"},
+    {max: 100, color: "#ffff00"},
+    {max: 150, color: "#ffa500"},
+    {max: 200, color: "#ff0000"},
+    {max: 999, color: "#9400D3"}];
+  function colorElement(val, elmentID) {
+    var e = document.getElementById(elmentID);
+    for (i = 0; i < aqiColors.length; i++) {
+      if (val <= aqiColors[i].max) {
+        e.style.backgroundColor = aqiColors[i].color;
+        return;
+      }
+    }
+  }
+  colorElement(%AQI%, "aqiDot");
+</script>
+<strong>Sensor Readings </strong> (<a href="ChartPage.html">charts</a>, <a id="zl" target="_blank">Satellite Image</a>)
 <table class="w3-table-all w3-hoverable">
   <tr> <td>Type</td> <td>PM 1.0</td>    <td>PM 2.5</td>    <td>PM 10</td>      </tr>
   <tr> <td>Standard</td> <td>%PM10STD%</td> <td>%PM25STD%</td> <td>%PM100STD%</td> </tr>
