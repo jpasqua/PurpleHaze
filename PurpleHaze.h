@@ -13,7 +13,7 @@
 
 
 namespace PH {
-  static const String VersionString = "0.0.1";
+  static const String VersionString = "0.0.2";
 
   extern AQIReadings latestData;
   extern PHSettings settings;
