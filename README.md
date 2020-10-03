@@ -88,7 +88,14 @@ All of the components can be wired together point-to-point, or assembled onto a 
 
 [<img src="doc/images/Protoboard.jpg" width="250">](doc/images/Protoboard.jpg)
 
-A PCB design is also available in the resources directory. As can be see in the images below, it is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Be careful - there are LEDs that look the same but whose pins are in a different order. Also note that the D1 Mini can be mounted on the top of the board as shown in the image, or below the board with the headers on the top if the D1 rather than the bottom. In the 3D model you'll find that the D1 is mounted on the bottom. The same is true for the sensor header.
+A PCB design is also available in the resources directory. As can be see in the images below, it is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html).
+
+Notes on the LEDs:
+
+* Be careful - there are LEDs that look the same but whose pins are in a different order. If you are using the PCB, make sure you have LEDs whose pins are ordered: `Dout`, `Vcc`, `GND`, `Din`
+* You'll notice that the LEDs have a flat spot on one side of the base. Align that flat spot to the flat spot shown on the PCB. Refer to the images below.
+
+The D1 Mini can be mounted on the top of the board as shown in the image, or below the board with the headers on the top of the D1 rather than the bottom. In the 3D model you'll find that the D1 is mounted on the bottom. The same is true for the sensor header.
 
 [<img src="doc/images/PCB_Bare.jpg" width="250">](doc/images/PCB_Bare.jpg)
 [<img src="doc/images/PCB_Populated.jpg" width="250">](doc/images/PCB_Populated.jpg)
@@ -168,7 +175,7 @@ Now that the General Settings are out of the way, you can adjust settings that a
 - **Description**: A description that is useful to the user. For example, the location of the device like "Back Yard" or "Inside".
 - **Blynk API Key**: An API key established by the user when configuring the Blynk app.
 - **Indicator Brightness**: If your device incorporates indicator LEDs, this sets their brightness in the range from 0-100%.
-- **Chart Colors**: The [charts page](#charts) shows historical data in the form of line charts. Each chart shows three readings and you can customize the colors of the lines. The background of the chart displays color bands that correspond to the air quality (green, yellow, and various shades of red). These can be changed in `data/ChartPage.html`, but not in the Web UI.
+- **Chart Colors**: The [charts page](#charts) shows historical data in the form of line charts. Each chart shows four lines: pm10, pm25, pm100, and AQI. You can customize the colors of the lines. The background of the chart displays color bands that correspond to the air quality (green, yellow, and various shades of red). These colors can be changed in `data/ChartPage.html`, but not in the Web UI.
 
 
 ## Using PurpleHaze
@@ -184,6 +191,7 @@ Now that the General Settings are out of the way, you can adjust settings that a
 | 🟣 Purple|Very Unhealthy|201 - 300|Health alert: The risk of health effects is increased for everyone.|
 | ⚫ Maroon|Hazardous|301+|Health warning of emergency conditions: everyone is more likely to be affected.|
 
+*PurpleHaze* uses a fairly simple algorithm to determine AQI based on sensor data. This algoritm is not "certified" in any way and you should **NOT** depend on it for any health related matters. It is similar to the method described in [this wikipedia article](https://en.wikipedia.org/wiki/Air_quality_index#Computing_the_AQI). However, the actual conversion table is taken from the paper ["Measurements of PM2.5 with PurpleAir under atmospheric conditions"](https://amt.copernicus.org/preprints/amt-2019-396/) and it's [supplement](https://amt.copernicus.org/preprints/amt-2019-396/amt-2019-396-supplement.pdf). 
 
 ### Viewing PurpleHaze data on your phone
 
