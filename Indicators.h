@@ -37,6 +37,64 @@ public:
   virtual void off() {  }
 };
 
+/*------------------------------------------------------------------------------
+ *
+ * An on/off LED indicator
+ *
+ *----------------------------------------------------------------------------*/
+
+class OnOffIndicator : public Indicator {
+public:
+  void begin(uint8_t pin) {
+    _pin = pin;
+    pinMode(_pin, OUTPUT);
+  }
+
+  virtual void setColor(uint32_t c) {
+    digitalWrite(_pin, (c != 0));
+  }
+  
+  void setColor(uint8_t r, uint8_t g, uint8_t b) {
+    digitalWrite(_pin, ((r != 0)&&(g != 0)&&(b !=0)));
+  }
+
+  void on() { digitalWrite(_pin, HIGH); }
+  void off() { digitalWrite(_pin, LOW); }
+
+private:
+  uint8_t _pin;
+};
+
+
+/*------------------------------------------------------------------------------
+ *
+ * An LED indicator that can display different intensities
+ *
+ *----------------------------------------------------------------------------*/
+
+class IntensityIndicator : public Indicator {
+public:
+  void begin(uint8_t pin) {
+    _pin = pin;
+  }
+
+  virtual void setColor(uint32_t c) {
+    setColor((c&0xff0000)>>16, (c&0x00ff00)>>8, (c&0x0000ff));
+  }
+  
+  void setColor(uint8_t r, uint8_t g, uint8_t b) {
+    uint8_t val = r > g ? r : b;
+    val = val > b ? val : b;
+    analogWrite(_pin, val);
+  }
+
+  void on() { analogWrite(_pin, 255); }
+  void off() { analogWrite(_pin, 0); }
+
+private:
+  uint8_t _pin;
+};
+
 
 /*------------------------------------------------------------------------------
  *
