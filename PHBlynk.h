@@ -10,6 +10,7 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
+#include <BlynkSimpleEsp8266.h>
 //                                  Local Includes
 #include "PurpleHaze.h"
 #include "PMS5003.h"
