@@ -184,12 +184,12 @@ Now that the General Settings are out of the way, you can adjust settings that a
 
 |Color|Concern|Range|Description of Air Quality|
 |--- |--- |--- |--- |
-| 🟢 Green|Good|0 to 50|Air quality is satisfactory, and air pollution poses little or no risk.|
-| 🟡 Yellow |Moderate|51 - 100|Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution.|
-| 🟠 Orange|Unhealthy for Sensitive Groups|101 - 150|Members of sensitive groups may experience health effects. The general public is less likely to be affected.|
-| 🔴 Red|Unhealthy|151 - 200|Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects.|
-| 🟣 Purple|Very Unhealthy|201 - 300|Health alert: The risk of health effects is increased for everyone.|
-| ⚫ Maroon|Hazardous|301+|Health warning of emergency conditions: everyone is more likely to be affected.|
+| ![](doc/images/Color_Green.png) |Good|0 to 50|Air quality is satisfactory, and air pollution poses little or no risk.|
+| ![](doc/images/Color_Yellow.png) |Moderate|51 - 100|Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution.|
+| ![](doc/images/Color_Orange.png)|Unhealthy for Sensitive Groups|101 - 150|Members of sensitive groups may experience health effects. The general public is less likely to be affected.|
+| ![](doc/images/Color_Red.png)|Unhealthy|151 - 200|Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects.|
+| ![](doc/images/Color_Purple.png)|Very Unhealthy|201 - 300|Health alert: The risk of health effects is increased for everyone.|
+| ![](doc/images/Color_Maroon.png)|Hazardous|301+|Health warning of emergency conditions: everyone is more likely to be affected.|
 
 *PurpleHaze* uses a fairly simple algorithm to determine AQI based on sensor data. This algoritm is not "certified" in any way and you should **NOT** depend on it for any health related matters. It is similar to the method described in [this wikipedia article](https://en.wikipedia.org/wiki/Air_quality_index#Computing_the_AQI). However, the actual conversion table is taken from the paper ["Measurements of PM2.5 with PurpleAir under atmospheric conditions"](https://amt.copernicus.org/preprints/amt-2019-396/) and it's [supplement](https://amt.copernicus.org/preprints/amt-2019-396/amt-2019-396-supplement.pdf). 
 
