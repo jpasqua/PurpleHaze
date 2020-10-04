@@ -121,19 +121,6 @@ public:
     leds->show();
   }
 
-  void cycle() {
-    for (int i = 0; i < _count; i++) {
-      leds->setPixelColor(i, i==0?255:0, i==1?255:0, i==2?255:0);
-      leds->show();
-      delay(266);
-    }
-    for (int i = _count; i >= 0; i--) {
-      leds->setPixelColor(i, 0, 0, 0);
-      leds->show();
-      delay(266);
-    }
-  }
-
   void setBrightness(uint8_t b) {
     leds->setBrightness(b);
     leds->show();
