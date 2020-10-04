@@ -39,18 +39,18 @@ namespace PH {
   AQIReadings latestData;
 
   namespace Internal {
-    static const uint16_t QualityBrackets[] = {50, 100, 150, 200, 150, 300, 350};
-    static const uint16_t nBrackets = sizeof(QualityBrackets)/sizeof(QualityBrackets[0]);
-    static const uint32_t QualityColors[] = {
-      0x6DDF4E,   //   0- 49 GOOD
-      0xFFFF00,   //  50- 99
-      0xEB6036,   // 100-149
-      0xE7352E,   // 150-199
-      0x8A1E4B,   // 200-249
-      0x831B40,   // 250-299
-      0x721527,   // 300-349
-      0x721627    // 350+
+    static const struct {
+      uint16_t max;
+      uint32_t color;
+    } QualityBrackets[] = {
+      { 50, 0x00ff00},
+      {100, 0xffff00},
+      {150, 0xffa500},
+      {200, 0xff0000},
+      {999, 0x9400D3},
     };
+    static const uint16_t nBrackets = sizeof(QualityBrackets)/sizeof(QualityBrackets[0]);
+
     static const String   SettingsFileName = "/settings.json";
 
     void ensureWebThingSettings() {
@@ -117,12 +117,13 @@ namespace PH {
 
       busyIndicator->setColor(0, 255, 0);
       uint16_t quality = aqiReader.derivedAQI(latestData.pm25_env);
-      int bracketIndex;
-      for (bracketIndex = 0; bracketIndex < nBrackets; bracketIndex++) {
-        if (quality < QualityBrackets[bracketIndex]) break;
+      for (int i = 0; i < nBrackets; i++) {
+        if (quality <= QualityBrackets[i].max) {
+          qualityIndicator->setColor(QualityBrackets[i].color);
+          break;
+        }
       }
-      qualityIndicator->setColor(QualityColors[bracketIndex]);
-
+      
       PHBlynk::update();
       lastTimestamp = latestData.timestamp;
       busyIndicator->off();
