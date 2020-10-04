@@ -160,6 +160,7 @@ namespace PHWebUI {
       PH::settings.chartColors.pm10 = WebUI::arg("pm10Color");
       PH::settings.chartColors.pm25 = WebUI::arg("pm25Color");
       PH::settings.chartColors.pm100 = WebUI::arg("pm100Color");
+      PH::settings.chartColors.aqi = WebUI::arg("aqiColor");
       PH::settings.write();
 
       // The description MAY have changed. Update the title just in case
