@@ -1,6 +1,6 @@
 # PurpleHaze - Air Quality Monitor
 
-This is a simple Air Quality Monitor based on the [Plantower PMS5003](https://www.adafruit.com/product/3686). You build some electronics, 3D-print a case, load this software, configure an app on your phone, and you're all set. What could be simpler? This software relies on the [Blynk](https://blynk.io) service to collect data in the cloud and make it available to the app on your phone. If you don't want to use Blynk, you can get the readings directly from *PurpleHaze* in your web browser. In the future, other services may be supported.
+*PurpleHaze* is a simple Air Quality Monitor based on the [Plantower PMS5003](https://www.adafruit.com/product/3686). You put together some electronics, 3D-print a case, load this software, configure an app on your phone, and you're all set. What could be simpler? This software uses the [Blynk](https://blynk.io) service to collect data in the cloud and make it available to the app on your phone. If you don't want to use Blynk, you can get the readings directly from *PurpleHaze* in your web browser. In the future, other services may be supported.
 
 The air quality monitor is configured using a Web User Interface where the user will specify information such as:
 
@@ -24,7 +24,7 @@ The following third party libraries are used within this project:
 * [TimeLib](https://github.com/PaulStoffregen/Time.git)
 * [WebThing](https://github.com/jpasqua/WebThing) [version 0.2.0 or later]
 
-The following libraries are used in the browser. you do not need to download or install them. They are listed here because if you are doing further development of the browser code, you may need to understand their usage:
+The following libraries are used in the browser. You do not need to download or install them. They are listed here because if you are doing further development of the browser code, you may need to understand their usage:
 
 * [Chart.js](https://www.chartjs.org)
 * [JQuery](https://jquery.com)
@@ -35,7 +35,7 @@ The following services play a role in providing parts of the functionality:
  - [Blynk](https://blynk.io): Provides a repository of air quality data and the ability to view it using a mobile app. If you decide not to use Blynk, you can still view data directly using a web browser.
  - Services used by WebThing
 	 - [Google Maps](https://developers.google.com/maps/documentation): Used for geocoding and reverse geocoding. Though not absolutely necessary, it does make using the system a bit more convenient.
-	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data. This is used to timestamp data. This service is necessary for the operation of *PurpleHaze*.
+	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data. This is used to timestamp data. It is necessary for the operation of *PurpleHaze*.
 
 <a name="organization"></a>
 ## Organization
@@ -180,7 +180,8 @@ Now that the General Settings are out of the way, you can adjust settings that a
 
 ## Using PurpleHaze
 
-*PurpleHaze* lets you view your air quality data on your phone or with a web browser. But what do all these numbers mean? There are many resources available to help you understand the data; for example, [this page](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics) on the US EPA website. The following table summarizes the air quality index values at a high level (adapted from [AirNow.gov](https://www.airnow.gov/aqi/aqi-basics/))
+*PurpleHaze* lets you view your air quality data on your phone or with a web browser. But what do all these numbers mean? There are many resources available to help you understand the data; for example, [this page](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics) on the US EPA website. The following table summarizes the air quality index values at a high level (adapted from [AirNow.gov](https://www.airnow.gov/aqi/aqi-basics/)).
+<a name="color_code"></a>
 
 |Color|Concern|Range|Description of Air Quality|
 |--- |--- |--- |--- |
@@ -191,7 +192,9 @@ Now that the General Settings are out of the way, you can adjust settings that a
 | ![](doc/images/Color_Purple.png)|Very Unhealthy|201 - 300|Health alert: The risk of health effects is increased for everyone.|
 | ![](doc/images/Color_Maroon.png)|Hazardous|301+|Health warning of emergency conditions: everyone is more likely to be affected.|
 
-*PurpleHaze* uses a fairly simple algorithm to determine AQI based on sensor data. This algoritm is not "certified" in any way and you should **NOT** depend on it for any health related matters. It is similar to the method described in [this wikipedia article](https://en.wikipedia.org/wiki/Air_quality_index#Computing_the_AQI). However, the actual conversion table is taken from the paper ["Measurements of PM2.5 with PurpleAir under atmospheric conditions"](https://amt.copernicus.org/preprints/amt-2019-396/) and it's [supplement](https://amt.copernicus.org/preprints/amt-2019-396/amt-2019-396-supplement.pdf). 
+The colors shown above are used on the [home page](#home) of the Web UI and on the [charts page](#charts). The air quality NeoPixel also displays one of these colors to show you the current AQI.
+
+*PurpleHaze* uses a fairly simple algorithm to determine AQI based on sensor data. This algorithm is not "certified" in any way and you should **NOT** depend on it for any health related matters. The algorithm used by *PurpleHaze* is similar to the method described in [this wikipedia article](https://en.wikipedia.org/wiki/Air_quality_index#Computing_the_AQI). However, the actual conversion table is taken from the paper ["Measurements of PM2.5 with PurpleAir under atmospheric conditions"](https://amt.copernicus.org/preprints/amt-2019-396/) and it's [supplement](https://amt.copernicus.org/preprints/amt-2019-396/amt-2019-396-supplement.pdf). 
 
 ### Viewing PurpleHaze data on your phone
 
@@ -208,6 +211,7 @@ Blynk QR Code:<br><img src="doc/images/BlynkQRCode.png" width="250" /></img><br>
 
 ### Viewing PurpleHaze data in your browser
 
+<a name="home"></a>
 ![](doc/images/Home.png)
 
 You're already familiar with the Web UI since you used it to configure *PurpleHaze*. Whenever you navigate to *PurpleHaze* in your browser, you will be presented with a home page that shows a variety of current and historical data from your monitor. Refer to the resources above to understand what all these values mean. All of the readings show you the values as of the time displayed at the top of the page, except for the table of moving averages. These will, as the name implies, show you the average PM25 Environmental values for the last 10 minutes, 30 minutes, hour, and 6 hour periods.
@@ -235,7 +239,7 @@ If you have added indicator LEDs, they will display information as follows:
 |------------	|--------------------	|-------------------------------------
 | 1: Quality 	| Off                	| No power to the device
 |            	| Gray               	| No data has been read yet 
-|            	| Green, Yellow, Red 	| The shade indicates the air quality
+|            	| Green, Yellow, Red, Purple, Maroon 	| The shade indicates the air quality as [defined above](#color_code)
 | 2: Sensor  	| Off                	| Sensor is asleep
 |            	| Yellow             	| Sensor is waking up
 |            	| Green              	| Sensor is awake
