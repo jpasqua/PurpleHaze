@@ -143,22 +143,22 @@ Serial.print('.');
 
 uint16_t AQIReader::sizeOfRange(HistoryRange r) {
   switch (r) {
-    case Range_1Hour: return readings_10min.size();
+    case Range_1Hour: return readings_5min.size();
     case Range_1Day: return readings_1hr.size();
     case Range_1Week: return readings_1day.size();
-    case Range_Combined: return readings_10min.size() + readings_1hr.size() + readings_1day.size();
+    case Range_Combined: return readings_5min.size() + readings_1hr.size() + readings_1day.size();
   }
   return 0; // Assert(CantHappen)
 }
 
 AQIReadings AQIReader::getFromRange(HistoryRange r, uint16_t index) {
   switch (r) {
-    case Range_1Hour: return readings_10min[index];
+    case Range_1Hour: return readings_5min[index];
     case Range_1Day: return readings_1hr[index];
     case Range_1Week: return readings_1day[index];
     case Range_Combined:
-      if (index < readings_10min.size()) return readings_10min[index];
-      index -= readings_10min.size();
+      if (index < readings_5min.size()) return readings_5min[index];
+      index -= readings_5min.size();
       if (index < readings_1hr.size()) return readings_1hr[index];
       index -= readings_1hr.size();
       // Fall out...
@@ -180,22 +180,32 @@ void AQIReader::enterState(State newState) {
 }
 
 void AQIReader::updateHistoricalData(AQIReadings& newSample) {
-  static int lastM = -1, lastH = -1, lastD = -1;
-  bool needToWrite = false;
+  // We don't necessarilly want to write the historical data to Flash on every
+  // reading. The following variables control how frequently that occurs
+  static const uint32_t WriteThreshold = 10 * 60 * 1000L; // Write every 10 Minutes
+  static uint32_t lastWrite = 0;
 
-  int m = minute(newSample.timestamp)/10;   // 10 Minute intervals
-  int h = hour(newSample.timestamp);
-  int d = day(newSample.timestamp);
+  bool storedNewValue = false;
 
-  if (m != lastM) { readings_10min.push(newSample); lastM = m; needToWrite = true; }
-  if (h != lastH) { readings_1hr.push(newSample); lastH = h; needToWrite = true; }
-  if ((d != lastD && h == 14) || (readings_1day.isEmpty() && h >= 14)) {
-    // Take readings at 2PM. If we don't have any data yet and we're already
-    // past 2PM, use the current reading to represent this day/
-    readings_1day.push(newSample); lastD = d;
-    needToWrite = true; 
+  if (newSample.timestamp - last5minTimestamp >= (5 * 60L)) {
+    readings_5min.push(newSample);
+    last5minTimestamp = newSample.timestamp;
+    storedNewValue = true;
   }
-  if (needToWrite) storeHistoricalData(HistoryFilePath);
+  if (newSample.timestamp - last1hrTimestamp >= (60 * 60L)) {
+    readings_1hr.push(newSample);
+    last1hrTimestamp = newSample.timestamp;
+    storedNewValue = true;
+  }
+  if (newSample.timestamp - last1dayTimestamp >= (24 * 60 * 60L)) {
+    readings_1day.push(newSample);
+    last1dayTimestamp = newSample.timestamp;
+    storedNewValue = true;
+  }
+  if (storedNewValue && (millis() - lastWrite > WriteThreshold)) {
+    storeHistoricalData(HistoryFilePath);
+    lastWrite = millis();
+  }
 }
 
 void AQIReader::loadHistoricalData(String historyFilePath) {
@@ -237,7 +247,9 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
     data.pm10_env = reading["pm10_env"];
     data.pm25_env = reading["pm25_env"];
     data.pm100_env = reading["pm100_env"];
-    readings_10min.push(data);
+    readings_5min.push(data);
+
+    if (data.timestamp > last5minTimestamp) last5minTimestamp = data.timestamp;
   }
   JsonArrayConst dayData = doc[F("day")]["data"];
   for (JsonObjectConst reading : dayData) {
@@ -247,6 +259,7 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
     data.pm25_env = reading["pm25_env"];
     data.pm100_env = reading["pm100_env"];
     readings_1hr.push(data);
+    if (data.timestamp > last1hrTimestamp) last1hrTimestamp = data.timestamp;
   }
   JsonArrayConst weekData = doc[F("week")]["data"];
   for (JsonObjectConst reading : weekData) {
@@ -256,6 +269,7 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
     data.pm25_env = reading["pm25_env"];
     data.pm100_env = reading["pm100_env"];
     readings_1day.push(data);
+    if (data.timestamp > last1dayTimestamp) last1dayTimestamp = data.timestamp;
   }
 
 // Log.verbose("History as read from file:");
