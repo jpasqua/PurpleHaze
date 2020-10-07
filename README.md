@@ -214,11 +214,15 @@ Blynk QR Code:<br><img src="doc/images/BlynkQRCode.png" width="250" /></img><br>
 <a name="home"></a>
 ![](doc/images/Home.png)
 
-You're already familiar with the Web UI since you used it to configure *PurpleHaze*. Whenever you navigate to *PurpleHaze* in your browser, you will be presented with a home page that shows a variety of current and historical data from your monitor. Refer to the resources above to understand what all these values mean. All of the readings show you the values as of the time displayed at the top of the page, except for the table of moving averages. These will, as the name implies, show you the average PM25 Environmental values for the last 10 minutes, 30 minutes, hour, and 6 hour periods.
+You're already familiar with the Web UI since you used it to configure *PurpleHaze*. Whenever you navigate to *PurpleHaze* in your browser, you will be presented with a home page that shows a variety of current and historical data from your monitor. Refer to the resources above to understand what all these values mean. The elements of the page are as follows:
 
-Below that you'll see a widget from [AirNow.gov](airnow.gov) that shows data for your area. Note that this data does not reflect the reading of your device.
+* **PurpleHaze Data**: This is just a heading, but also shows the time of the last reading taken by the device
+* **AQI** (Air Quality Index): The current AQI reading and the associated color code for that level. If you hover over this area you'll see some text describing the level.
+* **Sensor Readings**: The most recent standard and environment readings of PM1.0, PM2.5, and PM10.0. The heading of this section includes two links labeled "charts" and "Satellite Image". You can also access charts [via the menu](#charts). If you click the "Satellite Image" link, a new window or tab will open with a satellite image centered over your location; i.e., the location you entered in the Web UI. This view is useful to visualize any major events (e.g. fires) that may be impacting your air quality.
+* **Particulate Counts**: The raw particulate counts for particles of various sizes.
+* Moving averages: The average PM25 Environment values for the last 10 minutes, 30 minutes, hour, and 6 hour periods. 
+* **Area Readings**: A widget from [AirNow.gov](airnow.gov) that shows data for your area. Note that this data does not reflect the reading of your device.
 
-At the top of the page you'll see two links right next to the title of the `Air Quality Index` table. The links are labeled "charts" and "Satellite Image". You can also access charts [via the menu](#charts). If you click the "Satellite Image" link, a new window or tab will open with a satellite image centered over your location. That is, the location you entered in the *PurpleHaze* Web UI. This page does not contain any information from your sensor. It is useful to visualize any major events (e.g. fires) that may be impacting your air quality.
 
 <a name="charts"></a>
 ![](doc/images/Charts.png)
