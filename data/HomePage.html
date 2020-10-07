@@ -35,24 +35,33 @@
     display: inline-block;
   }
 </style>
-<table><tr><td><span class="dot" id="aqiDot"></span></td><td style="vertical-align:top">AQI: %AQI%</td></tr></table>
+<table class="w3-tooltip">
+  <tr>
+    <td><span class="dot" id="aqiDot"></span></td>
+    <td style="vertical-align:top"> AQI: %AQI%&nbsp; <span class="w3-text w3-small" id="aqi_desc"></span></td>
+  </tr>
+</table>
 <script type="text/javascript">
   const aqiColors = [
-    {max:  50, color: "#00ff00"},
-    {max: 100, color: "#ffff00"},
-    {max: 150, color: "#ffa500"},
-    {max: 200, color: "#ff0000"},
-    {max: 999, color: "#9400D3"}];
+    {max:  50, color: "#00ff00", desc: "Good: Air quality is satisfactory, and air pollution poses little or no risk."},
+    {max: 100, color: "#ffff00", desc: "Moderate: Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution."},
+    {max: 150, color: "#ffa500", desc: "Unhealthy for Sensitive Groups: Members of sensitive groups may experience health effects. The general public is less likely to be affected."},
+    {max: 200, color: "#ff0000", desc: "Unhealthy: Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects."},
+    {max: 300, color: "#9400D3", desc: "Very Unhealthy: Health alert: The risk of health effects is increased for everyone."},
+    {max: 999, color: "#7E0023", desc: "Hazardous: Health warning of emergency conditions: everyone is more likely to be affected."}
+  ];
   function colorElement(val, elmentID) {
     var e = document.getElementById(elmentID);
     for (i = 0; i < aqiColors.length; i++) {
       if (val <= aqiColors[i].max) {
         e.style.backgroundColor = aqiColors[i].color;
+        const desc = document.getElementById("aqi_desc");
+        desc.textContent = aqiColors[i].desc;
         return;
       }
     }
   }
-  colorElement(%AQI%, "aqiDot");
+colorElement(%AQI%, "aqiDot");
 </script>
 <strong>Sensor Readings </strong> (<a href="ChartPage.html">charts</a>, <a id="zl" target="_blank">Satellite Image</a>)
 <table class="w3-table-all w3-hoverable">
