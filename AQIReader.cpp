@@ -217,6 +217,7 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
   size_t size = 0;
   if (!historyFile) {
     Log.error(F("Failed to open history file for read: %s"), historyFilePath.c_str());
+    return;
   } else {
     size = historyFile.size();
     if (size > MaxHistoryFileSize) {
