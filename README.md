@@ -100,7 +100,9 @@ The D1 Mini can be mounted on the top of the board as shown in the image, or bel
 [<img src="doc/images/PCB_Bare.jpg" width="250">](doc/images/PCB_Bare.jpg)
 [<img src="doc/images/PCB_Populated.jpg" width="250">](doc/images/PCB_Populated.jpg)
 
-Speaking of the sensor header, it is there for use with the adapter board that comes with the Adafruit sensor and is also available form [aliexpress](https://www.aliexpress.com/item/33040162499.html). You can bypass that board completely by cutting the connector off one end of the cable and soldering the wires directly to the board in place of the sensor header. Only four wires from the cable are needed: `VCC`, `GND`, `TX`, and `RX`.
+Speaking of the sensor header, it is there for use with the adapter board that comes with the Adafruit sensor and is also available form [aliexpress](https://www.aliexpress.com/item/33040162499.html). You can bypass that board completely by cutting the connector off one end of the cable and soldering the wires directly to the board in place of the sensor header. Only four wires from the cable are needed: `VCC`, `GND`, `TX`, and `RX`. You can see that configuration in the image below:
+
+[<img src="doc/images/Direct.jpg" width="250">](doc/images/Direct.jpg)
 
 The 3D Model for the housing has a bracket that is designed to work with this PCB. You can use a service like [OSH Park](https://oshpark.com/) or [JLCPCB](https://jlcpcb.com) to fabricate the board by uploading the design which is a single zip file containing the [Gerber](https://en.wikipedia.org/wiki/Gerber_format) files.
 
