@@ -145,8 +145,8 @@ uint16_t AQIReader::sizeOfRange(HistoryRange r) {
   switch (r) {
     case Range_1Hour: return readings_5min.size();
     case Range_1Day: return readings_1hr.size();
-    case Range_1Week: return readings_1day.size();
-    case Range_Combined: return readings_5min.size() + readings_1hr.size() + readings_1day.size();
+    case Range_1Week: return readings_12hr.size();
+    case Range_Combined: return readings_5min.size() + readings_1hr.size() + readings_12hr.size();
   }
   return 0; // Assert(CantHappen)
 }
@@ -155,7 +155,7 @@ AQIReadings AQIReader::getFromRange(HistoryRange r, uint16_t index) {
   switch (r) {
     case Range_1Hour: return readings_5min[index];
     case Range_1Day: return readings_1hr[index];
-    case Range_1Week: return readings_1day[index];
+    case Range_1Week: return readings_12hr[index];
     case Range_Combined:
       if (index < readings_5min.size()) return readings_5min[index];
       index -= readings_5min.size();
@@ -163,7 +163,7 @@ AQIReadings AQIReader::getFromRange(HistoryRange r, uint16_t index) {
       index -= readings_1hr.size();
       // Fall out...
   }
-  return readings_1day[index];
+  return readings_12hr[index];
 }
 
 void AQIReader::enterState(State newState) {
@@ -197,8 +197,8 @@ void AQIReader::updateHistoricalData(AQIReadings& newSample) {
     last1hrTimestamp = newSample.timestamp;
     storedNewValue = true;
   }
-  if (newSample.timestamp - last1dayTimestamp >= (24 * 60 * 60L)) {
-    readings_1day.push(newSample);
+  if (newSample.timestamp - last1dayTimestamp >= (12 * 60 * 60L)) {
+    readings_12hr.push(newSample);
     last1dayTimestamp = newSample.timestamp;
     storedNewValue = true;
   }
@@ -269,7 +269,7 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
     data.pm10_env = reading["pm10_env"];
     data.pm25_env = reading["pm25_env"];
     data.pm100_env = reading["pm100_env"];
-    readings_1day.push(data);
+    readings_12hr.push(data);
     if (data.timestamp > last1dayTimestamp) last1dayTimestamp = data.timestamp;
   }
 
@@ -319,12 +319,12 @@ void AQIReader::logData(AQIReadings& data) {
   Log.verbose(F("---------------------------------------"));
   Log.verbose(F("PM 1.0: %d\t\tPM 2.5: %d\t\tPM 10: %d"), data.pm10_env ,data.pm25_env, data.pm100_env);
   Log.verbose(F("---------------------------------------"));
-  Log.verbose(F("Particles > 0.3um / 0.1L air:"), data.particles_03um);
-  Log.verbose(F("Particles > 0.5um / 0.1L air:"), data.particles_05um);
-  Log.verbose(F("Particles > 1.0um / 0.1L air:"), data.particles_10um);
-  Log.verbose(F("Particles > 2.5um / 0.1L air:"), data.particles_25um);
-  Log.verbose(F("Particles > 5.0um / 0.1L air:"), data.particles_50um);
-  Log.verbose(F("Particles > 50 um / 0.1L air:"), data.particles_100um);
+  Log.verbose(F("Particles > 0.3um / 0.1L air: %d"), data.particles_03um);
+  Log.verbose(F("Particles > 0.5um / 0.1L air: %d"), data.particles_05um);
+  Log.verbose(F("Particles > 1.0um / 0.1L air: %d"), data.particles_10um);
+  Log.verbose(F("Particles > 2.5um / 0.1L air: %d"), data.particles_25um);
+  Log.verbose(F("Particles > 5.0um / 0.1L air: %d"), data.particles_50um);
+  Log.verbose(F("Particles > 50 um / 0.1L air: %d"), data.particles_100um);
   Log.verbose(F("---------------------------------------"));
 }
 

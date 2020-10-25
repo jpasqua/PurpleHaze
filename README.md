@@ -229,7 +229,13 @@ You're already familiar with the Web UI since you used it to configure *PurpleHa
 <a name="charts"></a>
 ![](doc/images/Charts.png)
 
-The Charts page provides several charts with historical data. In each chart you will see a line for PM10, PM25, and PM100 data. The charts cover three different time frames: the last hour, the last day, and the last week. Hover your mouse over a dot on the chart to see the precise value and time it was recorded. For any of the charts, if you click on the legend of one of the lines, it will toggle that line's visibility in the graph. For example, if you just want to see the PM25 day, click on the legend items for PM10 and PM100 and those lines will disappear. Click them again and they will return.
+The Charts page provides several charts with historical data. In each chart you will see a line for the Air Quality Index, PM10, PM25, and PM100 data. The charts cover three different time frames:
+
+* The last hour, recorded at 5 minute intervals
+* The last day, recorded at 1 hour intervals
+* The last week, recorded at 6 hour intervals
+
+Hover your mouse over a dot on the chart to see the precise value and time it was recorded. For any of the charts, if you click on the legend of one of the lines, it will toggle that line's visibility in the graph. For example, if you just want to see the PM25 line, click on the legend items for PM10 and PM100 and those lines will disappear. Click them again and they will return.
 
 Note that when you first turn on your device, there will be no historical data so the charts won't be very interesting. Over time they will fill up with data.
 
@@ -286,12 +292,12 @@ Finally, the `/dev` page also has a `Request Reboot` button. If you press the bu
 
 During development you may be uploading sketch data from time to time. When you do this, it overwrites the entire SPIFFS file system on the ESP8266. This means any settings that you have customized through the web interface will be wiped out. This gets annoying, but you can work around it in two ways:
 
-1. [Not Recommnded] Change the *PurpleHaze* code and the WebThing library to hard-wire your default settings.
+1. [Not Recommended] Change the *PurpleHaze* code and the WebThing library to hard-wire your default settings.
 2. [Recommended] Configure *PurpleHaze* the way you like it. From the developer menu, click on the `View Settings` button to get your settings as JSON. Save the text into a file named `settings.json` and put it into your data directory. Do the same thing by pressing the `View WebThing Settings` button and save that text into `data/wt/settings.json` From that point forward, any time you upload sketch data, your preferred settings will be uploaded also.
 
 **History**
 
-The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *PurpleHaze* saves the historical data for the last hour (with readings every 5 minutes), the last day (with readings every hour), and the last week (with readings every day).
+The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *PurpleHaze* saves the historical data for the last hour (with readings every 5 minutes), the last day (with readings every hour), and the last week (with readings every 12 hours).
 
 Uploading new versions of the code will not overwrite the history, but uploading new data files will. You can preserve your history in similar way as just described for settings. From the developer menu, click on the `View History` button. This will return your history as JSON. Save the text into a file named `history.json` and put it into your data directory. When you upload sketch data, the history will also be uploaded.
 
@@ -301,4 +307,4 @@ You can use the indicator LEDs to help you debug if you are not connected to the
 
 **Rebooting**
 
-When you need to restart the device, it is best to power cycle your ESP8266 and PMS5003 rather than just hitting the reset button. I've noticed situations where the ESP has a hard time resyncing with the sensor after a reset (as opposed to a power-cycle).
+When you need to restart the device, it is best to power cycle your ESP8266 and PMS5003 rather than just hitting the reset button. I've noticed situations where the ESP has a hard time re-syncing with the sensor after a reset (as opposed to a power-cycle).

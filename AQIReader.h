@@ -60,9 +60,9 @@ private:
   uint32_t last1hrTimestamp = 0;
   uint32_t last1dayTimestamp = 0;
 
-  CircularBuffer<AQIReadings, 60/5> readings_5min; // The last hour's worth of readings at 5 minute intervals
-  CircularBuffer<AQIReadings, 24> readings_1hr; // The last day's worth of readings at 1 hour intervals
-  CircularBuffer<AQIReadings, 7> readings_1day; // The last week's worth of readings at 1 day intervals
+  CircularBuffer<AQIReadings, 12> readings_5min;  // The last hour's worth of readings at 5 minute intervals
+  CircularBuffer<AQIReadings, 24> readings_1hr;   // The last day's worth of readings at 1 hour intervals
+  CircularBuffer<AQIReadings, 14> readings_12hr;  // The last week's worth of readings at 12 hour intervals
 
   void enterState(State);
   void updateHistoricalData(AQIReadings& newSample);
