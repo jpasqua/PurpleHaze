@@ -260,6 +260,7 @@ If you have added indicator LEDs, they will display information as follows:
 |            	| Red                	| Problem initializing
 |            	| Blue               	| No wifi has been configured
 |            	| Green              	| Processing readings
+|            	| Magenta              	| Serving a web request
 
 <a name="dev-info"></a>
 ## Operational Info for Developers

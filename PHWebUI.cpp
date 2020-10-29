@@ -21,6 +21,7 @@
 // ----- BEGIN: WebUI namespacea
 namespace PHWebUI {
   static const String   checkedOrNot[2] = {"", "checked='checked'"};
+  static const uint32_t BusyColor = 0xff88ff;
   ESPTemplateProcessor  *templateHandler;
 
   // ----- BEGIN: PHWebUI::Internal
@@ -73,9 +74,11 @@ namespace PHWebUI {
         return "";
       };
 
+      PH::busyIndicator->setColor(BusyColor);
       WebUI::startPage();
       templateHandler->send("/HomePage.html", mapper);
       WebUI::finishPage();
+      PH::busyIndicator->off();
     }
 
     void displayChartPage() {
@@ -90,9 +93,11 @@ namespace PHWebUI {
         return "";
       };
 
+      PH::busyIndicator->setColor(BusyColor);
       WebUI::startPage();
       templateHandler->send("/ChartPage.html", mapper);
       WebUI::finishPage();
+      PH::busyIndicator->off();
     }
 
     // Displays a form allowing the user to update the PurpleHaze settings.
@@ -115,9 +120,11 @@ namespace PHWebUI {
         return "";
       };
 
+      PH::busyIndicator->setColor(BusyColor);
       WebUI::startPage();
       templateHandler->send("/ConfigForm.html", mapper);
       WebUI::finishPage();
+      PH::busyIndicator->off();
     }
   }   // ----- END: PHWebUI::Pages
 
@@ -136,7 +143,9 @@ namespace PHWebUI {
         PH::aqiReader.emitHistoryAsJson(range, s);
       };
 
+      PH::busyIndicator->setColor(BusyColor);
       WebUI::sendArbitraryContent("application/json", -1, provider);
+      PH::busyIndicator->off();
     }
 
 
@@ -191,9 +200,11 @@ namespace PHWebUI {
         return "";
       };
 
+      PH::busyIndicator->setColor(BusyColor);
       WebUI::startPage();
       templateHandler->send("/DevPage.html", mapper);
       WebUI::finishPage();
+      PH::busyIndicator->off();
     }
 
     void reboot() {
@@ -207,7 +218,9 @@ namespace PHWebUI {
 
       DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
                                                          PH::settings.asJSON();
+      PH::busyIndicator->setColor(BusyColor);
       WebUI::sendJSONContent(doc);
+      PH::busyIndicator->off();
       doc->clear();
       delete doc;
     }
