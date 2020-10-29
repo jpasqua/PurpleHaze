@@ -19,11 +19,12 @@
 
 namespace PHBlynk {
   // ----- Constants
-  static const int BlynkEnv010        = 0;
-  static const int BlynkEnv025        = 1;
-  static const int BlynkEnv100        = 2;
-  static const int BlynkTimestampPin  = 3;
-  static const int BlynkMA30          = 4;
+  static const int BlynkEnv010    = 20;
+  static const int BlynkEnv025    = 21;
+  static const int BlynkEnv100    = 22;
+  static const int BlynkTimestamp = 23;
+  static const int BlynkMA30      = 24;
+  static const int BlynkAQI       = 25;
 
   // ----- State
   bool connectedToBlynk = false;
@@ -54,7 +55,8 @@ namespace PHBlynk {
     Blynk.virtualWrite(BlynkEnv025, PH::latestData.pm25_env);
     Blynk.virtualWrite(BlynkEnv100, PH::latestData.pm100_env);
     Blynk.virtualWrite(BlynkMA30, (uint16_t)PH::aqiReader.pm25_env_30min.getAverage());
-    Blynk.virtualWrite(BlynkTimestampPin, PH::formattedTime(PH::latestData.timestamp));
+    Blynk.virtualWrite(BlynkTimestamp, PH::formattedTime(PH::latestData.timestamp));
+    Blynk.virtualWrite(BlynkAQI, PH::aqiReader.derivedAQI(PH::latestData.pm25_env));
     Log.trace("Blynk update complete");
   }
 

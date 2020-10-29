@@ -295,6 +295,10 @@ During development you may be uploading sketch data from time to time. When you 
 1. [Not Recommended] Change the *PurpleHaze* code and the WebThing library to hard-wire your default settings.
 2. [Recommended] Configure *PurpleHaze* the way you like it. From the developer menu, click on the `View Settings` button to get your settings as JSON. Save the text into a file named `settings.json` and put it into your data directory. Do the same thing by pressing the `View WebThing Settings` button and save that text into `data/wt/settings.json` From that point forward, any time you upload sketch data, your preferred settings will be uploaded also.
 
+**Blynk**
+
+The virtual pins used by Blynk are currently hard-wired in the code and are not available in the Web UI. If you want to use different pin assignments, you need to change them in `PHBlynk.h` and make the settings in the Blynk app correspond to the values you have chosen.
+
 **History**
 
 The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *PurpleHaze* saves the historical data for the last hour (with readings every 5 minutes), the last day (with readings every hour), and the last week (with readings every 12 hours).
