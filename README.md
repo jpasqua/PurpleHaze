@@ -283,6 +283,22 @@ The `/dev` page also has a `View WebThing Settings` button which will return a p
 
 As mentioned above, *PurpleHaze* periodically saves historical information to flash memory. You can see that data in JSON format by pressing the `View History` button. You can also get to this data directly with the url `http://[PH_Adress]/getHistory?range=combined`. You can also get just the hour-data, day data, or week data by substituting `hour`, `day`, or `week` as the range.
 
+**AQI**
+
+A client can get the most recent AQI reading using the endpoint: `http://[PH_Adress]/getAQI`. This call will return a JSON object containing the AQI along with a timestamp and additional supporting information. For example:
+
+````
+{
+  "timestamp": 1603993511,
+  "aqi": 40,
+  "shortDesc": "Good",
+  "longDesc": "Air quality is satisfactory, and air pollution poses little or no risk.",
+  "color": 65280
+ }
+````
+
+A client can display this information in whatever way it wishes. The descriptions are not localized at the moment. They are always in English and correspond to the wording used by [AirNow.gov](http://airnow.gov).
+
 **Rebooting**
 
 Finally, the `/dev` page also has a `Request Reboot` button. If you press the button you will be presented with a popup in your browser asking if you are sure. If you confirm, your *PurpleHaze* device will immediately reboot as if the reset button had been pressed.

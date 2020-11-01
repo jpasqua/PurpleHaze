@@ -21,8 +21,31 @@ namespace PH {
   extern AQIReader aqiReader;
   extern Indicator* busyIndicator;
 
+  /**
+   * Return a pointer to a static buffer with the supplied time as a formatted
+   * string of the form YYYY/MM/DD HH:MM:SS
+   */
   char* formattedTime(time_t theTime);
-  void setIndicatorBrightness(uint8_t b); // 0-100%
+
+  /**
+   * Set the brightness of all indicators to the supplied
+   * value from 0-100%
+   */
+  void setIndicatorBrightness(uint8_t b);
+
+  /**
+   * Appends a JSON description corresponding to the supplied AQI value
+   * to the supplied String object.
+   * Example result:
+   * {
+   *   "timestamp": 1604162511,
+   *   "aqi": 51,
+   *   "shortDesc": "Moderate",
+   *   "longDesc": "Air quality is acceptable. <remainder omitted for brevity>",
+   *   "color": 16776960
+   * }
+   */
+  void aqiAsJSON(uint16_t quality, String& result);
 }
 
 #endif  // PurpleHaze_h

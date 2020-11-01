@@ -148,6 +148,14 @@ namespace PHWebUI {
       PH::busyIndicator->off();
     }
 
+    void getAQI() {
+      PH::busyIndicator->setColor(BusyColor);
+      String result;
+      result.reserve(300);
+      PH::aqiAsJSON(PH::aqiReader.derivedAQI(PH::latestData.pm25_env), result);
+      WebUI::sendStringContent("application/json", result);
+      PH::busyIndicator->off();
+    }
 
     // Handler for the "/updatePHConfig" endpoint. This is invoked as the target
     // of the form presented by "/displayPHConfig". It updates the values of the
@@ -242,6 +250,7 @@ namespace PHWebUI {
 
     WebUI::registerHandler("/updatePHConfig",     Endpoints::updatePHConfig);
     WebUI::registerHandler("/getHistory",         Endpoints::getHistory);
+    WebUI::registerHandler("/getAQI",             Endpoints::getAQI);
 
     WebUI::registerHandler("/dev",                Dev::displayDevPage);
     WebUI::registerHandler("/dev/reboot",         Dev::reboot);
