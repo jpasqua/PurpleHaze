@@ -53,13 +53,13 @@ namespace PHWebUI {
       auto mapper =[](String &key) -> String {
         if (key == "LAT")  return WebThing::settings.latAsString();
         if (key == "LNG")  return WebThing::settings.lngAsString();
-        if (key == "AQI") return (String(PH::aqiReader.derivedAQI(PH::latestData.pm25_env)));
-        if (key == "PM10STD") return (String(PH::latestData.pm10_standard));
-        if (key == "PM25STD") return (String(PH::latestData.pm25_standard));
-        if (key == "PM100STD") return (String(PH::latestData.pm100_standard));
-        if (key == "PM10ENV") return (String(PH::latestData.pm10_env));
-        if (key == "PM25ENV") return (String(PH::latestData.pm25_env));
-        if (key == "PM100ENV") return (String(PH::latestData.pm100_env));
+        if (key == "AQI") return (String(PH::aqiReader.derivedAQI(PH::latestData.env.pm25)));
+        if (key == "PM10STD") return (String(PH::latestData.standard.pm10));
+        if (key == "PM25STD") return (String(PH::latestData.standard.pm25));
+        if (key == "PM100STD") return (String(PH::latestData.standard.pm100));
+        if (key == "PM10ENV") return (String(PH::latestData.env.pm10));
+        if (key == "PM25ENV") return (String(PH::latestData.env.pm25));
+        if (key == "PM100ENV") return (String(PH::latestData.env.pm100));
         if (key == "P03") return (String(PH::latestData.particles_03um));
         if (key == "P05") return (String(PH::latestData.particles_05um));
         if (key == "P10") return (String(PH::latestData.particles_10um));
@@ -67,10 +67,10 @@ namespace PHWebUI {
         if (key == "P50") return (String(PH::latestData.particles_50um));
         if (key == "P100") return (String(PH::latestData.particles_100um));
         if (key == "TMST") return String(PH::formattedTime(PH::latestData.timestamp));
-        if (key == "MA10") return (String(PH::aqiReader.pm25_env_10min.getAverage(), 0));
-        if (key == "MA30") return (String(PH::aqiReader.pm25_env_30min.getAverage(), 0));
-        if (key == "MA1H") return (String(PH::aqiReader.pm25_env_1hr.getAverage(), 0));
-        if (key == "MA6H") return (String(PH::aqiReader.pm25_env_6hr.getAverage(), 0));
+        if (key == "MA10") return (String(PH::aqiReader.pm25env_10min.getAverage(), 0));
+        if (key == "MA30") return (String(PH::aqiReader.pm25env_30min.getAverage(), 0));
+        if (key == "MA1H") return (String(PH::aqiReader.pm25env_1hr.getAverage(), 0));
+        if (key == "MA6H") return (String(PH::aqiReader.pm25env_6hr.getAverage(), 0));
         return "";
       };
 
@@ -152,7 +152,7 @@ namespace PHWebUI {
       PH::busyIndicator->setColor(BusyColor);
       String result;
       result.reserve(300);
-      PH::aqiAsJSON(PH::aqiReader.derivedAQI(PH::latestData.pm25_env), result);
+      PH::aqiAsJSON(PH::aqiReader.derivedAQI(PH::latestData.env.pm25), result);
       WebUI::sendStringContent("application/json", result);
       PH::busyIndicator->off();
     }

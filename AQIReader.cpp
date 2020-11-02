@@ -45,12 +45,10 @@ static const uint32_t MaxHistoryFileSize = 8192;
 
 AQIReader::AQIReader() {
   aqi = new PMS5003();
-  pm25_env_10min.setSamplesToConsider(2);         // (2) 5-minute periods
-  pm25_env_30min.setSamplesToConsider(6);         // (6) 5-minute periods
-  pm25_env_1hr.setSamplesToConsider(12);          // (12) 5-minute periods
-  pm25_env_6hr.setSamplesToConsider(6 * 12);      // (6) 1-hour periods
-  pm25_env_1day.setSamplesToConsider(4 * 72);     // (4) 6-hour periods
-  pm25_env_1week.setSamplesToConsider(7 * 288);   // (7) 1-day periods
+  pm25env_10min.setSamplesToConsider(2);         // (2) 5-minute periods
+  pm25env_30min.setSamplesToConsider(6);         // (6) 5-minute periods
+  pm25env_1hr.setSamplesToConsider(12);          // (12) 5-minute periods
+  pm25env_6hr.setSamplesToConsider(6 * 12);      // (6) 1-hour periods
 }
 
 bool AQIReader::init(Stream* streamToSensor, Indicator* indicator) {
@@ -90,12 +88,12 @@ void AQIReader::emitHistoryAsJson(HistoryRange r, Stream& s) {
   s.println("{ \"data\": [");
 
   for (int i = 0; i < size; i++) {
-    AQIReadings data = getFromRange(r, i);
+    RecordedReadings data = getFromRange(r, i);
     if (needsComma) s.println(",");
     s.print("{ \"ts\":"); s.print(data.timestamp - tzOffset);
-    s.print(", \"pm10_env\":"); s.print(data.pm10_env);
-    s.print(", \"pm25_env\":"); s.print(data.pm25_env);
-    s.print(", \"pm100_env\":"); s.print(data.pm100_env);
+    s.print(", \"pm10_env\":"); s.print(data.env.pm10);
+    s.print(", \"pm25_env\":"); s.print(data.env.pm25);
+    s.print(", \"pm100_env\":"); s.print(data.env.pm100);
     s.print(" }");
     needsComma = true;
   }
@@ -134,7 +132,7 @@ Serial.print('.');
     return;
   }
 
-  updateMovingAvgs(data.pm25_env);
+  updateMovingAvgs(data.env.pm25);
   updateHistoricalData(data);
   logAvgs();
 
@@ -145,17 +143,17 @@ uint16_t AQIReader::sizeOfRange(HistoryRange r) {
   switch (r) {
     case Range_1Hour: return readings_5min.size();
     case Range_1Day: return readings_1hr.size();
-    case Range_1Week: return readings_12hr.size();
-    case Range_Combined: return readings_5min.size() + readings_1hr.size() + readings_12hr.size();
+    case Range_1Week: return readings_6hr.size();
+    case Range_Combined: return readings_5min.size() + readings_1hr.size() + readings_6hr.size();
   }
   return 0; // Assert(CantHappen)
 }
 
-AQIReadings AQIReader::getFromRange(HistoryRange r, uint16_t index) {
+AQIReader::RecordedReadings AQIReader::getFromRange(HistoryRange r, uint16_t index) {
   switch (r) {
     case Range_1Hour: return readings_5min[index];
     case Range_1Day: return readings_1hr[index];
-    case Range_1Week: return readings_12hr[index];
+    case Range_1Week: return readings_6hr[index];
     case Range_Combined:
       if (index < readings_5min.size()) return readings_5min[index];
       index -= readings_5min.size();
@@ -163,7 +161,7 @@ AQIReadings AQIReader::getFromRange(HistoryRange r, uint16_t index) {
       index -= readings_1hr.size();
       // Fall out...
   }
-  return readings_12hr[index];
+  return readings_6hr[index];
 }
 
 void AQIReader::enterState(State newState) {
@@ -186,19 +184,22 @@ void AQIReader::updateHistoricalData(AQIReadings& newSample) {
   static uint32_t lastWrite = 0;
 
   bool storedNewValue = false;
+  RecordedReadings readings;
+  readings.timestamp = newSample.timestamp;
+  readings.env = newSample.env;
 
   if (newSample.timestamp - last5minTimestamp >= (5 * 60L)) {
-    readings_5min.push(newSample);
+    readings_5min.push(readings);
     last5minTimestamp = newSample.timestamp;
     storedNewValue = true;
   }
   if (newSample.timestamp - last1hrTimestamp >= (60 * 60L)) {
-    readings_1hr.push(newSample);
+    readings_1hr.push(readings);
     last1hrTimestamp = newSample.timestamp;
     storedNewValue = true;
   }
-  if (newSample.timestamp - last1dayTimestamp >= (12 * 60 * 60L)) {
-    readings_12hr.push(newSample);
+  if (newSample.timestamp - last1dayTimestamp >= (6 * 60 * 60L)) {
+    readings_6hr.push(readings);
     last1dayTimestamp = newSample.timestamp;
     storedNewValue = true;
   }
@@ -237,7 +238,7 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
 // Log.verbose("Historical data:");
 // serializeJsonPretty(doc, Serial);
 
-  AQIReadings data;
+  RecordedReadings data;
   int32_t tzOffset = WebThing::getGMTOffset();
   // Note that timestamps are externalized as GMT time. When we
   // internalize them, we need to adjust back to local time
@@ -245,20 +246,19 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
   for (JsonObjectConst reading : hourData) {
     data.timestamp = reading["ts"];
     data.timestamp += tzOffset;
-    data.pm10_env = reading["pm10_env"];
-    data.pm25_env = reading["pm25_env"];
-    data.pm100_env = reading["pm100_env"];
+    data.env.pm10 = reading["pm10_env"];
+    data.env.pm25 = reading["pm25_env"];
+    data.env.pm100 = reading["pm100_env"];
     readings_5min.push(data);
-
     if (data.timestamp > last5minTimestamp) last5minTimestamp = data.timestamp;
   }
   JsonArrayConst dayData = doc[F("day")]["data"];
   for (JsonObjectConst reading : dayData) {
     data.timestamp = reading["ts"];
     data.timestamp += tzOffset;
-    data.pm10_env = reading["pm10_env"];
-    data.pm25_env = reading["pm25_env"];
-    data.pm100_env = reading["pm100_env"];
+    data.env.pm10 = reading["pm10_env"];
+    data.env.pm25 = reading["pm25_env"];
+    data.env.pm100 = reading["pm100_env"];
     readings_1hr.push(data);
     if (data.timestamp > last1hrTimestamp) last1hrTimestamp = data.timestamp;
   }
@@ -266,10 +266,10 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
   for (JsonObjectConst reading : weekData) {
     data.timestamp = reading["ts"];
     data.timestamp += tzOffset;
-    data.pm10_env = reading["pm10_env"];
-    data.pm25_env = reading["pm25_env"];
-    data.pm100_env = reading["pm100_env"];
-    readings_12hr.push(data);
+    data.env.pm10 = reading["pm10_env"];
+    data.env.pm25 = reading["pm25_env"];
+    data.env.pm100 = reading["pm100_env"];
+    readings_6hr.push(data);
     if (data.timestamp > last1dayTimestamp) last1dayTimestamp = data.timestamp;
   }
 
@@ -300,12 +300,10 @@ void AQIReader::storeHistoricalData(String historyFilePath) {
 }
 
 void AQIReader::updateMovingAvgs(uint16_t newSample) {
-  pm25_env_10min.addSample(newSample);
-  pm25_env_30min.addSample(newSample);
-  pm25_env_1hr.addSample(newSample);
-  pm25_env_6hr.addSample(newSample);
-  pm25_env_1day.addSample(newSample);
-  pm25_env_1week.addSample(newSample);
+  pm25env_10min.addSample(newSample);
+  pm25env_30min.addSample(newSample);
+  pm25env_1hr.addSample(newSample);
+  pm25env_6hr.addSample(newSample);
 }
 
 
@@ -315,9 +313,9 @@ void AQIReader::logData(AQIReadings& data) {
   Log.verbose(F("---------------------------------------"));
   Log.verbose(F("Concentration Units (standard)"));
   Log.verbose(F("---------------------------------------"));
-  Log.verbose(F("PM 1.0: %d\t\tPM 2.5: %d\t\tPM 10: %d"), data.pm10_standard ,data.pm25_standard, data.pm100_standard);
+  Log.verbose(F("PM 1.0: %d\t\tPM 2.5: %d\t\tPM 10: %d"), data.standard.pm10 ,data.standard.pm25, data.standard.pm100);
   Log.verbose(F("---------------------------------------"));
-  Log.verbose(F("PM 1.0: %d\t\tPM 2.5: %d\t\tPM 10: %d"), data.pm10_env ,data.pm25_env, data.pm100_env);
+  Log.verbose(F("PM 1.0: %d\t\tPM 2.5: %d\t\tPM 10: %d"), data.env.pm10 ,data.env.pm25, data.env.pm100);
   Log.verbose(F("---------------------------------------"));
   Log.verbose(F("Particles > 0.3um / 0.1L air: %d"), data.particles_03um);
   Log.verbose(F("Particles > 0.5um / 0.1L air: %d"), data.particles_05um);
@@ -331,10 +329,8 @@ void AQIReader::logData(AQIReadings& data) {
 void AQIReader::logAvgs() {
   Log.verbose("-- %s --", WebThing::formattedInterval(
     hour(data.timestamp), minute(data.timestamp), second(data.timestamp), true, true).c_str());
-  Log.verbose(F("Last 30 Minutes: %F"), pm25_env_30min.getAverage());
-  Log.verbose(F("Last 1 hour: %F"), pm25_env_1hr.getAverage());
-  Log.verbose(F("Last 6 hours: %F"), pm25_env_6hr.getAverage());
-  Log.verbose(F("Last 1 day: %F"), pm25_env_1day.getAverage());
-  Log.verbose(F("Last 1 week: %F"), pm25_env_1week.getAverage());
+  Log.verbose(F("Last 30 Minutes: %F"), pm25env_30min.getAverage());
+  Log.verbose(F("Last 1 hour: %F"), pm25env_1hr.getAverage());
+  Log.verbose(F("Last 6 hours: %F"), pm25env_6hr.getAverage());
 }
 

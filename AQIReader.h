@@ -27,18 +27,14 @@ public:
   uint16_t derivedAQI(uint16_t reading);
 
   // Moving averages
-  MovingAverage pm25_env_10min;
-  MovingAverage pm25_env_30min;
-  MovingAverage pm25_env_1hr;
-  MovingAverage pm25_env_6hr;
-  MovingAverage pm25_env_1day;
-  MovingAverage pm25_env_1week;
+  MovingAverage pm25env_10min;
+  MovingAverage pm25env_30min;
+  MovingAverage pm25env_1hr;
+  MovingAverage pm25env_6hr;
 
   // Historical data
   enum HistoryRange {Range_1Hour, Range_1Day, Range_1Week, Range_Combined};
   void emitHistoryAsJson(HistoryRange r, Stream& s);
-  uint16_t sizeOfRange(HistoryRange r);
-  AQIReadings getFromRange(HistoryRange r, uint16_t index);
 
   bool init(Stream* streamToSensor, Indicator* indicator);
   void process(time_t wallClock);
@@ -50,6 +46,10 @@ public:
 private:
   enum State {awake, retrying, waking, asleep};
   static const uint32_t ColorForState[];
+  typedef struct RecordedReadings {
+    uint32_t timestamp;
+    PMReadings env;
+  };
 
   PMS5003* aqi;
   State state;
@@ -60,9 +60,9 @@ private:
   uint32_t last1hrTimestamp = 0;
   uint32_t last1dayTimestamp = 0;
 
-  CircularBuffer<AQIReadings, 12> readings_5min;  // The last hour's worth of readings at 5 minute intervals
-  CircularBuffer<AQIReadings, 24> readings_1hr;   // The last day's worth of readings at 1 hour intervals
-  CircularBuffer<AQIReadings, 14> readings_12hr;  // The last week's worth of readings at 12 hour intervals
+  CircularBuffer<RecordedReadings, 12> readings_5min; // The last hour's worth of readings at 5 minute intervals
+  CircularBuffer<RecordedReadings, 24> readings_1hr;  // The last day's worth of readings at 1 hour intervals
+  CircularBuffer<RecordedReadings, 28> readings_6hr;  // The last week's worth of readings at 6 hour intervals
 
   void enterState(State);
   void updateHistoricalData(AQIReadings& newSample);
@@ -70,6 +70,8 @@ private:
   void loadHistoricalData(String historyFilePath);
   void updateMovingAvgs(uint16_t newSample);
   void computeAverages(AQIReadings& avg, AQIReadings* dataSet, uint16_t nReadings);
+  uint16_t sizeOfRange(HistoryRange r);
+  RecordedReadings getFromRange(HistoryRange r, uint16_t index);
 };
 
 #endif  // AQIReader_h

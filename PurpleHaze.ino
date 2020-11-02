@@ -128,7 +128,7 @@ namespace PH {
       if (latestData.timestamp == lastTimestamp) return;
 
       busyIndicator->setColor(0, 255, 0);
-      uint16_t quality = aqiReader.derivedAQI(latestData.pm25_env);
+      uint16_t quality = aqiReader.derivedAQI(latestData.env.pm25);
       for (int i = 0; i < nBrackets; i++) {
         if (quality <= QualityBrackets[i].max) {
           qualityIndicator->setColor(QualityBrackets[i].color);

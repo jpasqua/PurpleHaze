@@ -19,14 +19,18 @@
 
 #include <Arduino.h>
 
+typedef struct PMReadings {
+  uint16_t pm10;
+  uint16_t pm25;
+  uint16_t pm100;
+};
+
 typedef struct {
   uint32_t timestamp;
-  uint16_t pm10_standard;   // Standard PM1.0
-  uint16_t pm25_standard;   // Standard PM2.5
-  uint16_t pm100_standard;  // Standard PM10.0
-  uint16_t pm10_env;        // Environmental PM1.0
-  uint16_t pm25_env;        // Environmental PM2.5
-  uint16_t pm100_env;       // Environmental PM10.0
+  // The following field sizes and order are defined to match the raw
+  // output from the sensor. Do not reorganize them!
+  PMReadings standard;
+  PMReadings env;
   uint16_t particles_03um;  // 0.3um Particle Count
   uint16_t particles_05um;  // 0.5um Particle Count
   uint16_t particles_10um;  // 1.0um Particle Count

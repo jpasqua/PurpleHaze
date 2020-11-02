@@ -318,7 +318,7 @@ The virtual pins used by Blynk are currently hard-wired in the code and are not 
 
 **History**
 
-The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *PurpleHaze* saves the historical data for the last hour (with readings every 5 minutes), the last day (with readings every hour), and the last week (with readings every 12 hours).
+The monitor itself will keep a relatively small amount of historical data on the device. This data is preserved across reboots or power outages. Specifically, every 10 minutes *PurpleHaze* saves the historical data for the last hour (with readings every 5 minutes), the last day (with readings every hour), and the last week (with readings every 6 hours).
 
 Uploading new versions of the code will not overwrite the history, but uploading new data files will. You can preserve your history in similar way as just described for settings. From the developer menu, click on the `View History` button. This will return your history as JSON. Save the text into a file named `history.json` and put it into your data directory. When you upload sketch data, the history will also be uploaded.
 

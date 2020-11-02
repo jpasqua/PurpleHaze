@@ -104,7 +104,7 @@ bool PMS5003::read(AQIReadings *data) {
   }
 
   // put it into a nice struct :)
-  memcpy((void *)&(data->pm10_standard), (void *)&buffer_u16[1], 24);
+  memcpy((void *)&(data->standard.pm10), (void *)&buffer_u16[1], 24);
 
   if (data->particles_03um + data->particles_05um + data->particles_10um + 
       data->particles_25um + data->particles_50um + data->particles_100um == 0) {

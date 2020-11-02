@@ -51,12 +51,12 @@ namespace PHBlynk {
   void update() {
     if (!connectedToBlynk) return;
     Log.trace("About to update Blynk...");
-    Blynk.virtualWrite(BlynkEnv010, PH::latestData.pm10_env);
-    Blynk.virtualWrite(BlynkEnv025, PH::latestData.pm25_env);
-    Blynk.virtualWrite(BlynkEnv100, PH::latestData.pm100_env);
-    Blynk.virtualWrite(BlynkMA30, (uint16_t)PH::aqiReader.pm25_env_30min.getAverage());
+    Blynk.virtualWrite(BlynkEnv010, PH::latestData.env.pm10);
+    Blynk.virtualWrite(BlynkEnv025, PH::latestData.env.pm25);
+    Blynk.virtualWrite(BlynkEnv100, PH::latestData.env.pm100);
+    Blynk.virtualWrite(BlynkMA30, (uint16_t)PH::aqiReader.pm25env_30min.getAverage());
     Blynk.virtualWrite(BlynkTimestamp, PH::formattedTime(PH::latestData.timestamp));
-    Blynk.virtualWrite(BlynkAQI, PH::aqiReader.derivedAQI(PH::latestData.pm25_env));
+    Blynk.virtualWrite(BlynkAQI, PH::aqiReader.derivedAQI(PH::latestData.env.pm25));
     Log.trace("Blynk update complete");
   }
 
