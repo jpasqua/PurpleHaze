@@ -46,7 +46,7 @@ public:
 private:
   enum State {awake, retrying, waking, asleep};
   static const uint32_t ColorForState[];
-  typedef struct RecordedReadings {
+  struct RecordedReadings {
     uint32_t timestamp;
     PMReadings env;
   };

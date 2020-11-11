@@ -41,8 +41,8 @@ namespace PH {
     static const struct {
       uint16_t max;
       uint32_t color;
-      char*    shortDesc;
-      char*    longDesc;
+      const char* shortDesc;
+      const char* longDesc;
     } QualityBrackets[] = {
       { 50, 0x00ff00, "Good",
           "Air quality is satisfactory, and air pollution poses little or no risk."},
@@ -150,8 +150,8 @@ namespace PH {
    *----------------------------------------------------------------------------*/
 
   void aqiAsJSON(uint16_t quality, String& result) {
-    char* shortDesc = "Unknown";
-    char* longDesc = "Unknown";
+    const char* shortDesc = "Unknown";
+    const char* longDesc = "Unknown";
     uint32_t color = 0x000000;
 
     for (int i = 0; i < Internal::nBrackets; i++) {

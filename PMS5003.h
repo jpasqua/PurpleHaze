@@ -19,7 +19,7 @@
 
 #include <Arduino.h>
 
-typedef struct PMReadings {
+struct PMReadings {
   uint16_t pm10;
   uint16_t pm25;
   uint16_t pm100;
