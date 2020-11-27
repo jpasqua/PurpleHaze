@@ -8,7 +8,6 @@
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
-#include <SoftwareSerial.h>
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <TimeLib.h>
@@ -16,6 +15,7 @@
 //                                  Local Includes
 #include "PurpleHaze.h"
 #include "HWConfig.h"
+#include "SecondarySerial.h"
 #include "AQIReader.h"
 #include "PHWebUI.h"
 #include "PHBlynk.h"
@@ -33,7 +33,7 @@ namespace PH {
   Indicator* qualityIndicator;
   Indicator* busyIndicator;
   NeoPixelIndicators* indicators;
-  SoftwareSerial* streamToSensor;
+  SecondarySerial streamToSensor;
   PHSettings settings;
   AQIReadings latestData;
 
@@ -97,10 +97,9 @@ namespace PH {
     }
 
     void prepSensor() {
-      streamToSensor = new SoftwareSerial(SS_RX_PIN, SS_TX_PIN);
-      streamToSensor->begin(9600);
+      streamToSensor.begin();
 
-      if (!aqiReader.init(streamToSensor, sensorIndicator)) {
+      if (!aqiReader.init(streamToSensor.s, sensorIndicator)) {
         Log.error("Unable to connect to Air Quality Sensor!");
         qualityIndicator->setColor(255, 0, 0);
         sensorIndicator->setColor(255, 0, 0);

@@ -7,8 +7,9 @@
  *
  *----------------------------------------------------------------------------*/
 
-const uint8_t SS_RX_PIN = D6;
-const uint8_t SS_TX_PIN = D8;
+// #define USE_SW_SERIAL 1
+const uint8_t SENSOR_RX_PIN = D6;
+const uint8_t SENSOR_TX_PIN = D8;
 
 
 /*------------------------------------------------------------------------------
