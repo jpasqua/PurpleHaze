@@ -13,9 +13,15 @@
 #ifndef Indicators_h
 #define Indicators_h
 
+#include <ArduinoLog.h>
+
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
+#if defined(ESP32)
+  #include <analogWrite.h>
+  #define PWMRANGE 255
+#endif
 #include <Adafruit_NeoPixel.h>
 //                                  Local Includes
 //--------------- End:    Includes ---------------------------------------------
@@ -128,7 +134,7 @@ public:
 
 private:
   uint8_t _pin = 0;
-  uint8_t _count = 0;;
+  uint8_t _count = 0;
 };
 
 

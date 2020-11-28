@@ -15,7 +15,7 @@ public:
       s = ss;
     #else
       HardwareSerial* hs = new HardwareSerial(1);
-      hs.begin(SensorBaudRate,SERIAL_8N1, SENSOR_RX_PIN, SENSOR_TX_PIN);
+      hs->begin(SensorBaudRate,SERIAL_8N1, SENSOR_RX_PIN, SENSOR_TX_PIN);
       s = hs;
     #endif
   }
