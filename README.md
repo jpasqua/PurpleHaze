@@ -113,7 +113,9 @@ The 3D Model for the housing has a bracket that is designed to work with this PC
 
 ### 3D Model
 
-A housing for *PurpleHaze* is [available on thingiverse](https://www.thingiverse.com/thing:4607364). It contains an internal mounting system that is designed to work with the PCB mentioned above. The 3D model is included so it can be modified to hold other configurations of the electronics.
+A housing for *PurpleHaze* is [available on thingiverse](https://www.thingiverse.com/thing:4607364). It contains an internal mounting system that is designed to work with the PCB mentioned above. The 3D model is included so it can be modified to hold other configurations of the electronics. 
+
+*Note*: The ESP32 version of the D1 Mini is wider than the ESP8266 version and conflicts with one of the mounting posts of the model. A future version will remedy this.
 
 [<img src="doc/images/Housing/H2.jpg" width="200">](doc/images/Housing/H2.jpg)
 [<img src="doc/images/Housing/H1.jpg" width="200">](doc/images/Housing/H1.jpg)
@@ -127,7 +129,9 @@ Building the software for *PurpleHaze* is a bit more complex than a typical appl
 
 1. Download and install the [`ESP8266 Sketch Data Upload`](https://github.com/esp8266/arduino-esp8266fs-plugin) plugin. For ESP32, use the [ESP32 Sketch Data Upload plugin](https://github.com/me-no-dev/arduino-esp32fs-plugin) plugin. Note that installing this plugin is not the same as installing a normal Arduino library. Follow the installation instructions [here](https://github.com/esp8266/arduino-esp8266fs-plugin#installation). If you have installed successfully, you will see a new menu item in the Arduino IDE Tools menu. See the screen shot below.
 2. Copy or link the `wt` directory from [*WebThing*](https://github.com/jpasqua/WebThing) `data` directory to the *PurpleHaze* `data` directory. When you're done you'll have a `data` directory that contains a number of `HTML` files and a `wt` subdirectory. The `wt` subdirectory will also contain `HTML` files.
-3. You need to reserve some flash memory space for the file system. In the Tools menu of the Arduino IDE you will see a `Flash Size` submenu. Choose `FS: 1MB`.
+3. You need to reserve some flash memory space for the file system.
+	* ESP8266: In the Tools menu of the Arduino IDE you will see a `Flash Size` submenu. Choose `FS: 1MB`.
+	* ESP32: Use the defaults - no need to make any changes.
 4. Now connect your ESP8266 to your computer via USB and select the `ESP8266 Sketch Data Upload` item from the tools menu. You will see all the files in your `data` directory, including those in the `wt` subdirectory being loaded onto your ESP8266. The process is the same for ESP32, though the specific names/menu items will be different.
 5. Finally you can proceed as usual and compile / upload *PurpleHaze* to your ESP8266.
 ![](doc/images/ArduinoToolsMenu.png)
@@ -170,7 +174,6 @@ These settings are common to many network connected devices and are encapsulated
 	* **Latitude, Longitude, Elevation**: In *PurpleHaze*, these are only used to determine your time zone (for this purpose elevation is not important).
 	* **Address** / Geocode: Since you probably don't know your lat/lon and elevation, enter an address in the Address field and press the Geocode button. Assuming you have already saved your Google Maps API key, the address will be translated to lat/lon and elevation. If you prefer not to create a Google Maps key, you can find your lat/lon manually as [described here](https://support.google.com/maps/answer/18539).
 * **Theme Color**: Choose a theme for the Web UI that suits your style. The themes are all from the [W3.CSS](https://www.w3schools.com/w3css/w3css_color_themes.asp) set.
-* **Indicator LED**: Ignore this section. *PurpleHaze* has a more flexible [indicator LED capability](#indicators).
 
 <a name="configure-PH"></a>
 ![](doc/images/ConfigurePH.png) 
