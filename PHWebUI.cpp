@@ -217,6 +217,7 @@ namespace PHWebUI {
 
     void reboot() {
       if (!WebUI::authenticationOK()) { return; }
+      WebUI::redirectHome();
       ESP.restart();
     }
 

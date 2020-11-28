@@ -8,14 +8,14 @@
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
-#include <SoftwareSerial.h>
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <TimeLib.h>
 #include <WebUI.h>
 //                                  Local Includes
-#include "PurpleHaze.h"
 #include "HWConfig.h"
+#include "PurpleHaze.h"
+#include "SecondarySerial.h"
 #include "AQIReader.h"
 #include "PHWebUI.h"
 #include "PHBlynk.h"
@@ -33,7 +33,7 @@ namespace PH {
   Indicator* qualityIndicator;
   Indicator* busyIndicator;
   NeoPixelIndicators* indicators;
-  SoftwareSerial* streamToSensor;
+  SecondarySerial streamToSensor;
   PHSettings settings;
   AQIReadings latestData;
 
@@ -72,7 +72,7 @@ namespace PH {
       WebThing::displayPowerOptions(false);
       WebThing::settings.sleepOverridePin = -1;
       WebThing::settings.hasVoltageSensing = false;
-      if (WebThing::settings.hostname.isEmpty()) WebThing::settings.hostname = ("ph_" + String(ESP.getChipId(), HEX));
+      WebThing::replaceEmptyHostname("ph-");
     }
 
     void flushBeforeSleep() { PHBlynk::disconnect(); }
@@ -93,14 +93,14 @@ namespace PH {
         npi = new NeoPixelIndicator(); npi->begin(indicators, 2); busyIndicator = npi;
 
       }
-      qualityIndicator->setColor(0x969696);  // No data available yet
+      qualityIndicator->setColor(0x969697);  // No data available yet
+      delay(1000);
     }
 
     void prepSensor() {
-      streamToSensor = new SoftwareSerial(SS_RX_PIN, SS_TX_PIN);
-      streamToSensor->begin(9600);
+      streamToSensor.begin();
 
-      if (!aqiReader.init(streamToSensor, sensorIndicator)) {
+      if (!aqiReader.init(streamToSensor.s, sensorIndicator)) {
         Log.error("Unable to connect to Air Quality Sensor!");
         qualityIndicator->setColor(255, 0, 0);
         sensorIndicator->setColor(255, 0, 0);
@@ -226,13 +226,6 @@ void setup() {
 }
 
 void loop() {
-  // static uint32_t l = millis();
-  // static uint32_t qi = 0;
-  // if (millis()-l > 500) {
-  //   l = millis();
-  //   qualityIndicator->setColor(Internal::QualityColors[qi]);
-  //   qi = (qi+1)%8;
-  // }
   WebThing::loop();
   PHBlynk::run();
   aqiReader.process(now());

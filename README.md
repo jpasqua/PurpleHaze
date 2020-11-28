@@ -18,11 +18,13 @@ The following third party libraries are used within this project:
 * [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
 * [Arduino-Log](https://github.com/thijse/Arduino-Log)
 * [ArduinoJson (v6)](https://github.com/bblanchon/ArduinoJson)
-* [BlynkSimpleEsp8266](https://github.com/blynkkk/blynk-library)
+* [blynk-library](https://github.com/blynkkk/blynk-library)
 * [CircularBuffer](https://github.com/rlogiacco/CircularBuffer)
-* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor)
+* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor) [0.0.2 or later for ESP32]
 * [TimeLib](https://github.com/PaulStoffregen/Time.git)
-* [WebThing](https://github.com/jpasqua/WebThing) [version 0.2.0 or later]
+* [WebThing](https://github.com/jpasqua/WebThing) [0.2.0 or later. v0.2.1 or later for ESP32]
+* ESP32 Only
+	* [ESP32_AnalogWrite](https://github.com/ERROPiX/ESP32_AnalogWrite)
 
 The following libraries are used in the browser. You do not need to download or install them. They are listed here because if you are doing further development of the browser code, you may need to understand their usage:
 
@@ -74,7 +76,8 @@ The primary functional areas of *PurpleHaze* are given below. You don't need to 
 <a name="building-PH"></a>
 ## Building PurpleHaze
 
-*PurpleHaze* has been built and tested with Arduino IDE 1.8.10 and ESP8266 cores 2.6.1 and 2.7.1. Newer versions are likely to work, but I haven't tried other specific combinations. If you have never built an Arduino project using an ESP8266, you'll need to [prepare your development environment](https://github.com/esp8266/Arduino#installing-with-boards-manager). 
+*PurpleHaze* has been built and tested with Arduino IDE 1.8.10 and ESP8266 cores 2.6.1 and 2.7.1. Newer versions are likely to work, but I haven't tried other specific combinations. If you have never built an Arduino project using an ESP8266, you'll need to [prepare your development environment](https://github.com/esp8266/Arduino#installing-with-boards-manager). *PurpleHaze* also supports the ESP32, but has minimal testing to date. It requires v1.0.5rc2 or later of the ESP32 Arduino core.
+
 
 ### Hardware
 
@@ -88,12 +91,13 @@ All of the components can be wired together point-to-point, or assembled onto a 
 
 [<img src="doc/images/Protoboard.jpg" width="250">](doc/images/Protoboard.jpg)
 
-A PCB design is also available in the resources directory. As can be see in the images below, it is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html).
+A PCB design is also available in the resources directory. As can be see in the images below, it is really nothing more than a consolidated place to mount a Wemos D1 Mini, the connector for the PMS5003 cable and WS2812D indicator LEDs such as [these](https://www.aliexpress.com/item/32847283594.html). Note that an ESP32 D1 Mini will fit this PCB, but the frontmost pairs of pins will hang past the edge of the board.
 
 Notes on the LEDs:
 
 * Be careful - there are LEDs that look the same but whose pins are in a different order. If you are using the PCB, make sure you have LEDs whose pins are ordered: `Dout`, `Vcc`, `GND`, `Din`
 * You'll notice that the LEDs have a flat spot on one side of the base. Align that flat spot to the flat spot shown on the PCB. Refer to the images below.
+* I've found that some WS2812D LEDs do not work reliably with the ESP32. Unfortunately the batches you order from the link given above are not consistent and may or may have issues.
 
 The D1 Mini can be mounted on the top of the board as shown in the image, or below the board with the headers on the top of the D1 rather than the bottom. In the 3D model you'll find that the D1 is mounted on the bottom. The same is true for the sensor header.
 
@@ -119,14 +123,13 @@ A housing for *PurpleHaze* is [available on thingiverse](https://www.thingiverse
 
 <a name="software"></a>
 ### Software
-Building the software for *PurpleHaze* is a bit more complex than a typical application because it stores files on the ESP8266 file system. This means that you need to use a plug-in to the Arduino IDE to upload those files to the Arduino. The file structure is described in detail in the [*WebThing*](https://github.com/jpasqua/WebThing) readme file. In this section I will describe the steps involved.
+Building the software for *PurpleHaze* is a bit more complex than a typical application because it stores files on the ESP8266/ESP32 file system. This means that you need to use a plug-in to the Arduino IDE to upload those files to the Arduino. The file structure is described in detail in the [*WebThing*](https://github.com/jpasqua/WebThing) readme file. In this section I will describe the steps involved.
 
-1. Download and install the [`ESP8266 Sketch Data Upload`](https://github.com/esp8266/arduino-esp8266fs-plugin) plug-in. Note that installing this plugin is not the same as installing a normal Arduino library. Follow the installation instructions [here](https://github.com/esp8266/arduino-esp8266fs-plugin#installation). If you have installed successfully, you will see a new menu item in the Arduino IDE Tools menu. See the screen shot below.
+1. Download and install the [`ESP8266 Sketch Data Upload`](https://github.com/esp8266/arduino-esp8266fs-plugin) plugin. For ESP32, use the [ESP32 Sketch Data Upload plugin](https://github.com/me-no-dev/arduino-esp32fs-plugin) plugin. Note that installing this plugin is not the same as installing a normal Arduino library. Follow the installation instructions [here](https://github.com/esp8266/arduino-esp8266fs-plugin#installation). If you have installed successfully, you will see a new menu item in the Arduino IDE Tools menu. See the screen shot below.
 2. Copy or link the `wt` directory from [*WebThing*](https://github.com/jpasqua/WebThing) `data` directory to the *PurpleHaze* `data` directory. When you're done you'll have a `data` directory that contains a number of `HTML` files and a `wt` subdirectory. The `wt` subdirectory will also contain `HTML` files.
 3. You need to reserve some flash memory space for the file system. In the Tools menu of the Arduino IDE you will see a `Flash Size` submenu. Choose `FS: 1MB`.
-4. Now connect your ESP8266 to your computer via USB and select the `ESP8266 Sketch Data Upload` item from the tools menu. You will see all the files in your `data` directory, including those in the `wt` subdirectory being loaded onto your ESP8266.
+4. Now connect your ESP8266 to your computer via USB and select the `ESP8266 Sketch Data Upload` item from the tools menu. You will see all the files in your `data` directory, including those in the `wt` subdirectory being loaded onto your ESP8266. The process is the same for ESP32, though the specific names/menu items will be different.
 5. Finally you can proceed as usual and compile / upload *PurpleHaze* to your ESP8266.
-
 ![](doc/images/ArduinoToolsMenu.png)
 
 ## Setting Up PurpleHaze
@@ -275,7 +278,7 @@ Internally this has the effect of changing the value of the `showDevMenu` settin
 
 **Viewing your settings**
 
-It can sometimes be useful to see all the settings in their JSON representation. The `/dev` page has a `View Settings` button which will return a page with the JSON representation of the settings. You can also get to this page directly with the url `http://[PH_Adress]/dev/settings`. If you save these settings as a file named `settings.json` and place it in your `data` directory, it can be uploaded to your device using `ESP8266 Sketch Data Uploader`. There is no need to do this, but developers may find it useful to easily switch between batches of settings.
+It can sometimes be useful to see all the settings in their JSON representation. The `/dev` page has a `View Settings` button which will return a page with the JSON representation of the settings. You can also get to this page directly with the url `http://[PH_Adress]/dev/settings`. If you save these settings as a file named `settings.json` and place it in your `data` directory, it can be uploaded to your device using `Sketch Data Uploader`. There is no need to do this, but developers may find it useful to easily switch between batches of settings.
 
 The `/dev` page also has a `View WebThing Settings` button which will return a page with the JSON representation of the WebThing settings. This includes things such as the hostname, API keys, and the web color scheme.
 
@@ -307,7 +310,7 @@ Finally, the `/dev` page also has a `Request Reboot` button. If you press the bu
 
 **Settings**
 
-During development you may be uploading sketch data from time to time. When you do this, it overwrites the entire SPIFFS file system on the ESP8266. This means any settings that you have customized through the web interface will be wiped out. This gets annoying, but you can work around it in two ways:
+During development you may be uploading sketch data from time to time. When you do this, it overwrites the entire SPIFFS file system on the ESP8266/ESP32. This means any settings that you have customized through the web interface will be wiped out. This gets annoying, but you can work around it in two ways:
 
 1. [Not Recommended] Change the *PurpleHaze* code and the WebThing library to hard-wire your default settings.
 2. [Recommended] Configure *PurpleHaze* the way you like it. From the developer menu, click on the `View Settings` button to get your settings as JSON. Save the text into a file named `settings.json` and put it into your data directory. Do the same thing by pressing the `View WebThing Settings` button and save that text into `data/wt/settings.json` From that point forward, any time you upload sketch data, your preferred settings will be uploaded also.
@@ -328,4 +331,4 @@ You can use the indicator LEDs to help you debug if you are not connected to the
 
 **Rebooting**
 
-When you need to restart the device, it is best to power cycle your ESP8266 and PMS5003 rather than just hitting the reset button. I've noticed situations where the ESP has a hard time re-syncing with the sensor after a reset (as opposed to a power-cycle).
+When you need to restart the device, it is best to power cycle your ESP8266/ESP32 and PMS5003 rather than just hitting the reset button. I've noticed situations where the ESP has a hard time re-syncing with the sensor after a reset (as opposed to a power-cycle).

@@ -10,8 +10,13 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
-#include <BlynkSimpleEsp8266.h>
-//                                  Local Includes
+#if defined(ESP8266)
+  #include <ESP8266WiFi.h>          // Required to remove redefinitions in BlynkSimple
+  #include <BlynkSimpleEsp8266.h>
+#elif defined(ESP32)
+  #include <WiFi.h>                 // Required to remove redefinitions in BlynkSimple
+  #include <BlynkSimpleEsp32.h>
+#endif//                                  Local Includes
 #include "PurpleHaze.h"
 #include "PMS5003.h"
 //--------------- End:    Includes ---------------------------------------------
