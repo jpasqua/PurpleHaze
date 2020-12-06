@@ -2,6 +2,9 @@
 #define SecondarySerial_h
 
 #include "HWConfig.h"
+#if defined(USE_SW_SERIAL)
+  #include <SoftwareSerial.h>
+#endif
 
 class SecondarySerial {
 public:
@@ -9,9 +12,8 @@ public:
 
   void begin() {
     #if defined(USE_SW_SERIAL)
-      #include <SoftwareSerial.h>
-      SoftwareSerial ss = new SoftwareSerial(SENSOR_RX_PIN, SENSOR_TX_PIN);
-      s->begin(SensorBaudRate);
+      SoftwareSerial* ss = new SoftwareSerial(SENSOR_RX_PIN, SENSOR_TX_PIN);
+      ss->begin(SensorBaudRate);
       s = ss;
     #else
       HardwareSerial* hs = new HardwareSerial(1);
