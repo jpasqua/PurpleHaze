@@ -11,7 +11,7 @@
 // ----- END: Constants used in the rest of the file
 
 // Pick a configuration. Use Config_Custom to define your own
-#define HWConfig Config_ESP32Mini
+#define HWConfig Config_D1Mini
 
 
 #if (HWConfig == Config_D1Mini)

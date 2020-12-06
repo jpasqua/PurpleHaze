@@ -100,10 +100,10 @@
       theConfig.data.datasets[3].data = [];
       for (var i = 0; i < theData.data.length; i++) {
         var timestamp = theData.data[i].ts*1000
-        theConfig.data.datasets[0].data.push({x: timestamp, y: theData.data[i].pm10_env})
-        theConfig.data.datasets[1].data.push( {x: timestamp, y: theData.data[i].pm25_env})
-        theConfig.data.datasets[2].data.push({x: timestamp, y: theData.data[i].pm100_env})
-        theConfig.data.datasets[3].data.push({x: timestamp, y: calcAQI(theData.data[i].pm25_env)})
+        theConfig.data.datasets[0].data.push({x: timestamp, y: theData.data[i].p10e})
+        theConfig.data.datasets[1].data.push( {x: timestamp, y: theData.data[i].p25e})
+        theConfig.data.datasets[2].data.push({x: timestamp, y: theData.data[i].p100e})
+        theConfig.data.datasets[3].data.push({x: timestamp, y: theData.data[i].aqi})
       }
     }  
 

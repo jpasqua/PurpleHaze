@@ -91,9 +91,10 @@ void AQIReader::emitHistoryAsJson(HistoryRange r, Stream& s) {
     RecordedReadings data = getFromRange(r, i);
     if (needsComma) s.println(",");
     s.print("{ \"ts\":"); s.print(data.timestamp - tzOffset);
-    s.print(", \"pm10_env\":"); s.print(data.env.pm10);
-    s.print(", \"pm25_env\":"); s.print(data.env.pm25);
-    s.print(", \"pm100_env\":"); s.print(data.env.pm100);
+    s.print(", \"p10e\":"); s.print(data.env.pm10);
+    s.print(", \"p25e\":"); s.print(data.env.pm25);
+    s.print(", \"p100e\":"); s.print(data.env.pm100);
+    s.print(", \"aqi\":"); s.print(derivedAQI(data.env.pm25));
     s.print(" }");
     needsComma = true;
   }
@@ -238,37 +239,39 @@ void AQIReader::loadHistoricalData(String historyFilePath) {
 // Log.verbose("Historical data:");
 // serializeJsonPretty(doc, Serial);
 
-  RecordedReadings data;
   int32_t tzOffset = WebThing::getGMTOffset();
+  auto extractVals = [tzOffset](RecordedReadings& dst, JsonObjectConst& src) -> void {
+    dst.timestamp = src["ts"];
+    dst.timestamp += tzOffset;
+    if (src.containsKey("p10e")) {  // V1 field names (shorter)
+      dst.env.pm10 = src["p10e"];
+      dst.env.pm25 = src["p25e"];
+      dst.env.pm100 = src["p100e"];
+    } else {                        // V0 field names
+      dst.env.pm10 = src["pm10_env"];
+      dst.env.pm25 = src["pm25_env"];
+      dst.env.pm100 = src["pm100_env"];
+    }
+  };
+
+  RecordedReadings data;
   // Note that timestamps are externalized as GMT time. When we
   // internalize them, we need to adjust back to local time
   JsonArrayConst hourData = doc[F("hour")]["data"];
   for (JsonObjectConst reading : hourData) {
-    data.timestamp = reading["ts"];
-    data.timestamp += tzOffset;
-    data.env.pm10 = reading["pm10_env"];
-    data.env.pm25 = reading["pm25_env"];
-    data.env.pm100 = reading["pm100_env"];
+    extractVals(data, reading);
     readings_5min.push(data);
     if (data.timestamp > last5minTimestamp) last5minTimestamp = data.timestamp;
   }
   JsonArrayConst dayData = doc[F("day")]["data"];
   for (JsonObjectConst reading : dayData) {
-    data.timestamp = reading["ts"];
-    data.timestamp += tzOffset;
-    data.env.pm10 = reading["pm10_env"];
-    data.env.pm25 = reading["pm25_env"];
-    data.env.pm100 = reading["pm100_env"];
+    extractVals(data, reading);
     readings_1hr.push(data);
     if (data.timestamp > last1hrTimestamp) last1hrTimestamp = data.timestamp;
   }
   JsonArrayConst weekData = doc[F("week")]["data"];
   for (JsonObjectConst reading : weekData) {
-    data.timestamp = reading["ts"];
-    data.timestamp += tzOffset;
-    data.env.pm10 = reading["pm10_env"];
-    data.env.pm25 = reading["pm25_env"];
-    data.env.pm100 = reading["pm100_env"];
+    extractVals(data, reading);
     readings_6hr.push(data);
     if (data.timestamp > last1dayTimestamp) last1dayTimestamp = data.timestamp;
   }
