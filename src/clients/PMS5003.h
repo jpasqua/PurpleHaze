@@ -18,27 +18,7 @@
 #define PMS5003_h
 
 #include <Arduino.h>
-
-struct PMReadings {
-  uint16_t pm10;
-  uint16_t pm25;
-  uint16_t pm100;
-};
-
-typedef struct {
-  uint32_t timestamp;
-  // The following field sizes and order are defined to match the raw
-  // output from the sensor. Do not reorganize them!
-  PMReadings standard;
-  PMReadings env;
-  uint16_t particles_03um;  // 0.3um Particle Count
-  uint16_t particles_05um;  // 0.5um Particle Count
-  uint16_t particles_10um;  // 1.0um Particle Count
-  uint16_t particles_25um;  // 2.5um Particle Count
-  uint16_t particles_50um;  // 5.0um Particle Count
-  uint16_t particles_100um; // 10.0um Particle Count
-} AQIReadings;
-
+#include "AQIReadings.h"
 
 class PMS5003 {
 public:
@@ -51,7 +31,6 @@ public:
   void sleep();
 
   // Wakeup a sleeping device. Wait 30 seconds after waking for stable readings
-
   void wakeUp();
 
   // Put the device into Active mode which is the default mode after power up.

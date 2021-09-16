@@ -14,6 +14,8 @@
 //                                  Local Includes
 #include "PurpleHaze.h"
 #include "PHWebUI.h"
+#include "src/utils/Output.h"
+#include "src/clients/AQIMgr.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -50,28 +52,28 @@ namespace PHWebUI {
       Log.trace("Web Request: Display Home Page");
       if (!WebUI::authenticationOK()) { return; }
 
-      auto mapper =[](String &key) -> String {
-        if (key == "LAT")  return WebThing::settings.latAsString();
-        if (key == "LNG")  return WebThing::settings.lngAsString();
-        if (key == "AQI") return (String(PH::aqiReader.derivedAQI(PH::latestData.env.pm25)));
-        if (key == "PM10STD") return (String(PH::latestData.standard.pm10));
-        if (key == "PM25STD") return (String(PH::latestData.standard.pm25));
-        if (key == "PM100STD") return (String(PH::latestData.standard.pm100));
-        if (key == "PM10ENV") return (String(PH::latestData.env.pm10));
-        if (key == "PM25ENV") return (String(PH::latestData.env.pm25));
-        if (key == "PM100ENV") return (String(PH::latestData.env.pm100));
-        if (key == "P03") return (String(PH::latestData.particles_03um));
-        if (key == "P05") return (String(PH::latestData.particles_05um));
-        if (key == "P10") return (String(PH::latestData.particles_10um));
-        if (key == "P25") return (String(PH::latestData.particles_25um));
-        if (key == "P50") return (String(PH::latestData.particles_50um));
-        if (key == "P100") return (String(PH::latestData.particles_100um));
-        if (key == "TMST") return String(PH::formattedTime(PH::latestData.timestamp));
-        if (key == "MA10") return (String(PH::aqiReader.pm25env_10min.getAverage(), 0));
-        if (key == "MA30") return (String(PH::aqiReader.pm25env_30min.getAverage(), 0));
-        if (key == "MA1H") return (String(PH::aqiReader.pm25env_1hr.getAverage(), 0));
-        if (key == "MA6H") return (String(PH::aqiReader.pm25env_6hr.getAverage(), 0));
-        return "";
+      auto mapper =[](const String &key, String& val) -> void {
+        const AQIReadings& aqiReadings = PH::aqiMgr.getLastReadings();
+        if      (key == "LAT")      val = WebThing::settings.latAsString();
+        else if (key == "LNG")      val = WebThing::settings.lngAsString();
+        else if (key == "AQI")      val.concat(PH::aqiMgr.derivedAQI(aqiReadings.env.pm25));
+        else if (key == "PM10STD")  val.concat(aqiReadings.standard.pm10);
+        else if (key == "PM25STD")  val.concat(aqiReadings.standard.pm25);
+        else if (key == "PM100STD") val.concat(aqiReadings.standard.pm100);
+        else if (key == "PM10ENV")  val.concat(aqiReadings.env.pm10);
+        else if (key == "PM25ENV")  val.concat(aqiReadings.env.pm25);
+        else if (key == "PM100ENV") val.concat(aqiReadings.env.pm100);
+        else if (key == "P03")      val.concat(aqiReadings.particles_03um);
+        else if (key == "P05")      val.concat(aqiReadings.particles_05um);
+        else if (key == "P10")      val.concat(aqiReadings.particles_10um);
+        else if (key == "P25")      val.concat(aqiReadings.particles_25um);
+        else if (key == "P50")      val.concat(aqiReadings.particles_50um);
+        else if (key == "P100")     val.concat(aqiReadings.particles_100um);
+        else if (key == "TMST")     val = Output::dateTime(aqiReadings.timestamp);
+        else if (key == "MA10")     val.concat(round(PH::aqiMgr.pm25env_10min.getAverage()));
+        else if (key == "MA30")     val.concat(round(PH::aqiMgr.pm25env_30min.getAverage()));
+        else if (key == "MA1H")     val.concat(round(PH::aqiMgr.pm25env_1hr.getAverage()));
+        else if (key == "MA6H")     val.concat(round(PH::aqiMgr.pm25env_6hr.getAverage()));
       };
 
       PH::busyIndicator->setColor(BusyColor);
@@ -85,12 +87,11 @@ namespace PHWebUI {
       Log.trace("Web Request: Display Chart Page");
       if (!WebUI::authenticationOK()) { return; }
 
-      auto mapper =[](String &key) -> String {
-        if (key == "PM10_CLR")  return PH::settings.chartColors.pm10;
-        if (key == "PM25_CLR")  return PH::settings.chartColors.pm25;
-        if (key == "PM100_CLR")  return PH::settings.chartColors.pm100;
-        if (key == "AQI_CLR")  return PH::settings.chartColors.aqi;
-        return "";
+      auto mapper =[](const String &key, String& val) -> void {
+        if      (key == "PM10_CLR")  val = PH::settings.chartColors.pm10;
+        else if (key == "PM25_CLR")  val = PH::settings.chartColors.pm25;
+        else if (key == "PM100_CLR") val = PH::settings.chartColors.pm100;
+        else if (key == "AQI_CLR")   val = PH::settings.chartColors.aqi;
       };
 
       PH::busyIndicator->setColor(BusyColor);
@@ -109,15 +110,18 @@ namespace PHWebUI {
       Log.trace("Web Request: Display Config");
       if (!WebUI::authenticationOK()) { return; }
 
-      auto mapper =[](String &key) -> String {
-        if (key == "DESC") return WebThing::encodeAttr(PH::settings.description);
-        if (key == "BLYNK_KEY")  return PH::settings.blynkAPIKey;
-        if (key == "I_BRIGHT")  return String(PH::settings.iBright);
-        if (key == "PM10_CLR")  return PH::settings.chartColors.pm10;
-        if (key == "PM25_CLR")  return PH::settings.chartColors.pm25;
-        if (key == "PM100_CLR")  return PH::settings.chartColors.pm100;
-        if (key == "AQI_CLR")  return PH::settings.chartColors.aqi;
-        return "";
+      auto mapper =[](const String &key, String& val) -> void {
+        if      (key == "DESC")       val = WebThing::encodeAttr(PH::settings.description);
+        else if (key == "BLYNK_KEY")  val = PH::settings.blynkAPIKey;
+        else if (key == "I_BRIGHT")   val.concat(PH::settings.iBright);
+        else if (key == "PM10_CLR")   val = PH::settings.chartColors.pm10;
+        else if (key == "PM25_CLR")   val = PH::settings.chartColors.pm25;
+        else if (key == "PM100_CLR")  val = PH::settings.chartColors.pm100;
+        else if (key == "AQI_CLR")    val = PH::settings.chartColors.aqi;
+        else if (key == "TEMP_CORRECT") val.concat(PH::settings.bmeSettings.tempCorrection);
+        else if (key == "HUMI_CORRECT") val.concat(PH::settings.bmeSettings.humiCorrection);
+        else if (key == "TEMP_CLR")   val = PH::settings.bmeSettings.chartColors.temp;
+        else if (key == "AVG_CLR")    val = PH::settings.bmeSettings.chartColors.avg;
       };
 
       PH::busyIndicator->setColor(BusyColor);
@@ -132,15 +136,15 @@ namespace PHWebUI {
   namespace Endpoints {
     void getHistory() {
       String rangeArg = WebUI::arg("range");
-      AQIReader::HistoryRange range;
+      AQIMgr::HistoryRange range;
 
-      if (rangeArg.equalsIgnoreCase("hour")) range = AQIReader::HistoryRange::Range_1Hour;
-      else if (rangeArg.equalsIgnoreCase("day")) range = AQIReader::HistoryRange::Range_1Day;
-      else if (rangeArg.equalsIgnoreCase("week")) range = AQIReader::HistoryRange::Range_1Week;
-      else range = AQIReader::HistoryRange::Range_Combined;
+      if (rangeArg.equalsIgnoreCase("hour")) range = AQIMgr::HistoryRange::Range_1Hour;
+      else if (rangeArg.equalsIgnoreCase("day")) range = AQIMgr::HistoryRange::Range_1Day;
+      else if (rangeArg.equalsIgnoreCase("week")) range = AQIMgr::HistoryRange::Range_1Week;
+      else range = AQIMgr::HistoryRange::Range_Combined;
 
       auto provider = [range](Stream& s) -> void {
-        PH::aqiReader.emitHistoryAsJson(range, s);
+        PH::aqiMgr.emitHistoryAsJson(range, s);
       };
 
       PH::busyIndicator->setColor(BusyColor);
@@ -152,7 +156,10 @@ namespace PHWebUI {
       PH::busyIndicator->setColor(BusyColor);
       String result;
       result.reserve(300);
-      PH::aqiAsJSON(PH::aqiReader.derivedAQI(PH::latestData.env.pm25), result);
+      const AQIReadings& aqiReadings = PH::aqiMgr.getLastReadings();
+      PH::aqiMgr.aqiAsJSON(
+        PH::aqiMgr.derivedAQI(aqiReadings.env.pm25),
+        aqiReadings.timestamp, result);
       WebUI::sendStringContent("application/json", result);
       PH::busyIndicator->off();
     }
@@ -203,9 +210,8 @@ namespace PHWebUI {
       Log.trace(F("Web Request: /dev/displayDevPage"));
       if (!WebUI::authenticationOK()) { return; }
 
-      auto mapper =[](String &key) -> String {
-        if (key == "SHOW_DEV_MENU") return checkedOrNot[PH::settings.showDevMenu];
-        return "";
+      auto mapper =[](const String &key, String& val) -> void {
+        if (key == "SHOW_DEV_MENU") val = checkedOrNot[PH::settings.showDevMenu];
       };
 
       PH::busyIndicator->setColor(BusyColor);

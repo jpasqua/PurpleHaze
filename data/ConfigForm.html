@@ -2,6 +2,14 @@
   <h2>PurpleHaze Settings:</h2>
   <p><label>Description</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='description' value='%DESC%' maxlength='60'></p>
   <p><label>Blynk API Key</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='blynkAPIKey' value='%BLYNK_KEY%' maxlength='60'></p>
+  <div class='w3-row w3-margin-top'>
+    <label>Temperature Correction</label>
+    <input class='w3-input w3-border' type='text' name='tempCorrection' value='%TEMP_CORRECT%' maxlength='12'>
+  </div>
+  <div class='w3-row'>
+    <label>Humidity Correction</label>
+    <input class='w3-input w3-border' type='text' name='humiCorrection' value='%HUMI_CORRECT%' maxlength='12'>
+  </div>
   <p><label>Indicator Brightness (0-100\%)</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='iBright' value='%I_BRIGHT%' maxlength='3'></p>
   <strong>Chart Colors</strong>
   <table>
@@ -9,6 +17,8 @@
     <tr><td>PM 2.5</td><td></label><input  type="color" name="pm25Color" value="%PM25_CLR%"></td></tr>
     <tr><td>PM 10.0</td><td></label><input  type="color" name="pm100Color" value="%PM100_CLR%"></td></tr>
     <tr><td>AQI</td><td></label><input  type="color" name="aqiColor" value="%AQI_CLR%"></td></tr>
+    <tr><td>Temperature</td><td></label><input  type="color" name="tempColor" value="%TEMP_CLR%"></td></tr>
+    <tr><td>Moving Average</td><td></label><input  type="color" name="avgColor" value="%AVG_CLR%"></td></tr>
   </table>
 
   <button class='w3-button w3-block w3-round-large w3-grey w3-section w3-padding' type='submit'>Save</button>

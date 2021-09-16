@@ -16,13 +16,26 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
+class BMESettings {
+public:
+  float   tempCorrection = 0.0; // Correction to the temp reading - always in Celsius
+  float   humiCorrection = 0.0; // Correction to the humidty sensor reading
+  struct {
+    String temp = "#4e7a27";
+    String avg = "#ff00ff";
+  } chartColors;
+  void fromJSON(const JsonDocument &doc);
+  void toJSON(JsonDocument &doc);
+  void logSettings();
+};
+
 class PHSettings: public BaseSettings {
 public:
   // ----- Constructors and methods
   PHSettings();
-  void fromJSON(JsonDocument &doc) override;
-  void toJSON(JsonDocument &doc);
-  void logSettings();
+  void fromJSON(const JsonDocument &doc) override;
+  void toJSON(JsonDocument &doc) override;
+  void logSettings() override;
 
   // ----- Settings
   String  description = "Air Quality Sensor"; // User's description of their AQ Sensor
@@ -35,9 +48,12 @@ public:
   } chartColors;
   uint8_t iBright = 50;                       // Brightness of indicators (0-100%)
   bool showDevMenu = false;
+  bool useMetric = false;
+  
+  BMESettings bmeSettings;
 
 private:
   // ----- Constants -----
-  static const uint32_t CurrentVersion;
+  static constexpr uint32_t CurrentVersion = 0x0002;
 };
 #endif // PHSettings_h

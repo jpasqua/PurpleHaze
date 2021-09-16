@@ -69,7 +69,7 @@ The primary functional areas of *PurpleHaze* are given below. You don't need to 
 * `PHWebUI`
 	* Implements the Web UI for *PurpleHaze* which primarily consists of pages that allow the user to view and update the settings of the device. When settings change in the Web UI, it calls back into the core of the code to have those changes reflected. 
 	* **NOTE**: Currently the real-time handling of changes is not very thorough. Many changes require a reboot to take effect.
-* `AQIReader`, `PMS5003`
+* `AQIMgr`, `PMS5003`
 	* `PMS5003` is the low level interface to the PMS5003 sensor. It is adapted from a couple of different libraries. See the source code for details.
 * `HWConfig.h` is used to provide configuration information related to the *PurpleHaze* hardware. Please ensure that the definitions in this file match your actual hardware configuration.
 
