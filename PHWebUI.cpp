@@ -23,8 +23,6 @@
 // ----- BEGIN: WebUI namespacea
 namespace PHWebUI {
   static const String   checkedOrNot[2] = {"", "checked='checked'"};
-  static const uint32_t BusyColor = 0xff88ff;
-  ESPTemplateProcessor  *templateHandler;
 
   // ----- BEGIN: PHWebUI::Internal
   namespace Internal {
@@ -36,6 +34,12 @@ namespace PHWebUI {
     String DEV_ACTION =
       "<a class='w3-bar-item w3-button' href='/dev'>"
       "<i class='fa fa-gears'></i> Dev Settings</a>";
+
+    constexpr uint32_t BusyColor = 0xff88ff;
+    void showBusyStatus(bool busy) {
+      if (busy) PH::busyIndicator->setColor(BusyColor);
+      else PH::busyIndicator->off();
+    }
   }
   // ----- END: PHWebUI::Internal
 
@@ -49,9 +53,6 @@ namespace PHWebUI {
     //    GET  /displayHomePage
     //
     void displayHomePage() {
-      Log.trace("Web Request: Display Home Page");
-      if (!WebUI::authenticationOK()) { return; }
-
       auto mapper =[](const String &key, String& val) -> void {
         const AQIReadings& aqiReadings = PH::aqiMgr.getLastReadings();
         if      (key == "LAT")      val = WebThing::settings.latAsString();
@@ -76,17 +77,10 @@ namespace PHWebUI {
         else if (key == "MA6H")     val.concat(round(PH::aqiMgr.pm25env_6hr.getAverage()));
       };
 
-      PH::busyIndicator->setColor(BusyColor);
-      WebUI::startPage();
-      templateHandler->send("/HomePage.html", mapper);
-      WebUI::finishPage();
-      PH::busyIndicator->off();
+      WebUI::wrapWebPage("/", "/HomePage.html", mapper);
     }
 
     void displayChartPage() {
-      Log.trace("Web Request: Display Chart Page");
-      if (!WebUI::authenticationOK()) { return; }
-
       auto mapper =[](const String &key, String& val) -> void {
         if      (key == "PM10_CLR")  val = PH::settings.chartColors.pm10;
         else if (key == "PM25_CLR")  val = PH::settings.chartColors.pm25;
@@ -94,11 +88,7 @@ namespace PHWebUI {
         else if (key == "AQI_CLR")   val = PH::settings.chartColors.aqi;
       };
 
-      PH::busyIndicator->setColor(BusyColor);
-      WebUI::startPage();
-      templateHandler->send("/ChartPage.html", mapper);
-      WebUI::finishPage();
-      PH::busyIndicator->off();
+      WebUI::wrapWebPage("/displayChartPage", "/ChartPage.html", mapper);
     }
 
     // Displays a form allowing the user to update the PurpleHaze settings.
@@ -107,9 +97,6 @@ namespace PHWebUI {
     //    GET  /displayPHConfig
     //
     void displayPHConfig() {
-      Log.trace("Web Request: Display Config");
-      if (!WebUI::authenticationOK()) { return; }
-
       auto mapper =[](const String &key, String& val) -> void {
         if      (key == "DESC")       val = WebThing::encodeAttr(PH::settings.description);
         else if (key == "BLYNK_KEY")  val = PH::settings.blynkAPIKey;
@@ -124,44 +111,44 @@ namespace PHWebUI {
         else if (key == "AVG_CLR")    val = PH::settings.bmeSettings.chartColors.avg;
       };
 
-      PH::busyIndicator->setColor(BusyColor);
-      WebUI::startPage();
-      templateHandler->send("/ConfigForm.html", mapper);
-      WebUI::finishPage();
-      PH::busyIndicator->off();
+      WebUI::wrapWebPage("/displayPHConfig", "/ConfigForm.html", mapper);
     }
   }   // ----- END: PHWebUI::Pages
 
 
   namespace Endpoints {
     void getHistory() {
-      String rangeArg = WebUI::arg("range");
-      AQIMgr::HistoryRange range;
+      auto action = []() {
+        String rangeArg = WebUI::arg("range");
+        AQIMgr::HistoryRange range;
 
-      if (rangeArg.equalsIgnoreCase("hour")) range = AQIMgr::HistoryRange::Range_1Hour;
-      else if (rangeArg.equalsIgnoreCase("day")) range = AQIMgr::HistoryRange::Range_1Day;
-      else if (rangeArg.equalsIgnoreCase("week")) range = AQIMgr::HistoryRange::Range_1Week;
-      else range = AQIMgr::HistoryRange::Range_Combined;
+        if (rangeArg.equalsIgnoreCase("hour")) range = AQIMgr::HistoryRange::Range_1Hour;
+        else if (rangeArg.equalsIgnoreCase("day")) range = AQIMgr::HistoryRange::Range_1Day;
+        else if (rangeArg.equalsIgnoreCase("week")) range = AQIMgr::HistoryRange::Range_1Week;
+        else range = AQIMgr::HistoryRange::Range_Combined;
 
-      auto provider = [range](Stream& s) -> void {
-        PH::aqiMgr.emitHistoryAsJson(range, s);
+        auto provider = [range](Stream& s) -> void {
+          PH::aqiMgr.emitHistoryAsJson(range, s);
+        };
+
+        WebUI::sendArbitraryContent("application/json", -1, provider);
       };
 
-      PH::busyIndicator->setColor(BusyColor);
-      WebUI::sendArbitraryContent("application/json", -1, provider);
-      PH::busyIndicator->off();
+      WebUI::wrapWebAction("/getHistory", action, false);
     }
 
     void getAQI() {
-      PH::busyIndicator->setColor(BusyColor);
-      String result;
-      result.reserve(300);
-      const AQIReadings& aqiReadings = PH::aqiMgr.getLastReadings();
-      PH::aqiMgr.aqiAsJSON(
-        PH::aqiMgr.derivedAQI(aqiReadings.env.pm25),
-        aqiReadings.timestamp, result);
-      WebUI::sendStringContent("application/json", result);
-      PH::busyIndicator->off();
+      auto action = []() {
+        String result;
+        result.reserve(300);
+        const AQIReadings& aqiReadings = PH::aqiMgr.getLastReadings();
+        PH::aqiMgr.aqiAsJSON(
+          PH::aqiMgr.derivedAQI(aqiReadings.env.pm25),
+          aqiReadings.timestamp, result);
+        WebUI::sendStringContent("application/json", result);
+      };
+
+      WebUI::wrapWebAction("/getHistory", action, false);
     }
 
     // Handler for the "/updatePHConfig" endpoint. This is invoked as the target
@@ -175,50 +162,42 @@ namespace PHWebUI {
     //    GET /updatePHConfig?description=DESC&iBright=INT&...
     //
     void updatePHConfig() {
-      if (!WebUI::authenticationOK()) { return; }
-      Log.trace("PHWebUI: Handle Update Config");
+      auto action = []() {
+        PH::settings.description = WebUI::arg("description");
+        PH::settings.blynkAPIKey = WebUI::arg("blynkAPIKey");
+        PH::settings.iBright = (constrain(WebUI::arg("iBright").toInt(), 0, 100));
+        PH::settings.chartColors.pm10 = WebUI::arg("pm10Color");
+        PH::settings.chartColors.pm25 = WebUI::arg("pm25Color");
+        PH::settings.chartColors.pm100 = WebUI::arg("pm100Color");
+        PH::settings.chartColors.aqi = WebUI::arg("aqiColor");
+        PH::settings.write();
 
-      PH::settings.description = WebUI::arg("description");
-      PH::settings.blynkAPIKey = WebUI::arg("blynkAPIKey");
-      PH::settings.iBright = (constrain(WebUI::arg("iBright").toInt(), 0, 100));
-      PH::settings.chartColors.pm10 = WebUI::arg("pm10Color");
-      PH::settings.chartColors.pm25 = WebUI::arg("pm25Color");
-      PH::settings.chartColors.pm100 = WebUI::arg("pm100Color");
-      PH::settings.chartColors.aqi = WebUI::arg("aqiColor");
-      PH::settings.write();
+        // The description MAY have changed. Update the title just in case
+        PH::setIndicatorBrightness(PH::settings.iBright);
+        WebUI::setTitle(PH::settings.description+" ("+WebThing::settings.hostname+")");
+        WebUI::redirectHome();
+      };
 
-      // The description MAY have changed. Update the title just in case
-      WebUI::setTitle(PH::settings.description+" ("+WebThing::settings.hostname+")");
-      PH::setIndicatorBrightness(PH::settings.iBright);
-
-      WebUI::redirectHome();
+      WebUI::wrapWebAction("/updatePHConfig", action, false);
     }
   }   // ----- END: PHWebUI::Endpoints
 
   namespace Dev {
     void updateSettings() {
-      if (!WebUI::authenticationOK()) { return; }
-      Log.trace("Web Request: /dev/updateSettings");
-
-      PH::settings.showDevMenu = WebUI::hasArg("showDevMenu");
-      PH::settings.write();
-
-      WebUI::redirectHome();
+      auto action = []() {
+        PH::settings.showDevMenu = WebUI::hasArg("showDevMenu");
+        PH::settings.write();
+        WebUI::redirectHome();
+      };
+      WebUI::wrapWebAction("/updateSettings", action, false);
     }
 
     void displayDevPage() {
-      Log.trace(F("Web Request: /dev/displayDevPage"));
-      if (!WebUI::authenticationOK()) { return; }
-
       auto mapper =[](const String &key, String& val) -> void {
         if (key == "SHOW_DEV_MENU") val = checkedOrNot[PH::settings.showDevMenu];
       };
 
-      PH::busyIndicator->setColor(BusyColor);
-      WebUI::startPage();
-      templateHandler->send("/DevPage.html", mapper);
-      WebUI::finishPage();
-      PH::busyIndicator->off();
+      WebUI::wrapWebPage("/displayDevPage", "/DevPage.html", mapper);
     }
 
     void reboot() {
@@ -228,16 +207,14 @@ namespace PHWebUI {
     }
 
     void yieldSettings() {
-      Log.trace(F("Web Request: /dev/settings"));
-      if (!WebUI::authenticationOK()) { return; }
-
-      DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
-                                                         PH::settings.asJSON();
-      PH::busyIndicator->setColor(BusyColor);
-      WebUI::sendJSONContent(doc);
-      PH::busyIndicator->off();
-      doc->clear();
-      delete doc;
+      auto action = []() {
+        DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
+                                                           PH::settings.asJSON();
+        WebUI::sendJSONContent(doc);
+        doc->clear();   // TO DO: Is this needed?
+        delete doc;     // TO DO: Is this needed?
+      };
+      WebUI::wrapWebAction("/updateSettings", action, false);
     }
 
   }   // ----- END: PHWebUI::Dev
@@ -251,6 +228,8 @@ namespace PHWebUI {
     }
     WebUI::addMenuItems(actions);
 
+    WebUI::registerBusyCallback(Internal::showBusyStatus);
+
     WebUI::registerHandler("/", Pages::displayHomePage);
     WebUI::registerHandler("/ChartPage.html",     Pages::displayChartPage);
     WebUI::registerHandler("/displayPHConfig",    Pages::displayPHConfig);
@@ -263,8 +242,6 @@ namespace PHWebUI {
     WebUI::registerHandler("/dev/reboot",         Dev::reboot);
     WebUI::registerHandler("/dev/settings",       Dev::yieldSettings);
     WebUI::registerHandler("/dev/updateSettings", Dev::updateSettings);
-
-    templateHandler = WebUI::getTemplateHandler();
   }
 
 }
