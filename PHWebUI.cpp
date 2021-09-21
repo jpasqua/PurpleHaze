@@ -11,16 +11,19 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
+#include <Output.h>
+//                                  WebThing Includes
+#include <sensors/WeatherMgr.h>
 //                                  Local Includes
+#include "src/hardware/HWConfig.h"
 #include "PurpleHaze.h"
 #include "PHWebUI.h"
-#include "src/utils/Output.h"
 #include "src/clients/AQIMgr.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
 
-// ----- BEGIN: WebUI namespacea
+// ----- BEGIN: WebUI namespace
 namespace PHWebUI {
   static const String   checkedOrNot[2] = {"", "checked='checked'"};
 
@@ -70,7 +73,7 @@ namespace PHWebUI {
         else if (key == "P25")      val.concat(aqiReadings.particles_25um);
         else if (key == "P50")      val.concat(aqiReadings.particles_50um);
         else if (key == "P100")     val.concat(aqiReadings.particles_100um);
-        else if (key == "TMST")     val = Output::dateTime(aqiReadings.timestamp);
+        else if (key == "TMST")     val = Output::formattedTime(Basics::wallClockFromMillis(aqiReadings.timestamp));
         else if (key == "MA10")     val.concat(round(PH::aqiMgr.pm25env_10min.getAverage()));
         else if (key == "MA30")     val.concat(round(PH::aqiMgr.pm25env_30min.getAverage()));
         else if (key == "MA1H")     val.concat(round(PH::aqiMgr.pm25env_1hr.getAverage()));
@@ -105,10 +108,15 @@ namespace PHWebUI {
         else if (key == "PM25_CLR")   val = PH::settings.chartColors.pm25;
         else if (key == "PM100_CLR")  val = PH::settings.chartColors.pm100;
         else if (key == "AQI_CLR")    val = PH::settings.chartColors.aqi;
-        else if (key == "TEMP_CORRECT") val.concat(PH::settings.bmeSettings.tempCorrection);
-        else if (key == "HUMI_CORRECT") val.concat(PH::settings.bmeSettings.humiCorrection);
-        else if (key == "TEMP_CLR")   val = PH::settings.bmeSettings.chartColors.temp;
-        else if (key == "AVG_CLR")    val = PH::settings.bmeSettings.chartColors.avg;
+#if defined(HAS_WEATHER_SENSOR)
+        else if (key == "WTHR_VIS")   val = "true";
+        else if (key == "TEMP_CORRECT") val.concat(PH::settings.weatherSettings.tempCorrection);
+        else if (key == "HUMI_CORRECT") val.concat(PH::settings.weatherSettings.humiCorrection);
+        else if (key == "TEMP_CLR")   val = PH::settings.weatherSettings.chartColors.temp;
+        else if (key == "AVG_CLR")    val = PH::settings.weatherSettings.chartColors.avg;
+#else
+        else if (key == "WTHR_VIS")   val = "false";
+#endif
       };
 
       WebUI::wrapWebPage("/displayPHConfig", "/ConfigForm.html", mapper);
@@ -136,6 +144,32 @@ namespace PHWebUI {
 
       WebUI::wrapWebAction("/getHistory", action, false);
     }
+
+#if defined(HAS_WEATHER_SENSOR)
+    void getWeatherHistory() {
+      auto action = []() {
+        String rangeArg = WebUI::arg("range");
+        WeatherMgr::HistoryRange range;
+
+        if (rangeArg.equalsIgnoreCase("hour")) range = WeatherMgr::HistoryRange::Range_1Hour;
+        else if (rangeArg.equalsIgnoreCase("day")) range = WeatherMgr::HistoryRange::Range_1Day;
+        else if (rangeArg.equalsIgnoreCase("week")) range = WeatherMgr::HistoryRange::Range_1Week;
+        else range = WeatherMgr::HistoryRange::Range_Combined;
+
+        auto provider = [range](Stream& s) -> void {
+          PH::weatherMgr.emitHistoryAsJson(range, s);
+        };
+
+        WebUI::sendArbitraryContent("application/json", -1, provider);
+      };
+
+      WebUI::wrapWebAction("/getWeatherHistory", action, false);
+    }
+#else
+    void getWeatherHistory() {
+      WebUI::redirectHome();
+    }
+#endif
 
     void getAQI() {
       auto action = []() {
@@ -236,6 +270,7 @@ namespace PHWebUI {
 
     WebUI::registerHandler("/updatePHConfig",     Endpoints::updatePHConfig);
     WebUI::registerHandler("/getHistory",         Endpoints::getHistory);
+    WebUI::registerHandler("/getWeatherHistory",  Endpoints::getWeatherHistory);
     WebUI::registerHandler("/getAQI",             Endpoints::getAQI);
 
     WebUI::registerHandler("/dev",                Dev::displayDevPage);
