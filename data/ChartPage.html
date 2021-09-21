@@ -98,12 +98,14 @@
       theConfig.data.datasets[1].data = [];
       theConfig.data.datasets[2].data = [];
       theConfig.data.datasets[3].data = [];
-      for (var i = 0; i < theData.data.length; i++) {
-        var timestamp = theData.data[i].ts*1000
-        theConfig.data.datasets[0].data.push({x: timestamp, y: theData.data[i].p10e})
-        theConfig.data.datasets[1].data.push( {x: timestamp, y: theData.data[i].p25e})
-        theConfig.data.datasets[2].data.push({x: timestamp, y: theData.data[i].p100e})
-        theConfig.data.datasets[3].data.push({x: timestamp, y: theData.data[i].aqi})
+      samples = theData.history;
+      for (var i = 0; i < samples.length; i++) {
+        var timestamp = samples[i].ts*1000
+        console.log(samples[i]);
+        theConfig.data.datasets[0].data.push({x: timestamp, y: samples[i].env.pm10})
+        theConfig.data.datasets[1].data.push({x: timestamp, y: samples[i].env.pm25})
+        theConfig.data.datasets[2].data.push({x: timestamp, y: samples[i].env.pm100})
+        theConfig.data.datasets[3].data.push({x: timestamp, y: samples[i].aqi})
       }
     }  
 
