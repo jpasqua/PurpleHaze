@@ -1,0 +1,42 @@
+#ifndef SensorConfig_h
+#define SensorConfig_h
+
+// The types of weather sensor readings. The values of these constants
+// must remain in sync with the values defined in WeatherSensor.h
+#define READ_TEMP (1 << 0)
+#define READ_HUMI (1 << 1)
+#define READ_PRES (1 << 2)
+
+// For reference, these are the types of readings that are available
+// from each of the sensor types
+#define BME280_AVAIL_READINGS   (READ_TEMP | READ_HUMI | READ_PRES)
+#define DHT22_AVAIL_READINGS    (READ_TEMP | READ_HUMI )
+#define DS18B20_AVAIL_READINGS  (READ_TEMP )
+
+//
+// SAMPLE CONFIGURATIONS
+//
+
+constexpr uint8_t BME_I2C_ADDR = 0x76;
+// constexpr uint8_t DHT22_PIN = XX;
+// constexpr uint8_t DS18B20_PIN = XX;
+
+// Here is a configuration where there is a single BME280 sensor
+#define BME280_READINGS (BME280_AVAIL_READINGS)
+
+// Here is a config with a BME280 and a DS18B20. We want the temp
+// value to come from the DS18B20 because it is more stable, accurate
+// #define BME280_READINGS   (0         | READ_HUMI | READ_PRES )
+// #define DS18B20_READINGS  (READ_TEMP | 0         | 0         )
+
+// Here is a contrived config with a BME280, DHT22, and DS18B20. We
+// configure things to get one type of reading from each
+// #define BME280_READINGS   (0         | 0         | READ_PRES )
+// #define DHT22_READINGS    (0         | READ_HUMI |           )
+// #define DS18B20_READINGS  (READ_TEMP | 0         | 0         )
+
+#if defined(BME280_READINGS) || defined (DHT22_READINGS) || defined(DHT22_READINGS)
+#define HAS_WEATHER_SENSOR
+#endif
+
+#endif	// SensorConfig_h
