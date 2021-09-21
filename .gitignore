@@ -5,3 +5,4 @@ doc/images/source
 resources/image_sources
 data/history.json
 *.bash
+*.json
