@@ -7,21 +7,24 @@
 
 
 //--------------- Begin:  Includes ---------------------------------------------
+//                                  Hardware Definitions
+#include "src/hardware/HWConfig.h"
 //                                  Core Libraries
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
 #include <TimeLib.h>
+#include <Output.h>
+//                                  WebThing Includes
 #include <WebUI.h>
+#include <sensors/WeatherMgr.h>
+#include <sensors/WeatherUtils.h>
+#include <clients/BlynkMgr.h>
+#include <clients/WeatherBlynkPublisher.h>
 //                                  Local Includes
-#include "HWConfig.h"
+#include "src/hardware/SecondarySerial.h"
 #include "PurpleHaze.h"
-#include "SecondarySerial.h"
 #include "PHWebUI.h"
-#include "src/clients/WeatherMgr.h"
-#include "src/utils/Output.h"
 #include "src/clients/AQIMgr.h"
-#include "src/clients/BlynkMgr.h"
-#include "src/clients/WeatherBlynkPublisher.h"
 #include "src/clients/AQIBlynkPublisher.h"
 //--------------- End:    Includes ---------------------------------------------
 
@@ -33,7 +36,7 @@ namespace PH {
    *
    *----------------------------------------------------------------------------*/
   AQIMgr aqiMgr;
-  #if defined(HAS_THP_SENSOR)
+  #if defined(HAS_WEATHER_SENSOR)
     WeatherMgr weatherMgr;
   #endif
 
@@ -62,6 +65,11 @@ namespace PH {
     void flushBeforeSleep() { BlynkMgr::disconnect(); }
 
     void prepIO() {
+      if (SDA_PIN >= 0 && SCL_PIN >= 0) {
+        // Override the deault I2C Pins
+        Wire.begin(SDA_PIN, SCL_PIN);
+      }
+
       if (NEOPIXEL_PIN == -1) {
         indicators = NULL;
         qualityIndicator = new Indicator();
@@ -91,17 +99,11 @@ namespace PH {
         busyIndicator->setColor(255, 0, 0);
       }
 
-      #if defined(HAS_THP_SENSOR)
-        if (SDA_PIN >= 0 && SCL_PIN >= 0) {
-          // Override the deault I2C Pins
-          Wire.begin(SDA_PIN, SCL_PIN);
-        }
-        weatherMgr.setAttributes(
-          settings.bmeSettings.tempCorrection,
-          settings.bmeSettings.humiCorrection,
-          WebThing::settings.elevation);
-        weatherMgr.begin(BME_I2C_ADDR);
-      #endif  // HAS_THP_SENSOR
+      WeatherUtils::configureAvailableSensors(weatherMgr);
+      weatherMgr.init(
+        settings.weatherSettings.tempCorrection,
+        settings.weatherSettings.humiCorrection,
+        WebThing::settings.elevation);
     }
 
     void prepWebUI() {
@@ -114,10 +116,10 @@ namespace PH {
       BlynkMgr::init(settings.blynkAPIKey);
 
       // ----- Register the BME Publisher
-      #if defined(HAS_THP_SENSOR)
+      #if defined(HAS_WEATHER_SENSOR)
         WeatherBlynkPublisher* bp = new WeatherBlynkPublisher(&weatherMgr);
         BlynkMgr::registerPublisher(bp);
-      #endif  // HAS_THP_SENSOR
+      #endif
 
       // ----- Register the AQI Publisher
       AQIBlynkPublisher* ap = new AQIBlynkPublisher(&aqiMgr);
@@ -143,9 +145,9 @@ namespace PH {
         busyIndicator->off();
       }
 
-      #if defined(HAS_THP_SENSOR)
+      #if defined(HAS_WEATHER_SENSOR)
         weatherMgr.takeReadings();
-      #endif  // HAS_THP_SENSOR
+      #endif  // HAS_WEATHER_SENSOR
 
       BlynkMgr::publish();
     }
@@ -186,7 +188,7 @@ void setup() {
   settings.read();                  // Read the settings
 
   Internal::prepIO();               // Prepare any I/O pins used locally
-  Output::setUnits(&settings.useMetric);
+  Output::setOptions(&settings.useMetric, &settings.use24Hour);
 
   Internal::ensureWebThingSettings();         // Override any pertinent settings in WebThing
   WebThing::notifyOnConfigMode(Internal::configModeCallback);

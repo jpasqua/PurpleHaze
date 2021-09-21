@@ -12,7 +12,8 @@
 #include <FS.h>
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
-#include <WTBasics.h>
+#include <BPABasics.h>
+//                                  WebThing Includes
 #include <WebThing.h>
 //                                  Local Includes
 #include "AQIMgr.h"
@@ -39,12 +40,17 @@ const struct {
       {150.5,  99.9, 201, 99},
       {250.5, 249.9, 301, 199}
 };
-static const int AQITableLength= sizeof(AQITable)/sizeof(AQITable[0]);
+static const int AQITableLength = sizeof(AQITable)/sizeof(AQITable[0]);
 
 static const char* HistoryFilePath = "/aqihist.json";
 
 AQIMgr::AQIMgr() {
   aqi = new PMS5003();
+
+  buffers.setBuffer(0, {&readings_5min, "hour", minutesToTime_t(5)});
+  buffers.setBuffer(1, {&readings_1hr, "day", hoursToTime_t(1)});
+  buffers.setBuffer(2, {&readings_6hr, "week", hoursToTime_t(6)});
+
   pm25env_10min.setSamplesToConsider(2);         // (2) 5-minute periods
   pm25env_30min.setSamplesToConsider(6);         // (6) 5-minute periods
   pm25env_1hr.setSamplesToConsider(12);          // (12) 5-minute periods
@@ -57,7 +63,7 @@ bool AQIMgr::init(Stream* streamToSensor, Indicator* indicator) {
     _indicator->setColor(255, 0, 0);
     return false;
   }
-  readHistoryfromFile();
+  buffers.load(HistoryFilePath);
 
   enterState(waking);
   return true;
@@ -109,31 +115,6 @@ Serial.print('.');
   enterState(asleep);
 }
 
-uint16_t AQIMgr::sizeOfRange(HistoryRange r) {
-  switch (r) {
-    case Range_1Hour: return readings_5min.size();
-    case Range_1Day: return readings_1hr.size();
-    case Range_1Week: return readings_6hr.size();
-    case Range_Combined: return readings_5min.size() + readings_1hr.size() + readings_6hr.size();
-  }
-  return 0; // Assert(CantHappen)
-}
-
-AQIMgr::SavedReadings AQIMgr::getFromRange(HistoryRange r, uint16_t index) {
-  switch (r) {
-    case Range_1Hour: return readings_5min.peekAt(index);
-    case Range_1Day: return readings_1hr.peekAt(index);
-    case Range_1Week: return readings_6hr.peekAt(index);
-    case Range_Combined:
-      if (index < readings_5min.size()) return readings_5min.peekAt(index);
-      index -= readings_5min.size();
-      if (index < readings_1hr.size()) return readings_1hr.peekAt(index);;
-      index -= readings_1hr.size();
-      // Fall out...
-  }
-  return readings_6hr.peekAt(index);
-}
-
 void AQIMgr::enterState(State newState) {
   state = newState;
   enteredStateAt = millis();
@@ -154,34 +135,20 @@ void AQIMgr::takeNoteOfNewData(AQIReadings& newSample) {
   // 3. Update the moving averages and log them
 
 
-  bool storedNewValue = false;
-  SavedReadings readings;
-  readings.timestamp = WTBasics::wallClockFromMillis(newSample.timestamp) + WebThing::getGMTOffset();
-  readings.env = newSample.env;
-
   // 1. Add this reading to the appropriate set of history buffers
-  if (readings.timestamp - last5minTimestamp >= (5 * 60)) {
-    readings_5min.push(readings);
-    last5minTimestamp = readings.timestamp;
-    storedNewValue = true;
-  }
-  if (readings.timestamp - last1hrTimestamp >= (60 * 60)) {
-    readings_1hr.push(readings);
-    last1hrTimestamp = readings.timestamp;
-    storedNewValue = true;
-  }
-  if (readings.timestamp - last1dayTimestamp >= (6 * 60 * 60)) {
-    readings_6hr.push(readings);
-    last1dayTimestamp = readings.timestamp;
-    storedNewValue = true;
-  }
+  SavedReadings readings;
+  readings.timestamp =  Basics::wallClockFromMillis(newSample.timestamp) - WebThing::getGMTOffset();
+  readings.env = newSample.env;
+  readings.aqi = derivedAQI(newSample.env.pm25);
+  historyBufferIsDirty |= buffers.conditionalPushAll(readings);
 
   // 2. If it has been an appropriate period of time, save the history to a file
   static const uint32_t WriteThreshold = 10 * 60 * 1000L; // Write every 10 Minutes
   static uint32_t lastWrite = 0;
-  if (storedNewValue && (millis() - lastWrite > WriteThreshold)) {
-    saveHistoryToFile();
+  if (historyBufferIsDirty && (millis() - lastWrite > WriteThreshold)) {
+    buffers.store(HistoryFilePath);
     lastWrite = millis();
+    historyBufferIsDirty = false;
   }
 
   // 3. Update the moving averages and log them
@@ -193,60 +160,17 @@ void AQIMgr::takeNoteOfNewData(AQIReadings& newSample) {
   logAvgs();
 }
 
-void AQIMgr::readHistoryfromFile() {
-  DynamicJsonDocument doc(MaxHistoryFileSize);
-
-  File historyFile = ESP_FS::open(HistoryFilePath, "r");
-  if (!historyFile) {
-    Log.notice(F("No AQI History file exists."));
-    return;
-  }
-
-  size_t size = historyFile.size();
-  if (size > MaxHistoryFileSize) {
-    Log.error(F("History file size is too large (%d)"), size);
-    return;
-  }
-
-  auto error = deserializeJson(doc, historyFile);
-  historyFile.close();
-  if (error) {
-    Log.warning(F("Failed to parse history file: %s"), error.c_str());
-    return;
-  }
-
-  JsonObjectConst obj;
-  obj = doc["hour"];  readings_5min.load(obj);
-  obj = doc["day"];   readings_1hr.load(obj);
-  obj = doc["week"];  readings_6hr.load(obj);
-}
-
 void AQIMgr::emitHistoryAsJson(HistoryRange r, Stream& s) {
   switch (r) {
     case Range_1Hour: readings_5min.store(s); break;
     case Range_1Day: readings_1hr.store(s); break;
     case Range_1Week: readings_6hr.store(s); break;
-    case Range_Combined: {
-      s.print("{ \"hour\":"); readings_5min.store(s); s.println(",");
-      s.print("  \"day\":");  readings_1hr.store(s);  s.println(",");
-      s.print("  \"week\":"); readings_6hr.store(s); s.println("}");
-    }
+    case Range_Combined: buffers.store(s); break;
   }
 }
-
-void AQIMgr::saveHistoryToFile() {
-  File historyFile = ESP_FS::open(HistoryFilePath, "w");
-  if (!historyFile) {
-    Log.notice(F("Could not open history file for write: %s"), HistoryFilePath);
-    return;
-  }
-
-  emitHistoryAsJson(Range_Combined, historyFile);
-}
-
 
 void AQIMgr::logData(AQIReadings& data) {
-  time_t wallClockOfReading = WTBasics::wallClockFromMillis(data.timestamp);
+  time_t wallClockOfReading = Basics::wallClockFromMillis(data.timestamp);
   Log.verbose("-- %s --", WebThing::formattedTime(wallClockOfReading, true, true).c_str());
   Log.verbose(F("---------------------------------------"));
   Log.verbose(F("Concentration Units (standard)"));
@@ -265,7 +189,7 @@ void AQIMgr::logData(AQIReadings& data) {
 }
 
 void AQIMgr::logAvgs() {
-  time_t wallClockOfReading = WTBasics::wallClockFromMillis(data.timestamp);
+  time_t wallClockOfReading = Basics::wallClockFromMillis(data.timestamp);
   Log.verbose("-- %s --", WebThing::formattedTime(wallClockOfReading, true, true).c_str());
   Log.verbose(F("Last 30 Minutes: %F"), pm25env_30min.getAverage());
   Log.verbose(F("Last 1 hour: %F"), pm25env_1hr.getAverage());
@@ -313,7 +237,7 @@ void AQIMgr::aqiAsJSON(uint16_t quality, time_t timestamp, String& result) {
     }
   }
 
-  time_t wallClock = WTBasics::wallClockFromMillis(timestamp) - WebThing::getGMTOffset();
+  time_t wallClock = Basics::wallClockFromMillis(timestamp) - WebThing::getGMTOffset();
   result += "{\n";
   result += "  \"timestamp\": "; result += wallClock; result += ",\n";
   result += "  \"aqi\": "; result += quality; result += ",\n";
@@ -338,7 +262,9 @@ uint32_t AQIMgr::colorForQuality(uint16_t quality) {
 //   "env": { "pm10": 3, "pm25": 6, "pm100": 1 } }
 
 void AQIMgr::SavedReadings::internalize(const JsonObjectConst &obj) {
-  timestamp = obj["timestamp"];
+  timestamp = obj["ts"];
+  aqi = obj["aqi"];
+
   JsonObjectConst jsonEnv = obj["env"];
   env.pm10 = jsonEnv["pm10"];
   env.pm25 = jsonEnv["pm25"];
@@ -348,7 +274,9 @@ void AQIMgr::SavedReadings::internalize(const JsonObjectConst &obj) {
 void AQIMgr::SavedReadings::externalize(Stream& writeStream) const {
   StaticJsonDocument<96> doc; // Size provided by https://arduinojson.org/v6/assistant
 
-  doc["timestamp"] = timestamp;
+  doc["ts"] = timestamp;
+  doc["aqi"] = aqi;
+
   JsonObject jsonEnv = doc.createNestedObject("env");
   jsonEnv["pm10"] = env.pm10;
   jsonEnv["pm25"] = env.pm25;

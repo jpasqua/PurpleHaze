@@ -11,16 +11,17 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
-#include <HistoryBuffer.h>
 #include <TimeLib.h>
-//                                  WebThing Includes
-#include <HistoryBuffer.h>
+#include <Indicators.h>
+#include <MovingAverage.h>
+#include <Indicators.h>
 #include <Serializable.h>
+#include <HistoryBuffer.h>
+#include <HistoryBuffers.h>
+//                                  WebThing Includes
 //                                  Local Includes
 #include "AQIReadings.h"
 #include "PMS5003.h"
-#include "../utils/MovingAverage.h"
-#include "../utils/Indicators.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -105,12 +106,14 @@ private:
   class SavedReadings : public Serializable {
   public:
     SavedReadings() = default;
-    SavedReadings(ParticleReadings& pr, time_t ts) : env(pr), timestamp(ts) { }
+    SavedReadings(ParticleReadings& pr, uint16_t quality, time_t ts)
+        : Serializable(ts), env(pr), aqi(quality) { }
+
     virtual void internalize(const JsonObjectConst &obj);
     virtual void externalize(Stream& writeStream) const;
 
     ParticleReadings env;
-    time_t timestamp;       // GMT
+    uint16_t aqi;
   };
 
   enum State {awake, retrying, waking, asleep};
@@ -124,14 +127,7 @@ private:
   
   // ----- Methods -----
   void enterState(State);
-
   void takeNoteOfNewData(AQIReadings& newSample);
-
-  void saveHistoryToFile();
-  void readHistoryfromFile();
-
-  uint16_t sizeOfRange(HistoryRange r);
-  SavedReadings getFromRange(HistoryRange r, uint16_t index);
 
   // --- Utility Functions ---
   void logData(AQIReadings& data);
@@ -144,13 +140,12 @@ private:
   uint32_t enteredStateAt;
   Indicator* _indicator;
   AQIReadings data;
-  time_t last5minTimestamp = 0;
-  time_t last1hrTimestamp = 0;
-  time_t last1dayTimestamp = 0;
 
   HistoryBuffer<SavedReadings, 12> readings_5min; // The last hour's worth of readings at 5 minute intervals
   HistoryBuffer<SavedReadings, 24> readings_1hr;  // The last day's worth of readings at 1 hour intervals
   HistoryBuffer<SavedReadings, 28> readings_6hr;  // The last week's worth of readings at 6 hour intervals
+  HistoryBuffers<3> buffers;
+  bool historyBufferIsDirty = false;
 };
 
 #endif  // AQIMgr_h

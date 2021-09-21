@@ -3,12 +3,13 @@
 
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
-#include <ArduinoLog.h>
 //                                  Third Party Libraries
+#include <ArduinoLog.h>
+#include <Output.h>
+//                                  WebThing Includes
+#include <clients/BlynkMgr.h>
 //                                  Local Includes
-#include "../utils/Output.h"
 #include "AQIMgr.h"
-#include "BlynkMgr.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -28,7 +29,7 @@ public:
     BlynkMgr::writeUnsigned(AQIPin, _aqiMgr->derivedAQI(readings.env.pm25));
 
     if (timeStatus() == timeSet) {
-      String dateTime = Output::dateTime(WTBasics::wallClockFromMillis(readings.timestamp));
+      String dateTime = Output::formattedTime(Basics::wallClockFromMillis(readings.timestamp));
       Log.verbose("Timestamp sent to Blynk: %s", dateTime.c_str());
       BlynkMgr::writeString(TimestampPin, dateTime);
     }

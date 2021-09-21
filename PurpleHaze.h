@@ -4,13 +4,15 @@
 //--------------- Begin:  Includes ---------------------------------------------
 //                                  Core Libraries
 //                                  Third Party Libraries
+#include <Indicators.h>
+//                                  WebThing Includes
 #include <WebThing.h>
+#include <sensors/WeatherMgr.h>
+#include <sensors/WeatherReadings.h>
 //                                  Local Includes
+#include "src/hardware/HWConfig.h"
 #include "PHSettings.h"
 #include "src/clients/AQIMgr.h"
-#include "src/clients/WeatherMgr.h"
-#include "src/clients/WeatherReadings.h"
-#include "src/utils/Indicators.h"
 //--------------- End:    Includes ---------------------------------------------
 
 
@@ -19,9 +21,9 @@ namespace PH {
 
   extern AQIMgr aqiMgr;
 
-  #if defined(HAS_THP_SENSOR)
+  #if defined(HAS_WEATHER_SENSOR)
     extern WeatherMgr weatherMgr;
-  #endif  // HAS_THP_SENSOR
+  #endif
 
   extern PHSettings settings;
   extern Indicator* busyIndicator;
