@@ -16,7 +16,7 @@
 //--------------- End:    Includes ---------------------------------------------
 
 
-class BMESettings {
+class WeatherSettings {
 public:
   float   tempCorrection = 0.0; // Correction to the temp reading - always in Celsius
   float   humiCorrection = 0.0; // Correction to the humidty sensor reading
@@ -49,8 +49,9 @@ public:
   uint8_t iBright = 50;                       // Brightness of indicators (0-100%)
   bool showDevMenu = false;
   bool useMetric = false;
+  bool use24Hour = false;
   
-  BMESettings bmeSettings;
+  WeatherSettings weatherSettings;
 
 private:
   // ----- Constants -----
