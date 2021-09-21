@@ -2,6 +2,7 @@
 #define HWConfig_h
 
 #include <Arduino.h>
+#include "SensorConfig.h"
 
 // ----- BEGIN: Constants used in the rest of the file. Do not change these
 // An enumeration of allowable values for HWConfig
@@ -12,10 +13,6 @@
 
 // Pick a configuration. Use Config_Custom to define your own
 #define HWConfig Config_D1Mini
-
-// Does this config include a Temp/Humidity/Pressure Sensor?
-#define HAS_THP_SENSOR
-
 
 #if (HWConfig == Config_D1Mini)
   /*------------------------------------------------------------------------------
@@ -31,11 +28,8 @@
 
   constexpr int8_t NEOPIXEL_PIN = D2;
 
-  #if defined(HAS_THP_SENSOR)
-    constexpr uint8_t BME_I2C_ADDR = 0x76;
-    constexpr uint8_t SDA_PIN = D1;
-    constexpr uint8_t SCL_PIN = D5;
-  #endif  // HAS_THP_SENSOR
+  constexpr uint8_t SDA_PIN = D1;
+  constexpr uint8_t SCL_PIN = D5;
 
 #elif (HWConfig == Config_ESP32Mini)
   /*------------------------------------------------------------------------------
@@ -50,11 +44,8 @@
 
   constexpr int8_t NEOPIXEL_PIN = 21;
 
-  #if defined(HAS_THP_SENSOR)
-    constexpr uint8_t BME_I2C_ADDR = 0x76;
-    constexpr uint8_t SDA_PIN = D1;
-    constexpr uint8_t SCL_PIN = D5;
-  #endif  // HAS_THP_SENSOR
+  constexpr uint8_t SDA_PIN = D1;
+  constexpr uint8_t SCL_PIN = D5;
 
 #elif (HWConfig ==  Config_Custom)
   /*------------------------------------------------------------------------------
@@ -68,11 +59,8 @@
   constexpr uint8_t SENSOR_RX_PIN = D6;
   constexpr uint8_t SENSOR_TX_PIN = D8;
 
-  #if defined(HAS_THP_SENSOR)
-    constexpr uint8_t BME_I2C_ADDR = 0x76;
-    constexpr uint8_t SDA_PIN = D1; // Set to -1 to use default I2C Pins
-    constexpr uint8_t SCL_PIN = D5;
-  #endif  // HAS_THP_SENSOR
+  constexpr uint8_t SDA_PIN = D1; // Set to -1 to use default I2C Pins
+  constexpr uint8_t SCL_PIN = D5;
 
   // If there are NeoPixels connected to use as status indicators, set the pin
   // that drives the data line. If no NeoPixels are connected, set the pin to -1
