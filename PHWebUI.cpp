@@ -89,6 +89,8 @@ namespace PHWebUI {
         else if (key == "PM25_CLR")  val = PH::settings.chartColors.pm25;
         else if (key == "PM100_CLR") val = PH::settings.chartColors.pm100;
         else if (key == "AQI_CLR")   val = PH::settings.chartColors.aqi;
+        else if (key == "TMP_CLR")   val = PH::settings.weatherSettings.chartColors.temp;
+        else if (key == "USE_METRIC")val = PH::settings.useMetric;
       };
 
       WebUI::wrapWebPage("/displayChartPage", "/ChartPage.html", mapper);
@@ -204,6 +206,8 @@ namespace PHWebUI {
         PH::settings.chartColors.pm25 = WebUI::arg("pm25Color");
         PH::settings.chartColors.pm100 = WebUI::arg("pm100Color");
         PH::settings.chartColors.aqi = WebUI::arg("aqiColor");
+        PH::settings.weatherSettings.chartColors.temp = WebUI::arg("tempColor");
+        PH::settings.weatherSettings.chartColors.avg = WebUI::arg("avgColor");
         PH::settings.write();
 
         // The description MAY have changed. Update the title just in case

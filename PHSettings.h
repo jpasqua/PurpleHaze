@@ -21,8 +21,8 @@ public:
   float   tempCorrection = 0.0; // Correction to the temp reading - always in Celsius
   float   humiCorrection = 0.0; // Correction to the humidty sensor reading
   struct {
-    String temp = "#4e7a27";
-    String avg = "#ff00ff";
+    String temp = "#ff00ff";
+    String avg = "#4e7a27";
   } chartColors;
   void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);

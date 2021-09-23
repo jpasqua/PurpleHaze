@@ -9,17 +9,30 @@
     }
   </style>
   <div style="width:75\%;">
-    <canvas id="hour_canvas"></canvas>
-    <canvas id="day_canvas"></canvas>
-    <canvas id="week_canvas"></canvas>
+    <canvas id="hour_canvas"></canvas><br>
+    <canvas id="day_canvas"></canvas><br>
+    <canvas id="week_canvas"></canvas><br>
   </div>
   <br>
   <br>
 
   <script>
+    const color_temp = '%TMP_CLR%';
+    const color_aqi = '%AQI_CLR%';
+
     const colorBands = [
       '#D9F8D2', '#FFFFD6', '#FBE0CE', '#FACCC9', '#EFB2C0',
       '#E398B7', '#FA7FB7', '#FA63B1', '#FA4BA5', '#FA2BA5' ]
+
+    function showLoading(canvasName) {
+      var c = document.getElementById(canvasName);
+      var ctx = c.getContext("2d");
+      ctx.font = "30px Arial";
+      ctx.beginPath();
+      ctx.rect(0, 0, 200, 100);
+      ctx.stroke();
+      ctx.fillText("Loading...", 10, 50);
+    }
 
     Chart.pluginService.register({
       beforeDraw: function (chart, easing) {
@@ -27,7 +40,7 @@
           var helpers = Chart.helpers;
           var ctx = chart.chart.ctx;
           var chartArea = chart.chartArea;
-          var yScale = chart.scales["y-axis-0"];
+          var yScale = chart.scales["aqi"];
 
           ctx.save();
           var done = false;
@@ -44,33 +57,51 @@
       }
     });
 
-    const color_pm10 = '%PM10_CLR%'
-    const color_pm25 = '%PM25_CLR%'
-    const color_pm100 = '%PM100_CLR%'
-    const color_aqi = '%AQI_CLR%'
     function createOptions(theTitle) {
       return {
         responsive: true, title: { display: true, text: theTitle, fontSize:16 },
         chartArea: { backgroundColor: 'rgba(251, 85, 85, 0.4)' },
         scales: {
-          xAxes: [{ display: true, scaleLabel: { display: true, labelString: 'Date' }, type: 'time' }],
-          yAxes: [{ display: true, scaleLabel: { display: true, labelString: 'Value' } }]
+          xAxes: [
+            { display: true, scaleLabel: { display: true, labelString: 'Date' }, type: 'time' }],
+          yAxes: [
+            { id: 'aqi', position: 'left', display: true,
+              ticks: {fontColor: color_aqi },
+              scaleLabel: { display: true, labelString: 'AQI', fontColor: color_aqi }},
+            { id: 'temp', position: 'right', display: true,
+              ticks: {suggestedMin: 50, suggestedMax: 90, fontColor: color_temp },
+              scaleLabel: { display: true, labelString: 'Temperature', fontColor: color_temp  }}
+          ]
         }
       }
     }
+
+    function dataset(label, axis, color, hide) {
+      return { label: label, yAxisID: axis,  borderColor: color,
+        fill: false, lineTension: 0, data: [], hidden: hide };
+    }
+
     function createDatasets() {
       return {
           datasets: [
-            { label: 'PM10 ENV', borderColor: color_pm10, fill: false, lineTension: 0, data: [] },
-            { label: 'PM25 ENV', borderColor: color_pm25, fill: false, lineTension: 0, data: [] },
-            { label: 'PM100 ENV', borderColor: color_pm100, fill: false, lineTension: 0, data: [] },
-            { label: 'AQI', borderColor: color_aqi, fill: false, lineTension: 0, data: [] } ]
+            dataset('PM10 ENV', 'aqi', '%PM10_CLR%', true),
+            dataset('PM25 ENV', 'aqi', '%PM25_CLR%', true),
+            dataset('PM100 ENV', 'aqi', '%PM100_CLR%', true),
+            dataset('AQI', 'aqi', color_aqi, false),
+            dataset('Temp', 'temp', color_temp, false)]
         }
     }
 
-    var hour_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Hour") };
-    var day_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Day") };
-    var week_config = { type: 'line', data: createDatasets(), options: createOptions("Historical Data for the Last Week") };
+    var hour_config = {
+        type: 'line', data: createDatasets(),
+        options: createOptions("Historical Data for the Last Hour")
+      };
+    var day_config = {
+      type: 'line', data: createDatasets(),
+      options: createOptions("Historical Data for the Last Day") };
+    var week_config = {
+      type: 'line', data: createDatasets(),
+      options: createOptions("Historical Data for the Last Week") };
 
 
     const AQITable = [
@@ -93,42 +124,39 @@
       return Math.floor(aqi)
     }
 
-    function prepData(theConfig, theData) {
-      theConfig.data.datasets[0].data = [];
-      theConfig.data.datasets[1].data = [];
-      theConfig.data.datasets[2].data = [];
-      theConfig.data.datasets[3].data = [];
-      samples = theData.history;
-      for (var i = 0; i < samples.length; i++) {
-        var timestamp = samples[i].ts*1000
-        console.log(samples[i]);
-        theConfig.data.datasets[0].data.push({x: timestamp, y: samples[i].env.pm10})
-        theConfig.data.datasets[1].data.push({x: timestamp, y: samples[i].env.pm25})
-        theConfig.data.datasets[2].data.push({x: timestamp, y: samples[i].env.pm100})
-        theConfig.data.datasets[3].data.push({x: timestamp, y: samples[i].aqi})
+    const useMetric = %USE_METRIC%;
+
+    function prepData(theConfig, aqiData, weatherData) {
+      for (var dataset of theConfig.data.datasets) dataset.data = [];
+      datasets = theConfig.data.datasets;
+      for (var sample of aqiData.history) {
+        var timestamp = sample.ts*1000
+        datasets[0].data.push({x: timestamp, y: sample.env.pm10})
+        datasets[1].data.push({x: timestamp, y: sample.env.pm25})
+        datasets[2].data.push({x: timestamp, y: sample.env.pm100})
+        datasets[3].data.push({x: timestamp, y: sample.aqi})
+      }
+      for (var sample of weatherData.history) {
+        var temp = useMetric ? sample.temp : (sample.t * 1.8 + 32);
+        datasets[4].data.push({x: sample.ts*1000, y: temp})
       }
     }  
 
-    $.when(
-      $.getJSON(
-        "/getHistory?range=hour",
-        function(theData) { prepData(hour_config, theData) })).then(function() {
-          var ctx = document.getElementById('hour_canvas').getContext('2d');
-          var hourChart = new Chart(ctx, hour_config);
-        }); 
-    $.when(
-      $.getJSON(
-        "/getHistory?range=day",
-        function(theData) { prepData(day_config, theData) })).then(function() {
-          var ctx = document.getElementById('day_canvas').getContext('2d');
-          var dayData = new Chart(ctx, day_config);
-      }); 
-    $.when(
-      $.getJSON(
-        "/getHistory?range=week",
-        function(theData) { prepData(week_config, theData) })).then(function() {
-          var ctx = document.getElementById('week_canvas').getContext('2d');
-          var weekData = new Chart(ctx, week_config);
-      }); 
+    function drawChart(range, config) {
+      var getAQI = $.getJSON("http://nrso.local/getHistory?range="+range);
+      var getWeather = $.getJSON("http://nrso.local/getWeatherHistory?range="+range);
+      $.when(getAQI, getWeather)
+        .then(function(aqiResult, weatherResult) {
+          prepData(config, aqiResult[0], weatherResult[0]);
+          new Chart(document.getElementById(range+'_canvas').getContext('2d'), config);
+        });
+    }
+
+    showLoading('hour_canvas');
+    showLoading('day_canvas');
+    showLoading('week_canvas');
+    drawChart("hour", hour_config);
+    drawChart("day", day_config);
+    drawChart("week", week_config);
 
   </script>
