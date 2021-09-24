@@ -29,14 +29,14 @@ namespace PHWebUI {
 
   // ----- BEGIN: PHWebUI::Internal
   namespace Internal {
-    String Actions =
+    const __FlashStringHelper* APP_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/ChartPage.html'>"
       "<i class='fa fa-bar-chart'></i> Charts</a>"
       "<a class='w3-bar-item w3-button' href='/displayPHConfig'>"
-      "<i class='fa fa-cog'></i> Configure PH</a>";
-    String DEV_ACTION =
+      "<i class='fa fa-cog'></i> Configure PH</a>");
+    const __FlashStringHelper* DEV_MENU_ITEMS = FPSTR(
       "<a class='w3-bar-item w3-button' href='/dev'>"
-      "<i class='fa fa-gears'></i> Dev Settings</a>";
+      "<i class='fa fa-gears'></i> Dev Settings</a>");
 
     constexpr uint32_t BusyColor = 0xff88ff;
     void showBusyStatus(bool busy) {
@@ -110,6 +110,8 @@ namespace PHWebUI {
         else if (key == "PM25_CLR")   val = PH::settings.chartColors.pm25;
         else if (key == "PM100_CLR")  val = PH::settings.chartColors.pm100;
         else if (key == "AQI_CLR")    val = PH::settings.chartColors.aqi;
+        else if (key == "USE_METRIC") val = checkedOrNot[PH::settings.useMetric];
+        else if (key == "USE_24HOUR") val = checkedOrNot[PH::settings.use24Hour];
 #if defined(HAS_WEATHER_SENSOR)
         else if (key == "WTHR_VIS")   val = "true";
         else if (key == "TEMP_CORRECT") val.concat(PH::settings.weatherSettings.tempCorrection);
@@ -202,6 +204,8 @@ namespace PHWebUI {
         PH::settings.description = WebUI::arg("description");
         PH::settings.blynkAPIKey = WebUI::arg("blynkAPIKey");
         PH::settings.iBright = (constrain(WebUI::arg("iBright").toInt(), 0, 100));
+        PH::settings.useMetric = WebUI::hasArg(F("metric"));
+        PH::settings.use24Hour = WebUI::hasArg(F("is24hour"));
         PH::settings.chartColors.pm10 = WebUI::arg("pm10Color");
         PH::settings.chartColors.pm25 = WebUI::arg("pm25Color");
         PH::settings.chartColors.pm100 = WebUI::arg("pm100Color");
@@ -220,51 +224,12 @@ namespace PHWebUI {
     }
   }   // ----- END: PHWebUI::Endpoints
 
-  namespace Dev {
-    void updateSettings() {
-      auto action = []() {
-        PH::settings.showDevMenu = WebUI::hasArg("showDevMenu");
-        PH::settings.write();
-        WebUI::redirectHome();
-      };
-      WebUI::wrapWebAction("/updateSettings", action, false);
-    }
-
-    void displayDevPage() {
-      auto mapper =[](const String &key, String& val) -> void {
-        if (key == "SHOW_DEV_MENU") val = checkedOrNot[PH::settings.showDevMenu];
-      };
-
-      WebUI::wrapWebPage("/displayDevPage", "/DevPage.html", mapper);
-    }
-
-    void reboot() {
-      if (!WebUI::authenticationOK()) { return; }
-      WebUI::redirectHome();
-      ESP.restart();
-    }
-
-    void yieldSettings() {
-      auto action = []() {
-        DynamicJsonDocument *doc = (WebUI::hasArg("wt")) ? WebThing::settings.asJSON() :
-                                                           PH::settings.asJSON();
-        WebUI::sendJSONContent(doc);
-        doc->clear();   // TO DO: Is this needed?
-        delete doc;     // TO DO: Is this needed?
-      };
-      WebUI::wrapWebAction("/updateSettings", action, false);
-    }
-
-  }   // ----- END: PHWebUI::Dev
-
-
   void init() {
     WebUI::setTitle(PH::settings.description+" ("+WebThing::settings.hostname+")");
-    String actions = Internal::Actions;
-    if (PH::settings.showDevMenu) {
-      actions += Internal::DEV_ACTION;
-    }
-    WebUI::addMenuItems(actions);
+
+    WebUI::addAppMenuItems(Internal::APP_MENU_ITEMS);
+    WebUI::Dev::init(
+        &PH::settings.showDevMenu, nullptr, &PH::settings, Internal::DEV_MENU_ITEMS);
 
     WebUI::registerBusyCallback(Internal::showBusyStatus);
 
@@ -276,11 +241,6 @@ namespace PHWebUI {
     WebUI::registerHandler("/getHistory",         Endpoints::getHistory);
     WebUI::registerHandler("/getWeatherHistory",  Endpoints::getWeatherHistory);
     WebUI::registerHandler("/getAQI",             Endpoints::getAQI);
-
-    WebUI::registerHandler("/dev",                Dev::displayDevPage);
-    WebUI::registerHandler("/dev/reboot",         Dev::reboot);
-    WebUI::registerHandler("/dev/settings",       Dev::yieldSettings);
-    WebUI::registerHandler("/dev/updateSettings", Dev::updateSettings);
   }
 
 }
