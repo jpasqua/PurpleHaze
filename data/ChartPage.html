@@ -126,6 +126,10 @@
 
     const useMetric = %USE_METRIC%;
 
+    function oneDecimal(f) {
+      return Math.trunc(Math.round(f*10))/10
+    }
+
     function prepData(theConfig, aqiData, weatherData) {
       for (var dataset of theConfig.data.datasets) dataset.data = [];
       datasets = theConfig.data.datasets;
@@ -137,8 +141,8 @@
         datasets[3].data.push({x: timestamp, y: sample.aqi})
       }
       for (var sample of weatherData.history) {
-        var temp = useMetric ? sample.temp : (sample.t * 1.8 + 32);
-        datasets[4].data.push({x: sample.ts*1000, y: temp})
+        var temp = useMetric ? sample.t : (sample.t * 1.8 + 32);
+        datasets[4].data.push({x: sample.ts*1000, y: oneDecimal(temp)})
       }
     }  
 
