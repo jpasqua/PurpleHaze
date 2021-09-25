@@ -11,6 +11,7 @@
 //                                  Core Libraries
 //                                  Third Party Libraries
 #include <ArduinoLog.h>
+#include <BPABasics.h>
 #include <Output.h>
 //                                  WebThing Includes
 #include <sensors/WeatherMgr.h>
@@ -25,7 +26,6 @@
 
 // ----- BEGIN: WebUI namespace
 namespace PHWebUI {
-  static const String   checkedOrNot[2] = {"", "checked='checked'"};
 
   // ----- BEGIN: PHWebUI::Internal
   namespace Internal {
@@ -34,9 +34,13 @@ namespace PHWebUI {
       "<i class='fa fa-bar-chart'></i> Charts</a>"
       "<a class='w3-bar-item w3-button' href='/displayPHConfig'>"
       "<i class='fa fa-cog'></i> Configure PH</a>");
-    const __FlashStringHelper* DEV_MENU_ITEMS = FPSTR(
-      "<a class='w3-bar-item w3-button' href='/dev'>"
-      "<i class='fa fa-gears'></i> Dev Settings</a>");
+
+
+    constexpr WebUI::Dev::Action ExtraDevButtons[] {
+      {"View AQI History", "getHistory", nullptr, nullptr},
+      {"View Weather History", "getWeatherHistory", nullptr, nullptr},
+    };
+    constexpr uint8_t NumExtraDevButtons = ARRAY_SIZE(ExtraDevButtons);
 
     constexpr uint32_t BusyColor = 0xff88ff;
     void showBusyStatus(bool busy) {
@@ -110,8 +114,8 @@ namespace PHWebUI {
         else if (key == "PM25_CLR")   val = PH::settings.chartColors.pm25;
         else if (key == "PM100_CLR")  val = PH::settings.chartColors.pm100;
         else if (key == "AQI_CLR")    val = PH::settings.chartColors.aqi;
-        else if (key == "USE_METRIC") val = checkedOrNot[PH::settings.useMetric];
-        else if (key == "USE_24HOUR") val = checkedOrNot[PH::settings.use24Hour];
+        else if (key == "USE_METRIC") val = WebUI::checkedOrNot[PH::settings.useMetric];
+        else if (key == "USE_24HOUR") val = WebUI::checkedOrNot[PH::settings.use24Hour];
 #if defined(HAS_WEATHER_SENSOR)
         else if (key == "WTHR_VIS")   val = "true";
         else if (key == "TEMP_CORRECT") val.concat(PH::settings.weatherSettings.tempCorrection);
@@ -228,8 +232,8 @@ namespace PHWebUI {
     WebUI::setTitle(PH::settings.description+" ("+WebThing::settings.hostname+")");
 
     WebUI::addAppMenuItems(Internal::APP_MENU_ITEMS);
-    WebUI::Dev::init(
-        &PH::settings.showDevMenu, nullptr, &PH::settings, Internal::DEV_MENU_ITEMS);
+    WebUI::Dev::init(&PH::settings.showDevMenu, &PH::settings);
+    WebUI::Dev::addButtons(Internal::ExtraDevButtons, Internal::NumExtraDevButtons);
 
     WebUI::registerBusyCallback(Internal::showBusyStatus);
 
