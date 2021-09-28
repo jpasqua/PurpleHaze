@@ -13,6 +13,8 @@
 
 // Pick a configuration. Use Config_Custom to define your own
 #define HWConfig Config_D1Mini
+//#define HWConfig Config_ESP32Mini
+//#define HWConfig Config_Custom
 
 #if (HWConfig == Config_D1Mini)
   /*------------------------------------------------------------------------------
