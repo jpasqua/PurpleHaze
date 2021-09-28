@@ -7,7 +7,7 @@
 #include <ArduinoLog.h>
 #include <Output.h>
 //                                  WebThing Includes
-#include <clients/BlynkMgr.h>
+#include <clients/BlynkClient.h>
 //                                  Local Includes
 #include "AQIMgr.h"
 //--------------- End:    Includes ---------------------------------------------
@@ -22,16 +22,16 @@ public:
     if (_aqiMgr->lastReadingTime() == _timestampOfLastData) return false;
 
     const AQIReadings& readings = _aqiMgr->getLastReadings();
-    BlynkMgr::writeUnsigned(Env010Pin, readings.env.pm10);
-    BlynkMgr::writeUnsigned(Env025Pin, readings.env.pm25);
-    BlynkMgr::writeUnsigned(Env100Pin, readings.env.pm100);
-    BlynkMgr::writeUnsigned(MA30Pin, _aqiMgr->pm25env_30min.getAverage());
-    BlynkMgr::writeUnsigned(AQIPin, _aqiMgr->derivedAQI(readings.env.pm25));
+    Blynk.virtualWrite(Env010Pin, readings.env.pm10);
+    Blynk.virtualWrite(Env025Pin, readings.env.pm25);
+    Blynk.virtualWrite(Env100Pin, readings.env.pm100);
+    Blynk.virtualWrite(MA30Pin, _aqiMgr->pm25env_30min.getAverage());
+    Blynk.virtualWrite(AQIPin, _aqiMgr->derivedAQI(readings.env.pm25));
 
     if (timeStatus() == timeSet) {
       String dateTime = Output::formattedTime(Basics::wallClockFromMillis(readings.timestamp));
       Log.verbose("Timestamp sent to Blynk: %s", dateTime.c_str());
-      BlynkMgr::writeString(TimestampPin, dateTime);
+      Blynk.virtualWrite(TimestampPin, dateTime);
     }
 
     _timestampOfLastData = readings.timestamp;
