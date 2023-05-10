@@ -1,0 +1,24 @@
+{
+  "schema": {
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled"
+    },
+    "refreshInterval": {
+      "title": "Seconds between updates",
+      "type": "number",
+      "minimum": 2
+    },
+    "riScale": { "type": "number" }
+  },
+  "form": [
+    {
+      "key": "enabled",
+      "notitle": true,
+      "inlinetitle": " Enable Plugin"
+    },
+    "refreshInterval",
+    { "key": "riScale", "type": "hidden" },
+    { "type": "submit", "title": "Save Settings" } 
+  ]
+}

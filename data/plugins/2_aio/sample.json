@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "enabled":true,
+  "username": "username",
+  "key": "aio_LongSequenceOfChars",
+  "groups": [
+    "backyard-weather-station"  ],
+  "nicknames": ["Backyard"],
+  "refreshInterval": 10,
+  "feeds": [
+    "0.temp",
+    "0.aqi"
+   ],
+  "riScale": 60000
+}

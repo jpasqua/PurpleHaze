@@ -1,0 +1,55 @@
+
+{
+  "items": [
+    {
+      "x": 0, "y": 0, "w": 64,  "h": 10, "xOff": 0, "yOff": 0,
+      "justify": "TL", "font": "S10", "color": "0xFFFFFF", "format": "%s",
+      "type": "String", "key": "$W.city"
+    },
+    {
+      "x": 64, "y": 0, "w": 64,  "h": 10, "xOff": 63, "yOff": 0,
+      "justify": "TR", "font": "S10", "color": "0xFFFFFF", "format": "%s",
+      "type": "String", "key": "$W.ldesc"
+    },
+
+    {
+      "x": 0, "y": 14, "w": 98,  "h":18, "xOff": 49, "yOff": 0,
+      "justify": "TC", "font": "D16", "color": "0x00ff00", "format": "%2d:%02d:%02d",
+      "type": "CLOCK", "key": "$S.time"
+    },
+
+    {
+    "x": 98, "y": 14, "w": 30,  "h": 10, "xOff": 29, "yOff": 0,
+    "justify": "TR", "font": "S10", "color": "0x00FF00", "format": "%0.0fF",
+    "type": "FLOAT", "key": "$W.temp"
+    },
+
+
+    {
+      "x": 0, "y": 36, "w": 64,  "h": 10, "xOff": 0, "yOff": 0,
+      "justify": "TL", "font": "S10", "color": "0xFFFFFF", "format": "%s",
+      "type": "String", "key": "$E.AR.NN1"
+    },
+    {
+      "x": 0, "y": 48, "w": 32,  "h": 10, "xOff": 32, "yOff": 0,
+      "justify": "TR", "font": "S10", "color": "0xFFFFFF", "format": "Temp:"
+    },
+    {
+      "x": 32, "y": 48, "w": 32,  "h": 10, "xOff": 0, "yOff": 0,
+      "justify": "TL", "font": "S10", "color": "0xFFFFFF",  "format": "%0.1fF",
+      "type": "FLOAT", "key": "$E.AR.0.temp"
+    },
+    {
+      "x": 64, "y": 48, "w": 32,  "h": 10, "xOff": 32, "yOff": 0,
+      "justify": "TR", "font": "S10", "color": "0xFFFFFF", "format": "AQI:"
+    },
+    {
+      "x": 96, "y": 48, "w": 32,  "h": 10, "xOff": 0, "yOff": 0,
+      "justify": "TL", "font": "S10", "color": "0xFFFFFF",  "format": "%.0f",
+      "type": "FLOAT", "key": "$E.AR.0.aqi"
+    }
+
+  ],
+  "bkg": "0x000000",
+  "screenID": "ExtAQI"
+}
