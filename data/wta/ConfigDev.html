@@ -1,0 +1,29 @@
+<h2>Developer Controls</h2>
+<div class='w3-card-2 w3-round-large'>
+  <div class='w3-container w3-margin-bottom'>
+    <form class='w3-container' action='/dev/updateSettings' method='get'>
+      <div class='w3-row'>
+        <input name='showDevMenu' class='w3-check' type='checkbox' %SHOW_DEV_MENU%>Show Developer Menu
+      </div>
+      <button class='w3-button w3-block w3-round-large w3-grey w3-section w3-padding' type='submit'>Save</button>
+    </form>
+  </div>
+</div>
+<div class='w3-container'>
+  <button class='w3-button w3-quarter w3-block w3-round-large w3-pale-green w3-padding' type='button' onclick='window.location.href = "/dev/settings"'>View Settings</button>
+</div>
+<div class='w3-container'>
+  <button class='w3-button w3-quarter w3-block w3-round-large w3-pale-green w3-padding w3-margin-top' type='button' onclick='window.location.href = "/dev/settings?wt=on"'>View WebThing Settings</button>
+</div>
+<div class='w3-container'>
+  <button class='w3-button w3-quarter w3-block w3-round-large w3-pale-green w3-padding w3-margin-top' type='button' onclick='window.location.href = "/dev/screenShot"'>Take a screen shot</button>
+</div>
+<div class='w3-container'>
+  <script>
+    function requestReboot() { if (confirm("Request a reboot?")) { window.location.href = "/dev/reboot"; } }
+  </script>
+  <button class='w3-button w3-quarter w3-block w3-round-large w3-pale-red w3-padding w3-margin-top' type='button' onclick='requestReboot()'>Request Reboot</button>
+</div>
+<div class='w3-container w3-margin-top'>
+  %HEAP%
+</div>

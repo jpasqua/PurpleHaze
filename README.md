@@ -1,28 +1,34 @@
-# PurpleHaze - Air Quality Monitor
+# PurpleHaze - An Environmental Sensor
 
-*PurpleHaze* is a simple Air Quality Monitor based on the [Plantower PMS5003](https://www.adafruit.com/product/3686). You put together some electronics, 3D-print a case, load this software, configure an app on your phone, and you're all set. What could be simpler? This software uses the [Blynk](https://blynk.io) service to collect data in the cloud and make it available to the app on your phone. If you don't want to use Blynk, you can get the readings directly from *PurpleHaze* in your web browser. In the future, other services may be supported.
+*PurpleHaze* is an environmental sensor that can be configured to monitor air quality, temperature, humidity, and barometric pressure, or various combinations of these. It can be used as a standalone sensor which is monitored in your web browser, and it can also be configured with a display to show the sensor data and other information such as weather forecasts.
 
-The air quality monitor is configured using a Web User Interface where the user will specify information such as:
+*PurpleHaze* can be run on an ESP8266 or ESP32 platform and is built using the Arduino IDE. It relies on the [Plantower PMS5003](https://www.adafruit.com/product/3686) for air quality measurements. It can use the DHT22, BME280, or DS18B20 (or a combination of these) for weather sensing. With this flexibility you might build one device that is just a sensor that provides temperature, humidity, and barometric pressure. You could build another for your desk that measures air quality, all the weather data, and has a display.
 
-* The location of the air quality monitor
-* API keys for the underlying services (like Blynk)
-* etc.
+**NOTE:** A mechanism is under development to publish the data to optionally publish collected data to [Adafruit.IO](https://io.adafruit.com)
 
-Some of this configuration information is specific to *PurpleHaze* while other information is common to any web-connected device. You can learn more about such `WebThing`'s [here](https://github.com/jpasqua/WebThing).
+*PurpleHaze* is configured using a Web User Interface which lets the user specify information such as:
+
+* The location of the device (e.g. "Front Yard")
+* API keys for the underlying services (e.g. TimeZoneDB)
+* The configuration of the display (if present)
+* ... and many other options
+
+*PurpleHaze* is built on top of the [WebThing](https://github.com/jpasqua/WebThing) and [WebThingApp](https://github.com/jpasqua/WebThingApp) frameworks. Any other devices built on those frameworks will have similar configuration and organization.
 
 ## Dependencies
 
 ### Libraries
-The following third party libraries are used within this project:
+The following libraries are used within this project. 
 
 * [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
 * [Arduino-Log](https://github.com/thijse/Arduino-Log)
 * [ArduinoJson (v6)](https://github.com/bblanchon/ArduinoJson)
 * [blynk-library](https://github.com/blynkkk/blynk-library)
 * [CircularBuffer](https://github.com/rlogiacco/CircularBuffer)
-* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor) [0.0.2 or later for ESP32]
+* [ESPTemplateProcessor](https://github.com/jpasqua/ESPTemplateProcessor)
 * [TimeLib](https://github.com/PaulStoffregen/Time.git)
-* [WebThing](https://github.com/jpasqua/WebThing) [0.2.0 or later. v0.2.1 or later for ESP32]
+* [WebThing](https://github.com/jpasqua/WebThing)
+* [WebThingApp](https://github.com/jpasqua/WebThingApp)
 * ESP32 Only
 	* [ESP32_AnalogWrite](https://github.com/ERROPiX/ESP32_AnalogWrite)
 
@@ -34,7 +40,6 @@ The following libraries are used in the browser. You do not need to download or 
 ### Services
 The following services play a role in providing parts of the functionality:
 
- - [Blynk](https://blynk.io): Provides a repository of air quality data and the ability to view it using a mobile app. If you decide not to use Blynk, you can still view data directly using a web browser.
  - Services used by WebThing
 	 - [Google Maps](https://developers.google.com/maps/documentation): Used for geocoding and reverse geocoding. Though not absolutely necessary, it does make using the system a bit more convenient.
 	 - [TimeZoneDB](https://timezonedb.com): Used to get local time and time zone data. This is used to timestamp data. It is necessary for the operation of *PurpleHaze*.
@@ -47,37 +52,73 @@ The directory structure of the project is shown below. You don't need to know th
 
 ````
     PurpleHaze
-        [Primary Source files including PurpleHaze.ino]
+        [Primary Source files including PurpleHazeApp.ino]
+        /src
+          /hardware
+            [Defines the configuration of HW used in your device]
+          /screens
+            [Code to show data on a locally attached display]
         /data
-            [HTML page templates for PurpleHaze]
-            /wt
-                [HTML page templates for WebThing]
+          [HTML page templates for PurpleHaze]
+          /plugins
+          	[Data defining optional plugins]
+          /wt
+          	[HTML page templates for WebThing]
+          /wta
+          	[HTML page templates for WebThing]
         /doc
-            /images
-                [images used in the documentation, not by the code]
+        /images
+            [images used in the documentation, not by the code]
         /resources
-            [Other resources such as a PCB design]
+        	[Other resources such such as source images used on the display]
 
 ````
 
 ### Code Structure
 
+
 The primary functional areas of *PurpleHaze* are given below. You don't need to know this to build and use the project, but if you want to work on it, this will give you an idea of where the different functionality is implemented.
 
-* `PurpleHaze`
-	* The primary logic for the application. It holds various objects, like the settings, that are available throughout the project. `PurpleHaze` uses the `WebThing` framework and follows the organization it defines for the setup and loop functions.
-* `PHWebUI`
+*PurpleHaze* is built using the [WebThingApp](https://github.com/jpasqua/WebThingApp) framework. This framework provides much of the basic functionality required by a <span style="color:blue">**Web**</span>-attched <span style="color:blue">**Thing**</span> which functions as an <span style="color:blue">**App**</span>. Hence the name <span style="color:blue">**WebThingApp**</span>. In this context **App** means something that has a local GUI (even a super simple one). **WebThingApp** is in turn built on a lower level framework called [WebThing](https://github.com/jpasqua/WebThing). It provides the more basic parts of the functionality without the GUI components. Using these frameworks allows PurpleHaze to focus on the core functionality of being an environment sensor, rather than all of the other infrastructure.
+
+Here is the general lay of the land for the code:
+
+* `PH2`
+  * This is boilerplate used by the WebThing/WebThingApp framework. No functionality resides here.
+* `PurpleHazeApp.[cpp,h]`
+  * The primary logic for the application.
+* `PHDataSupplier.[cpp,h]`
+  * Externalizes the data from the sensors to other components of the system, including plugins.
+* PHScreenConfig.h
+  * Defines which screens should be displayed as part of the GUI. This is only relevant to devices that have a locally attached display.
+* PHSettings.[cpp,h]
+  * Defines the settings used by *PurpleHaze* and the code to internalize/externalize the settings to JSON.
+* PHWebUI.[cpp,h]
 	* Implements the Web UI for *PurpleHaze* which primarily consists of pages that allow the user to view and update the settings of the device. When settings change in the Web UI, it calls back into the core of the code to have those changes reflected. 
 	* **NOTE**: Currently the real-time handling of changes is not very thorough. Many changes require a reboot to take effect.
-* `AQIMgr`, `PMS5003`
-	* `PMS5003` is the low level interface to the PMS5003 sensor. It is adapted from a couple of different libraries. See the source code for details.
-* `HWConfig.h` is used to provide configuration information related to the *PurpleHaze* hardware. Please ensure that the definitions in this file match your actual hardware configuration.
+* src/hardware/
+  * specifies the combination of hardware in use by your actual device. 
+* src/screens/
+  *  The implementation of the various screens of data that be shown on the optionally attached displays.
 
 <a name="building-PH"></a>
 ## Building PurpleHaze
 
-*PurpleHaze* has been built and tested with Arduino IDE 1.8.10 and ESP8266 cores 2.6.1 and 2.7.1. Newer versions are likely to work, but I haven't tried other specific combinations. If you have never built an Arduino project using an ESP8266, you'll need to [prepare your development environment](https://github.com/esp8266/Arduino#installing-with-boards-manager). *PurpleHaze* also supports the ESP32, but has minimal testing to date. It requires v1.0.5rc2 or later of the ESP32 Arduino core.
+*PurpleHaze* has been built and tested with the hardware and software listed below. Other versions may work, but haven't been tested.
 
+**Hardware**
+
+* Microcontroller: ESP8266 or ESP32
+* Air Quality Sensor: PMS5003
+* Weather Sensors: DME280, DHT22, DS18B20
+* WS2812B NeoPixels 
+
+** Software**
+
+* IDE: Arduino 1.8.10, 1.8.13, 1.8.19
+* ESP8266 Core: **FILL IN**
+* ESP32 Core: **FILL IN**
+* Libraries: See dependency list above.
 
 ### Hardware
 
@@ -140,7 +181,7 @@ Building the software for *PurpleHaze* is a bit more complex than a typical appl
 
 ### Getting Started with Configuration
 
-Before you get started, you will need API keys for the services mentioned above (Google Maps, TimezoneDB, and Blynk). All are free. Please go to each site, create a key, and keep track of them. You'll need to supply them during the configuration process. Technically, you don't need a Google Maps key. Without it you'll need to look up the latitude and longitude of your location on your own and enter them into the Web UI. You also don't need a Blynk key if you just want to get the sensor reading from the Web UI, not an app on your phone. You do need a TimezoneDB key so *PurpleHaze* can keep track of the time of the readings.
+Before you get started, you will need API keys for the services mentioned above (Google Maps and  TimezoneDB). They are free for non-commercial use. Please go to each site, create a key, and keep track of them. You'll need to supply them during the configuration process. Technically, you don't need a Google Maps key. Without it you'll need to look up the latitude and longitude of your location on your own and enter them into the Web UI. You do need a TimezoneDB key so *PurpleHaze* can keep track of the time of the readings. It is also useful for other functions if you have a display attached.
 
 <a name="connecting-to-your-network"></a>
 ### Connecting to your network

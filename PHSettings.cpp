@@ -23,14 +23,17 @@ void WeatherSettings::fromJSON(const JsonDocument &doc) {
   tempCorrection = doc["wthr"]["tempCorrection"];
   humiCorrection = doc["wthr"]["humiCorrection"];
   chartColors.temp = String(doc["wthr"]["chartColors"]["temp"]|"#4e7a27");
-  chartColors.avg = String(doc["wthr"]["chartColors"]["avg"]|"#ff00ff");
+  chartColors.humi = String(doc["wthr"]["chartColors"]["humi"]|"#ff00ff");
+  graphRange = doc["wthr"]["graphRange"];
+  graphRange = (graphRange > 2) ? 2 : graphRange;
 }
 
 void WeatherSettings::toJSON(JsonDocument &doc) {
   doc["wthr"]["tempCorrection"] = tempCorrection;
   doc["wthr"]["humiCorrection"] = humiCorrection;
   doc["wthr"]["chartColors"]["temp"] = chartColors.temp;
-  doc["wthr"]["chartColors"]["avg"] = chartColors.avg;
+  doc["wthr"]["chartColors"]["humi"] = chartColors.humi;
+  doc["wthr"]["graphRange"] = graphRange;
 }
 
 void WeatherSettings::logSettings() {
@@ -38,58 +41,68 @@ void WeatherSettings::logSettings() {
   Log.verbose(F("  tempCorrection = %F"), tempCorrection);
   Log.verbose(F("  humiCorrection = %F"), humiCorrection);
   Log.verbose(F("  chartColors.temp = %s"), chartColors.temp.c_str());
-  Log.verbose(F("  chartColors.avg = %s"), chartColors.avg.c_str());
+  Log.verbose(F("  chartColors.humi = %s"), chartColors.humi.c_str());
+  Log.verbose(F("  Graph Range = %d"), graphRange);
+}
+
+void AQISettings::fromJSON(const JsonDocument &doc) {
+  chartColors.aqi = String(doc["aqi"]["chartColors"]["aqi"]|"#f00f88");
+  graphRange = doc["aqi"]["graphRange"];
+  graphRange = (graphRange > 2) ? 2 : graphRange;
+}
+
+void AQISettings::toJSON(JsonDocument &doc) {
+  doc["aqi"]["chartColors"]["aqi"] = chartColors.aqi;
+  doc["aqi"]["graphRange"] = graphRange;
+}
+
+void AQISettings::logSettings() {
+  Log.verbose(F("AQI Settings"));
+  Log.verbose(F("  chartColors.aqi = %s"), chartColors.aqi.c_str());
+  Log.verbose(F("  Graph Range = %d"), graphRange);
 }
 
 
 
 PHSettings::PHSettings() {
   version = PHSettings::CurrentVersion;
-  maxFileSize = 1024;
+  maxFileSize = 2048;
 }
 
 void PHSettings::fromJSON(const JsonDocument &doc) {
-  description = doc["description"].as<String>();
-  blynkAPIKey = String(doc["blynkAPIKey"]|"");
-  showDevMenu = doc[F("showDevMenu")];
-  useMetric = doc[F("useMetric")];
-  use24Hour = doc[F("use24Hour")];
-  iBright = doc[F("iBright")];
-  chartColors.pm10 = String(doc["chartColors"]["pm10"]|"#e32400");
-  chartColors.pm25 = String(doc["chartColors"]["pm25"]|"#4e7a27");
-  chartColors.pm100 = String(doc["chartColors"]["pm100"]|"#0042aa");
-  chartColors.aqi = String(doc["chartColors"]["aqi"]|"#f00f88");
+  description = (doc["description"]|"Environment Sensor");
+  // if (description.isEmpty() || description == "null") description = String("Environment Sensor");
+  aio.username = String(doc["aioUsername"]|"");
+  aio.key = String(doc["aioKey"]|"");
+  aio.groupName = String(doc["aioGroup"]|"");
+  iBright = doc[F("iBright")] | 80;
 
+  aqiSettings.fromJSON(doc);
   weatherSettings.fromJSON(doc);
-  logSettings();
+  WTAppSettings::fromJSON(doc);
 }
 
 void PHSettings::toJSON(JsonDocument &doc) {
   doc["description"] = description;
-  doc["blynkAPIKey"] = blynkAPIKey;
-  doc[F("showDevMenu")] = showDevMenu;
-  doc[F("useMetric")] = useMetric;
-  doc[F("use24Hour")] = use24Hour;
+  doc["aioUsername"] = aio.username;
+  doc["aioKey"] = aio.key;
+  doc["aioGroup"] = aio.groupName;
   doc[F("iBright")] = iBright;
-  doc["chartColors"]["pm10"] = chartColors.pm10;
-  doc["chartColors"]["pm25"] = chartColors.pm25;
-  doc["chartColors"]["pm100"] = chartColors.pm100;
-  doc["chartColors"]["aqi"] = chartColors.aqi;
+
+  aqiSettings.toJSON(doc);
   weatherSettings.toJSON(doc);
+  WTAppSettings::toJSON(doc);
 }
 
 void PHSettings::logSettings() {
   Log.verbose(F("PurpleHaze Settings"));
   Log.verbose(F("  description = %s"), description.c_str());
-  Log.verbose(F("  blynkAPIKey = %s"), blynkAPIKey.c_str());
-  Log.verbose(F("  show dev menu: %T"), showDevMenu);
-  Log.verbose(F("  Use metric: %T"), useMetric);
-  Log.verbose(F("  Use 24 Hour Time: %T"), use24Hour);
+  Log.verbose(F("  aio.username = %s"), aio.username.c_str());
+  Log.verbose(F("  aio.key = %s"), aio.key.c_str());
+  Log.verbose(F("  aio.groupName = %s"), aio.groupName.c_str());
   Log.verbose(F("  indicator brightness: %d"), iBright);
-  Log.verbose(F("  chartColors.pm10 = %s"), chartColors.pm10.c_str());
-  Log.verbose(F("  chartColors.pm25 = %s"), chartColors.pm25.c_str());
-  Log.verbose(F("  chartColors.pm100 = %s"), chartColors.pm100.c_str());
-  Log.verbose(F("  chartColors.aqi = %s"), chartColors.aqi.c_str());
+  aqiSettings.logSettings();
   weatherSettings.logSettings();
+  WTAppSettings::logSettings();
 }
 
