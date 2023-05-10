@@ -1,8 +1,6 @@
 .DS_Store
 data/wt
+data/wta
+data/wthrhist.json
+data/aqihist.html
 *settings.json
-doc/images/source
-resources/image_sources
-data/history.json
-*.bash
-*.json
