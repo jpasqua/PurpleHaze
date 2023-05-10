@@ -1,6 +1,6 @@
 .DS_Store
+*settings.json
 data/wt
 data/wta
 data/wthrhist.json
-data/aqihist.html
-*settings.json
+data/aqihist.json
