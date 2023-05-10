@@ -1,51 +1,169 @@
-<script type="text/javascript">
-  window.onload = function() {
-      const lat = Math.floor(%LAT%*10)/10
-      const lon = Math.floor(%LNG%*10)/10
 
-      var d = new Date()
-      var dd = String(d.getDate()).padStart(2, '0')
-      var mm = String(d.getMonth() + 1).padStart(2, '0')  // Month is 0-based
-      var yyyy = d.getFullYear()
-      var dateString = yyyy+"-"+mm+"-"+dd
+<style type="text/css">
+.collapsible {
+  cursor: pointer;
+  padding: 18px;
+  width: 100\%;
+  border: 1px solid white;
+  text-align: left;
+}
 
-      var hh = String(d.getHours()).padStart(2, '0')
-      var mi = String(d.getMinutes()).padStart(2, '0')
-      var ss = String(d.getSeconds()).padStart(2, '0')
-      var tz = d.getTimezoneOffset()/60
-      var timeString = hh + ':' + mi + '/' + ss + "," + tz
+.collapsible:before {
+  content: '\\02795';
+  float: left;
+  margin-right: 5px;
+}
 
-      // Format of the zoom.earth URL: https://zoom.earth/#view=37.4,-122.2,4z/date=2020-09-14,08:00,-7
-      var zoomURL = "https://zoom.earth/#view=" + lat + "," + lon +",8z/"
-      zoomURL += dateString + "," + timeString  
+.active:before {
+  content: "\\02796";
+}
 
-      var zl = document.getElementById("zl");  
-      zl.href = zoomURL;
-    }
+.dot {
+  height: 12px;
+  width: 12px;
+  background-color: #00ff00;
+  border-radius: 50\%;
+  display: inline-block;
+}
+</style>
+
+<div class='w3-container'>
+
+<!-- Description, Location, and basic readings -->
+<div class="w3-margin-bottom">
+<h3>%DESC%<small>&nbsp;for <span id='AddrField'></span></small></h3>
+<span id="TempHeader" style="display:none"> Temp: %TEMP%&nbsp;</span>
+<span id="AQIHeader" style="display:none">
+  <span class="w3-tooltip">
+    <span class="dot" id="aqiDot"></span>
+       AQI: %AQI%&nbsp; <span class="w3-text w3-small" id="aqi_desc"></span>
+     </span>
+   </span>
+</span>
+</div>
+
+<!-- AQI Info -->
+<div id="AQIBlock" style='display:none'>
+<button id='AQICollapseButton' type="button" class='collapsible w3-button w3-block w3-theme-l2 w3-padding' onclick='showHide(this, "AQIData")'>Air Quality Details</button>
+<div id="AQIData" style='display:none' class='w3-card-4 w3-margin-bottom'>
+  <div class='w3-container w3-margin-bottom'>
+  <strong>Sensor Readings</strong>&nbsp;<small>as of %TMST%</small>&nbsp;(<a href="ChartPage.html">charts</a>, <a id="zl" target="_blank">Satellite Image</a>)
+  <table class="w3-table-all w3-hoverable">
+    <tr> <td>Type</td> <td>PM 1.0</td>    <td>PM 2.5</td>    <td>PM 10</td>      </tr>
+    <tr> <td>Standard</td> <td>%PM10STD%</td> <td>%PM25STD%</td> <td>%PM100STD%</td> </tr>
+    <tr> <td>Environment</td> <td>%PM10ENV%</td> <td>%PM25ENV%</td> <td>%PM100ENV%</td> </tr>
+  </table>
+  <strong>Particulate Counts</strong>
+  <table class="w3-table-all w3-hoverable">
+    <tr> <td>Particles > Size</td> <td>Count / 0.1L air</td> </tr>
+    <tr> <td>0.3um</td> <td>%P03%</td> </tr>
+    <tr> <td>0.5um</td> <td>%P05%</td> </tr>
+    <tr> <td>1.0um</td> <td>%P10%</td> </tr>
+    <tr> <td>2.5um</td> <td>%P25%</td> </tr>
+    <tr> <td>5.0um</td> <td>%P50%</td> </tr>
+    <tr> <td>50 um</td> <td>%P100%</td> </tr>
+  </table>
+  <p></p>
+</div>
+</div>
+</div>
+
+<!-- Weather Info -->
+<div id="WeatherBlock" style='display:none'>
+<button id='WeatherCollapseButton' type="button" class='collapsible w3-button w3-block w3-theme-l2 w3-padding' onclick='showHide(this, "WthrData")'>Weather Details</button>
+<div id="WthrData" style='display:none' class='w3-card-4 w3-margin-bottom'>
+  <div class='w3-container w3-margin-bottom'>
+  <strong>Sensor Readings</strong>&nbsp;<small>as of %W_TMST%</small>&nbsp;(<a href="ChartPage.html">charts</a>)
+    <table style='padding-right: 10px'>
+    <tr> <td>Temperature: </td>      <td>%TEMP%</td> </tr>
+    <tr> <td>Humidity: </td>         <td>%HUMI%</td> </tr>
+    <tr> <td>Barometer (abs): </td>  <td>%BARO%</td> </tr>
+    <tr> <td>Barometer (rel): </td>  <td>%RELP%</td> </tr>
+    <tr> <td>Heat Index: </td>       <td>%HTIN%</td> </tr>
+    <tr> <td>Dew Point: </td>        <td>%DWPT%</td> </tr>
+    <tr> <td>Dew Point Spread: </td> <td>%DPSP%</td> </tr>
+    <tr> <td>Voltage: </td>          <td>%VLTG%</td> </tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- OpenWeatherMap Widget -->
+<div id="openweathermap-widget-11" class="w3-margin-top w3-margin-bottom"></div>
+<script src='http://openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'></script>
+<script>
+  window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];
+  window.myWidgetParam.push({ id: 11, cityid: '%CITYID%', appid: '%WEATHER_KEY%', units: '%UNITS%', containerid: 'openweathermap-widget-11', });
+  (function() { var script = document.createElement('script');
+    script.async = true;
+    script.charset = "utf-8";
+    script.src = "http://openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js"; var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(script, s); })();
 </script>
 
+<!-- AirNow Widget -->
+<iframe height="340" src="https://widget.airnow.gov/aq-dial-widget/?latitude=%LAT%&longitude=%LNG%" style="border: 1px; border-color: black; border-radius: 25px;" width="230"></iframe>
 
-<h3><strong>PurpleHaze Data</strong><small> (Timestamp: %TMST%)</small></h3>
-<style>
-  .dot {
-    height: 25px;
-    width: 25px;
-    background-color: #00ff00;
-    border-radius: 50\%;
-    display: inline-block;
-  }
-</style>
-<table class="w3-tooltip">
-  <tr>
-    <td><span class="dot" id="aqiDot"></span></td>
-    <td style="vertical-align:top"> AQI: %AQI%&nbsp; <span class="w3-text w3-small" id="aqi_desc"></span></td>
-  </tr>
-</table>
+</div>
+
+<script src='https://maps.googleapis.com/maps/api/js?key=%GMAPS_KEY%'></script>
+
 <script type="text/javascript">
+  const hasAQI = %HAS_AQI%;
+  const hasTemp = %HAS_TEMP%;
+
+  function pageStorageKey(key) {
+    return "PH_Home_" + key;
+  }
+
+  function showHide(button, elementID) {
+    button.classList.toggle("active"); 
+    var x = document.getElementById(elementID);
+    if (x.style.display === "none") { 
+      x.style.display = "block";
+      window.localStorage.setItem(pageStorageKey(elementID), 'open');
+    }
+    else {
+      x.style.display = "none";
+      window.localStorage.setItem(pageStorageKey(elementID), 'closed');
+    }
+  }
+
+  function createSatImageLink() {
+    const lat = Math.floor(%LAT%*10)/10
+    const lon = Math.floor(%LNG%*10)/10
+
+    var d = new Date()
+    var dd = String(d.getDate()).padStart(2, '0')
+    var mm = String(d.getMonth() + 1).padStart(2, '0')  // Month is 0-based
+    var yyyy = d.getFullYear()
+    var dateString = yyyy+"-"+mm+"-"+dd
+
+    var hh = String(d.getHours()).padStart(2, '0')
+    var mi = String(d.getMinutes()).padStart(2, '0')
+    var ss = String(d.getSeconds()).padStart(2, '0')
+    var tz = d.getTimezoneOffset()/60
+    var timeString = hh + ':' + mi + '/' + ss + "," + tz
+
+    // Format of the zoom.earth URL: https://zoom.earth/#view=37.4,-122.2,4z/date=2020-09-14,08:00,-7
+    var zoomURL = "https://zoom.earth/#view=" + lat + "," + lon +",8z/"
+    zoomURL += dateString + "," + timeString  
+
+    var zl = document.getElementById("zl");  
+    zl.href = zoomURL;
+  }
+
+  var geocoder = new google.maps.Geocoder()
+  function reverseGeocode() {
+    var loc = new google.maps.LatLng( %LAT% , %LNG% )
+    geocoder.geocode({ 'location': loc }, function(results, status) {
+      if (status === 'OK') { document.getElementById('AddrField').textContent = results[0].formatted_address }})
+  }
+
   const aqiColors = [
     {max:  50, color: "#00ff00", desc: "Good: Air quality is satisfactory, and air pollution poses little or no risk."},
     {max: 100, color: "#ffff00", desc: "Moderate: Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution."},
-    {max: 150, color: "#ffa500", desc: "Unhealthy for Sensitive Groups: Members of sensitive groups may experience health effects. The general public is less likely to be affected."},
+    {max: 150, color: "#fc6b21", desc: "Unhealthy for Sensitive Groups: Members of sensitive groups may experience health effects. The general public is less likely to be affected."},
     {max: 200, color: "#ff0000", desc: "Unhealthy: Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects."},
     {max: 300, color: "#9400D3", desc: "Very Unhealthy: Health alert: The risk of health effects is increased for everyone."},
     {max: 999, color: "#7E0023", desc: "Hazardous: Health warning of emergency conditions: everyone is more likely to be affected."}
@@ -61,28 +179,29 @@
       }
     }
   }
-colorElement(%AQI%, "aqiDot");
+
+  function reopen(buttonName, blockName) {
+    const lastOpenState = window.localStorage.getItem(pageStorageKey(blockName));
+    if (lastOpenState == null) window.localStorage.setItem(pageStorageKey(blockName), 'closed');
+    else if (lastOpenState == 'open') showHide(document.getElementById(buttonName), blockName);
+  }
+
+  function prep() {
+    reverseGeocode();
+    if (hasAQI) {
+      var AQI_LEVEL = parseInt('%AQI%');  // The AQI token may not be available if hasAQI is false
+      document.getElementById('AQIBlock').style.display = "block";
+      createSatImageLink();
+      document.getElementById('AQIHeader').style.display = "inline";
+      colorElement(AQI_LEVEL, "aqiDot");
+      reopen('AQICollapseButton', 'AQIData');
+    }
+    if (hasTemp) {
+      document.getElementById('WeatherBlock').style.display = "block";
+      document.getElementById('TempHeader').style.display = "inline";
+      reopen('WeatherCollapseButton', 'WthrData');
+    }
+  }
+  window.onload = prep();
+
 </script>
-<strong>Sensor Readings </strong> (<a href="ChartPage.html">charts</a>, <a id="zl" target="_blank">Satellite Image</a>)
-<table class="w3-table-all w3-hoverable">
-  <tr> <td>Type</td> <td>PM 1.0</td>    <td>PM 2.5</td>    <td>PM 10</td>      </tr>
-  <tr> <td>Standard</td> <td>%PM10STD%</td> <td>%PM25STD%</td> <td>%PM100STD%</td> </tr>
-  <tr> <td>Environment</td> <td>%PM10ENV%</td> <td>%PM25ENV%</td> <td>%PM100ENV%</td> </tr>
-</table>
-<strong>Particulate Counts</strong>
-<table class="w3-table-all w3-hoverable">
-  <tr> <td>Particles > Size</td> <td>Count / 0.1L air</td> </tr>
-  <tr> <td>0.3um</td> <td>%P03%</td> </tr>
-  <tr> <td>0.5um</td> <td>%P05%</td> </tr>
-  <tr> <td>1.0um</td> <td>%P10%</td> </tr>
-  <tr> <td>2.5um</td> <td>%P25%</td> </tr>
-  <tr> <td>5.0um</td> <td>%P50%</td> </tr>
-  <tr> <td>50 um</td> <td>%P100%</td> </tr>
-</table>
-<strong>2.5um Moving Averages</strong>
-<table class="w3-table-all w3-hoverable">
-  <tr> <td>10 min</td> <td>30 min</td>    <td>1 hr</td>    <td>6 hrs</td>      </tr>
-  <tr> <td>%MA10%</td> <td>%MA30%</td> <td>%MA1H%</td> <td>%MA6H%</td> </tr>
-</table>
-<strong>Areas Readings </strong>(Lat/Lon: %LAT%, %LNG%)<br>
-<iframe height="340" src="https://widget.airnow.gov/aq-dial-widget/?latitude=%LAT%&longitude=%LNG%&transparent=true" style="border: none; border-radius: 25px;" width="230"></iframe>

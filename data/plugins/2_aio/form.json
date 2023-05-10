@@ -1,0 +1,71 @@
+{
+  "schema": {
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled"
+    },
+    "username": {
+      "title": "AdafruitIO User Name",
+      "type": "string"
+    },
+    "key": {
+      "title": "AdafruitIO Key",
+      "type": "string"
+    },
+    "groups": {
+      "title":"AdafruitIO Groups",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "string",
+        "title": "AdafruitIO Groups"
+      }
+    },
+    "nicknames": {
+      "title":"Station Names",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "string",
+        "title": "Station Name"
+      }
+    },
+    "refreshInterval": {
+      "title": "Minutes between updates",
+      "type": "number",
+      "minimum": 2
+    },
+    "feeds": {
+      "title": "Feeds",
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "title": "Feed"
+      }
+    },
+    "riScale": { "type": "number" }
+  },
+  "form": [
+    {
+      "key": "enabled",
+      "notitle": true,
+      "inlinetitle": " Enable AdafruitIO Weather"
+    },
+    "username",
+    "key",
+    "groups",
+    "nicknames",
+    "refreshInterval",
+    {
+      "type": "fieldset",
+      "title": "Advanced",
+      "expandable": true,
+      "items": [ "feeds"]
+    },
+    { "key": "riScale", "type": "hidden" },
+    { "type": "submit", "title": "Save Settings" } 
+  ]
+}

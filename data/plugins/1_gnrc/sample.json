@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "enabled":true,
+  "refreshInterval": 60,
+  "riScale": 1000
+}

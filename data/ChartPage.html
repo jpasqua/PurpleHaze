@@ -17,8 +17,13 @@
   <br>
 
   <script>
-    const color_temp = '%TMP_CLR%';
+    const color_temp = '%TEMP_CLR%';
+    const color_humi = '%HUMI_CLR%';
     const color_aqi = '%AQI_CLR%';
+    const useMetric = ('%USE_METRIC%' == 'checked');
+    const hasAQI = %HAS_AQI%;
+    const hasTemp = %HAS_TEMP%;
+    const hasHumi = %HAS_HUMI%
 
     const colorBands = [
       '#D9F8D2', '#FFFFD6', '#FBE0CE', '#FACCC9', '#EFB2C0',
@@ -34,46 +39,68 @@
       ctx.fillText("Loading...", 10, 50);
     }
 
-    Chart.pluginService.register({
-      beforeDraw: function (chart, easing) {
-        if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
-          var helpers = Chart.helpers;
-          var ctx = chart.chart.ctx;
-          var chartArea = chart.chartArea;
-          var yScale = chart.scales["aqi"];
+    if (hasAQI) {
+      var onlyTempVisible = false;
 
-          ctx.save();
-          var done = false;
-          for (var y = 50; y <= 500 && !done; y += 50) {
-            var yPixel = yScale.getPixelForValue(y)
-            if (yPixel <= chartArea.top) { yPixel = chartArea.top; done = true; }
-            ctx.fillStyle = colorBands[y/50-1];
-            var lower = Math.min(yScale.getPixelForValue(y-50), chartArea.bottom)
-            var ht = yPixel - lower
-            ctx.fillRect(chartArea.left, lower, chartArea.right - chartArea.left, ht);
-          }
-          ctx.restore();
+      Chart.pluginService.register({
+        beforeRender: function (chart, options) {
+          if (hasTemp && hasAQI && !chart.isDatasetVisible(0)) onlyTempVisible = true;
+          else onlyTempVisible = false;
         }
-      }
-    });
+      });
 
+      Chart.pluginService.register({
+        beforeDraw: function (chart, easing) {
+          if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
+            if (!hasAQI || onlyTempVisible) return;
+
+            var helpers = Chart.helpers;
+            var ctx = chart.chart.ctx;
+            var chartArea = chart.chartArea;
+            var yScale = chart.scales["aqi"];
+
+            ctx.save();
+            var done = false;
+            for (var y = 50; y <= 500 && !done; y += 50) {
+              var yPixel = yScale.getPixelForValue(y);
+              if (yPixel <= chartArea.top) { yPixel = chartArea.top; done = true; }
+              var lower = Math.min(yScale.getPixelForValue(y-50), chartArea.bottom)
+              var ht = yPixel - lower;
+              if (ht < 0) {
+                ctx.fillStyle = colorBands[y/50-1];
+                ctx.fillRect(chartArea.left, lower, chartArea.right - chartArea.left, ht);
+              }
+            }
+            ctx.restore();
+            // return false;
+          }
+        }
+      });
+    }
+    
     function createOptions(theTitle) {
-      return {
+      var options = {
         responsive: true, title: { display: true, text: theTitle, fontSize:16 },
         chartArea: { backgroundColor: 'rgba(251, 85, 85, 0.4)' },
         scales: {
-          xAxes: [
-            { display: true, scaleLabel: { display: true, labelString: 'Date' }, type: 'time' }],
-          yAxes: [
-            { id: 'aqi', position: 'left', display: true,
-              ticks: {fontColor: color_aqi },
-              scaleLabel: { display: true, labelString: 'AQI', fontColor: color_aqi }},
-            { id: 'temp', position: 'right', display: true,
-              ticks: {suggestedMin: 50, suggestedMax: 90, fontColor: color_temp },
-              scaleLabel: { display: true, labelString: 'Temperature', fontColor: color_temp  }}
-          ]
+          xAxes: [ { display: true, scaleLabel: { display: true, labelString: 'Date' }, type: 'time' } ],
+          yAxes: [  ]
         }
+      };
+      var index = 0;
+      if (hasAQI) {
+        options.scales.yAxes.push({
+          id: 'aqi', position: 'left', display: true, ticks: {fontColor: color_aqi },
+          scaleLabel: { display: true, labelString: 'AQI', fontColor: color_aqi }});
       }
+      if (hasTemp) {
+        options.scales.yAxes.push({
+          id: 'temp', position: 'right', display: true,
+          ticks: {fontColor: color_temp },
+          scaleLabel: { display: true, labelString: 'Temp/Humi', fontColor: color_temp  }});
+        if (options.scales.yAxes.length == 1) options.scales.yAxes[0].position = 'left';
+      }
+      return options;
     }
 
     function dataset(label, axis, color, hide) {
@@ -82,14 +109,17 @@
     }
 
     function createDatasets() {
-      return {
-          datasets: [
-            dataset('PM10 ENV', 'aqi', '%PM10_CLR%', true),
-            dataset('PM25 ENV', 'aqi', '%PM25_CLR%', true),
-            dataset('PM100 ENV', 'aqi', '%PM100_CLR%', true),
-            dataset('AQI', 'aqi', color_aqi, false),
-            dataset('Temp', 'temp', color_temp, false)]
-        }
+      var ds = { datasets: [] };
+      if (hasAQI) {
+        ds.datasets.push(dataset('AQI', 'aqi', color_aqi, false));
+      }
+      if (hasTemp) {
+        ds.datasets.push(dataset('Temp', 'temp', color_temp, false));
+      }
+      if (hasHumi) {
+        ds.datasets.push(dataset('Humidity', 'temp', color_humi, false));
+      }
+      return ds;
     }
 
     var hour_config = {
@@ -124,8 +154,6 @@
       return Math.floor(aqi)
     }
 
-    const useMetric = %USE_METRIC%;
-
     function oneDecimal(f) {
       return Math.trunc(Math.round(f*10))/10
     }
@@ -133,22 +161,37 @@
     function prepData(theConfig, aqiData, weatherData) {
       for (var dataset of theConfig.data.datasets) dataset.data = [];
       datasets = theConfig.data.datasets;
-      for (var sample of aqiData.history) {
-        var timestamp = sample.ts*1000
-        datasets[0].data.push({x: timestamp, y: sample.env.pm10})
-        datasets[1].data.push({x: timestamp, y: sample.env.pm25})
-        datasets[2].data.push({x: timestamp, y: sample.env.pm100})
-        datasets[3].data.push({x: timestamp, y: sample.aqi})
+      if (hasAQI) {
+        for (var sample of aqiData.history) {
+          var timestamp = sample.ts*1000
+          datasets[0].data.push({x: timestamp, y: sample.aqi})
+        }
       }
-      for (var sample of weatherData.history) {
-        var temp = useMetric ? sample.t : (sample.t * 1.8 + 32);
-        datasets[4].data.push({x: sample.ts*1000, y: oneDecimal(temp)})
+      if (hasTemp) {
+        var index = hasAQI ? 1 : 0;
+        for (var sample of weatherData.history) {
+          var timestamp = sample.ts*1000
+          var temp = useMetric ? sample.t : (sample.t * 1.8 + 32);
+          datasets[index].data.push({x: timestamp, y: oneDecimal(temp)})
+          if (hasHumi) {
+            var h =  sample.hasOwnProperty('h') ? sample.h : 10;
+            datasets[index+1].data.push({x: timestamp, y: h})
+          }
+        }
       }
     }  
 
     function drawChart(range, config) {
-      var getAQI = $.getJSON("http://nrso.local/getHistory?range="+range);
-      var getWeather = $.getJSON("http://nrso.local/getWeatherHistory?range="+range);
+      if (hasAQI) {
+        var getAQI = $.getJSON("/getHistory?range="+range);
+      } else {
+        var getAQI = function() { return [0]; };
+      }
+      if (hasTemp) {
+        var getWeather = $.getJSON("/getWeatherHistory?range="+range);
+      } else {
+        var getWeather = function() { return [0]; };
+      }
       $.when(getAQI, getWeather)
         .then(function(aqiResult, weatherResult) {
           prepData(config, aqiResult[0], weatherResult[0]);

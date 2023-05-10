@@ -11,7 +11,7 @@
 //                                  Core Libraries
 #include <Arduino.h>
 //                                  Third Party Libraries
-#include <BaseSettings.h>
+#include <WTAppSettings.h>
 //                                  Local Includes
 //--------------- End:    Includes ---------------------------------------------
 
@@ -22,14 +22,26 @@ public:
   float   humiCorrection = 0.0; // Correction to the humidty sensor reading
   struct {
     String temp = "#ff00ff";
-    String avg = "#4e7a27";
+    String humi = "#4e7a27";
   } chartColors;
+  uint8_t graphRange = 0;
   void fromJSON(const JsonDocument &doc);
   void toJSON(JsonDocument &doc);
   void logSettings();
 };
 
-class PHSettings: public BaseSettings {
+class AQISettings {
+public:
+  struct {
+    String aqi = "#f00f88";
+  } chartColors;
+  uint8_t graphRange = 0;
+  void fromJSON(const JsonDocument &doc);
+  void toJSON(JsonDocument &doc);
+  void logSettings();
+};
+
+class PHSettings: public WTAppSettings {
 public:
   // ----- Constructors and methods
   PHSettings();
@@ -39,18 +51,14 @@ public:
 
   // ----- Settings
   String  description = "Air Quality Sensor"; // User's description of their AQ Sensor
-  String  blynkAPIKey = "";                   // Your API Key from Blynk
   struct {
-    String pm10 = "#e32400";
-    String pm25 = "#4e7a27";
-    String pm100 = "#0042aa";
-    String aqi = "#f00f88";
-  } chartColors;
+    String username;
+    String key;
+    String groupName;
+  } aio;
   uint8_t iBright = 50;                       // Brightness of indicators (0-100%)
-  bool showDevMenu = false;
-  bool useMetric = false;
-  bool use24Hour = false;
   
+  AQISettings aqiSettings;
   WeatherSettings weatherSettings;
 
 private:

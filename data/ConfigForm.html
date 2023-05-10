@@ -14,7 +14,9 @@
   <p><input name='metric' class='w3-check' type='checkbox' %USE_METRIC%> Use Metric</p>
 
 
-  <p><label>Blynk API Key</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='blynkAPIKey' value='%BLYNK_KEY%' maxlength='60'></p>
+  <p><label>AdafruitIO Username</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioUsername' value='%AIO_USER%' maxlength='60'></p>
+  <p><label>AdafruitIO Key</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioKey' value='%AIO_KEY%' maxlength='60'></p>
+  <p><label>AdafruitIO Group</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioGroup' value='%AIO_GROUP%' maxlength='60'></p>
 
   <div id='AQISettings' style='display:none' class='w3-card-4 w3-round-large'>
     <header class='w3-container w3-light-grey'>
@@ -24,11 +26,14 @@
       <div class='w3-row w3-margin-top w3-margin-bottom'>
         Chart Colors
         <table>
-        <tr><td>PM 1.0</td><td></label><input  type='color' name='pm10Color' value='%PM10_CLR%'></td></tr>
-        <tr><td>PM 2.5</td><td></label><input  type='color' name='pm25Color' value='%PM25_CLR%'></td></tr>
-        <tr><td>PM 10.0</td><td></label><input  type='color' name='pm100Color' value='%PM100_CLR%'></td></tr>
         <tr><td>AQI</td><td></label><input  type='color' name='aqiColor' value='%AQI_CLR%'></td></tr>
         </table>
+        <p>Graph Screen Range
+        <select class='w3-option w3-padding' name='aqiGraphRange'>
+          <option value='0' %AG0%>1 Hour</option>
+          <option value='1' %AG1%>1 Day</option>
+          <option value='2' %AG2%>1 Week</option>
+        </select></p>
       </div>
     </div>
   </div>
@@ -47,11 +52,17 @@
         <input class='w3-input w3-border' type='text' name='humiCorrection' value='%HUMI_CORRECT%' maxlength='12'>
       </div>
       <div class='w3-row w3-margin-top w3-margin-bottom'>
-        Chart Colors
+        Web Chart Colors
         <table>
           <tr><td>Temperature</td><td></label><input  type='color' name='tempColor' value='%TEMP_CLR%'></td></tr>
-          <tr><td>Moving Average</td><td></label><input  type='color' name='avgColor' value='%AVG_CLR%'></td></tr>
+          <tr><td>Humidity</td><td></label><input  type='color' name='humiColor' value='%HUMI_CLR%'></td></tr>
         </table>
+        <p>Graph Screen Range
+        <select class='w3-option w3-padding' name='weatherGraphRange'>
+          <option value='0' %WG0%>1 Hour</option>
+          <option value='1' %WG1%>1 Day</option>
+          <option value='2' %WG2%>1 Week</option>
+        </select></p>
       </div>
     </div>
   </div>
@@ -60,6 +71,6 @@
 </form>
 
   <script>
-    showHide('WeatherSettings', %WTHR_VIS%);
-    showHide('AQISettings', true);
+    showHide('WeatherSettings', %HAS_TEMP%);
+    showHide('AQISettings', %HAS_AQI%);
   </script>
