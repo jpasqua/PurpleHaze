@@ -307,7 +307,7 @@ void PurpleHazeApp::configureDisplay() {
 void PurpleHazeApp::configurePins() {
   // Initialize the synthetic grounds
   for (int i = 0; i < hwConfig.nSyntheticGrounds; i++) {
-    uint8_t pin = hwConfig.syntheticGrounds[i];
+    Basics::Pin pin = hwConfig.syntheticGrounds[i];
     if (pin != Basics::UnusedPin) {
       pinMode(pin, OUTPUT);
       digitalWrite(pin, LOW);      
@@ -316,7 +316,7 @@ void PurpleHazeApp::configurePins() {
 
   // Register any physical buttons that are connected
   for (int i = 0; i < hwConfig.nPhysicalButtons; i++) {
-    uint8_t pin = hwConfig.physicalButtons[i];
+    Basics::Pin pin = hwConfig.physicalButtons[i];
     if (pin != Basics::UnusedPin) {
       WebThing::buttonMgr.addButton(pin);
     }
