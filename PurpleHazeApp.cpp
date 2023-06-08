@@ -57,7 +57,7 @@
  *----------------------------------------------------------------------------*/
 
 // CUSTOM: Update these strings for your app:
-static const char* VersionString = "0.0.9";
+static const char* VersionString = "0.1.0";
 static const char* AppName = "PurpleHaze";
 static const char* AppPrefix = "PH-";
 
