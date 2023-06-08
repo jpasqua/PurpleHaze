@@ -10,16 +10,20 @@
   <p><label>Description (e.g. a name or place)</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='description' value='%DESC%' maxlength='60'></p>
   <p><label>Indicator Brightness (0-100\%)</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='iBright' value='%I_BRIGHT%' maxlength='3'></p>
 
-  <p><input name='is24hour' class='w3-check' type='checkbox' %USE_24HOUR%> Use 24 Hour Clock (13:30 vs 1:30)</p>
-  <p><input name='metric' class='w3-check' type='checkbox' %USE_METRIC%> Use Metric</p>
 
+  <div id='AIOSettings' class='w3-card-4'>
+    <header class='w3-container w3-theme-l4'>
+      <h4>AdafruitIO Settings</h4>
+    </header>
+    <div class='w3-container w3-margin-bottom'>
+      <p><label>AdafruitIO Username</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioUsername' value='%AIO_USER%' maxlength='60'></p>
+      <p><label>AdafruitIO Key</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioKey' value='%AIO_KEY%' maxlength='60'></p>
+      <p><label>AdafruitIO Group</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioGroup' value='%AIO_GROUP%' maxlength='60'></p>
+    </div>
+  </div>
 
-  <p><label>AdafruitIO Username</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioUsername' value='%AIO_USER%' maxlength='60'></p>
-  <p><label>AdafruitIO Key</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioKey' value='%AIO_KEY%' maxlength='60'></p>
-  <p><label>AdafruitIO Group</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='aioGroup' value='%AIO_GROUP%' maxlength='60'></p>
-
-  <div id='AQISettings' style='display:none' class='w3-card-4 w3-round-large'>
-    <header class='w3-container w3-light-grey'>
+  <div id='AQISettings' style='display:none' class='w3-card-4'>
+    <header class='w3-container w3-theme-l4'>
       <h4>AQI Settings</h4>
     </header>
     <div class='w3-container w3-margin-bottom'>
@@ -38,8 +42,8 @@
     </div>
   </div>
 
-  <div id='WeatherSettings' style='display:none' class='w3-card-4 w3-round-large w3-margin-top'>
-    <header class='w3-container w3-light-grey'>
+  <div id='WeatherSettings' style='display:none' class='w3-card-4 w3-margin-top'>
+    <header class='w3-container w3-theme-l4'>
       <h4>Weather Settings</h4>
     </header>
     <div class='w3-container w3-margin-bottom'>

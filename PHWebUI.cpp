@@ -38,7 +38,7 @@ namespace PHWebUI {
       "<i class='fa fa-cog'></i> Configure Purple Haze</a>"
 #if defined(GUI_DSPLY)
       "<a class='w3-bar-item w3-button' href='/presentScreenConfig'>"
-      "<i class='fa fa-window-restore'></i> Configure Screens</a>"
+      "<i class='fa fa-window-restore'></i> Select Screens</a>"
 #endif
       );
 
@@ -175,8 +175,6 @@ namespace PHWebUI {
       else if (key == "AIO_USER")   val = phSettings->aio.username;
       else if (key == "AIO_GROUP")  val = phSettings->aio.groupName;
       else if (key == "I_BRIGHT")   val.concat(phSettings->iBright);
-      else if (key == "USE_METRIC") val = WebUI::checkedOrNot[phSettings->uiOptions.useMetric];
-      else if (key == "USE_24HOUR") val = WebUI::checkedOrNot[phSettings->uiOptions.use24Hour];
       else if (key == "LAT")        val = WebThing::settings.latAsString();
       else if (key == "LNG")        val = WebThing::settings.lngAsString();
       else if (key == "GMAPS_KEY")  val = WebThing::settings.googleMapsKey;
@@ -337,8 +335,6 @@ namespace PHWebUI {
         phSettings->aio.username = WebUI::arg("aioUsername");
         phSettings->aio.groupName = WebUI::arg("aioGroup");
         phSettings->iBright = (constrain(WebUI::arg("iBright").toInt(), 0, 100));
-        phSettings->uiOptions.useMetric = WebUI::hasArg(F("metric"));
-        phSettings->uiOptions.use24Hour = WebUI::hasArg(F("is24hour"));
 #if defined(HAS_AQI_SENSOR)
         phSettings->aqiSettings.chartColors.aqi = WebUI::arg("aqiColor");
         phSettings->aqiSettings.graphRange = WebUI::arg("aqiGraphRange").toInt();
