@@ -153,7 +153,6 @@ void PurpleHazeApp::app_initClients() {
 void PurpleHazeApp::app_conditionalUpdate(bool force) {
   // CUSTOM: Update any app-specific clients
   static bool startingUp = true;
-  (void)force;
 
   #if defined(HAS_AQI_SENSOR)
     static uint32_t lastTimestamp = 0;
