@@ -4,3 +4,5 @@ data/wt
 data/wta
 data/wthrhist.json
 data/aqihist.json
+*.zip
+*.tar
