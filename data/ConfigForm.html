@@ -42,19 +42,57 @@
     </div>
   </div>
 
+  <script>
+    function autoComp(cur, adj, target) {
+      var current = parseFloat(document.getElementById(cur).value, 10);
+      var target = parseFloat(document.getElementById(target).value, 10);
+      var adjustment = target - current;
+      document.getElementById(adj).value = adjustment.toFixed(2);
+    }
+  </script>
+
   <div id='WeatherSettings' style='display:none' class='w3-card-4 w3-margin-top'>
     <header class='w3-container w3-theme-l4'>
       <h4>Weather Settings</h4>
     </header>
+
     <div class='w3-container w3-margin-bottom'>
       <div class='w3-row w3-margin-top'>
-        <label>Temperature Correction</label>
-        <input class='w3-input w3-border' type='text' name='tempCorrection' value='%TEMP_CORRECT%' maxlength='12'>
+        Temperature Calibration
       </div>
-      <div class='w3-row'>
-        <label>Humidity Correction</label>
-        <input class='w3-input w3-border' type='text' name='humiCorrection' value='%HUMI_CORRECT%' maxlength='12'>
+      <div class='w3-row w3-margin-bottom'>
+        <div class='w3-quarter'>
+          <span>Raw: </span><input class='w3-border' id='t_current' type='text' value='%RAW_TEMP%' maxlength='6' size='6'>
+        </div>
+        <div class='w3-quarter'>
+          <span>Target: </span><input class='w3-border' id='t_target' type='text' placeholder='%TEMP%' maxlength='6' size='6'>
+        </div>
+        <div class='w3-quarter'>
+          <label>Correction: </label><input class='w3-border' id='t_correct' type='text' name='tempCorrection' value='%TEMP_CORRECT%' maxlength='6' size='6'>
+        </div>
+        <div class='w3-quarter'>
+          <button type="button" onclick="autoComp('t_current', 't_correct', 't_target');">Auto</button>
+        </div>
       </div>
+
+      <div class='w3-row w3-margin-top'>
+        Humidity Calibration
+      </div>
+      <div class='w3-row w3-margin-bottom'>
+        <div class='w3-quarter'>
+          <span>Raw: </span><input class='w3-border' id='h_current' type='text' value='%RAW_HUMI%' maxlength='6' size='6'>
+        </div>
+        <div class='w3-quarter'>
+          <span>Target: </span><input class='w3-border' id='h_target' type='text' placeholder='%HUMI%' maxlength='6' size='6'>
+        </div>
+        <div class='w3-quarter'>
+          <label>Correction: </label><input class='w3-border' id='h_correct' type='text' name='humiCorrection' value='%HUMI_CORRECT%' maxlength='6' size='6'>
+        </div>
+        <div class='w3-quarter'>
+          <button type="button" onclick="autoComp('h_current', 'h_correct', 'h_target');">Auto</button>
+        </div>
+      </div>
+
       <div class='w3-row w3-margin-top w3-margin-bottom'>
         Web Chart Colors
         <table>

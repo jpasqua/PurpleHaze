@@ -120,22 +120,6 @@ namespace PHWebUI {
     }
 
 
-    bool mapWeatherSettings(const String& key, String& val) {
-      char gr = key[2] - '0';  // GraphRange. Returns '\0' if no such index
-      #if defined(HAS_WEATHER_SENSOR)
-        if (key == "TEMP_CORRECT")      val.concat(phSettings->weatherSettings.tempCorrection);
-        else if (key == "HUMI_CORRECT") val.concat(phSettings->weatherSettings.humiCorrection);
-        else if (key == "TEMP_CLR")     val = phSettings->weatherSettings.chartColors.temp;
-        else if (key == "HUMI_CLR")     val = phSettings->weatherSettings.chartColors.humi;
-        else if (gr == phSettings->weatherSettings.graphRange && key.startsWith("WG")) val = "selected";
-        else return false;
-        return true;
-      #else
-        (void)key; (void)val; // Avoid compiler warning
-        return false;
-      #endif
-    }
-
 #define TEMP_TO_STRING(t, s) {                                    \
   if (isnan(wReadings.temp)) s = "N/A";                           \
   else s = String(Output::temp(t), 1) + Output::tempUnits();      \
@@ -148,6 +132,39 @@ namespace PHWebUI {
   if (isnan(wReadings.pressure)) s = "N/A";                       \
   else s = String(Output::baro(b), 1) + Output::baroUnits();      \
 }
+
+
+    bool mapWeatherSettings(const String& key, String& val) {
+      char gr = key[2] - '0';  // GraphRange. Returns '\0' if no such index
+      #if defined(HAS_WEATHER_SENSOR)
+        const WeatherReadings& wReadings = phApp->weatherMgr.getLastReadings();
+        if (key == "TEMP_CORRECT") { 
+          float tempCorrection = wtApp->settings->uiOptions.useMetric ? 
+            phSettings->weatherSettings.tempCorrection :
+            Basics::delta_c_to_f(phSettings->weatherSettings.tempCorrection);
+            val.concat(tempCorrection);
+        }
+        else if (key == "HUMI_CORRECT") val.concat(phSettings->weatherSettings.humiCorrection);
+        else if (key == "RAW_TEMP") {
+          float rawTemp = wReadings.temp - phSettings->weatherSettings.tempCorrection;
+          TEMP_TO_STRING(rawTemp, val);
+        }
+        else if (key == "RAW_HUMI") {
+          float rawHumi = wReadings.humidity - phSettings->weatherSettings.humiCorrection;
+          HUMI_TO_STRING(wReadings.humidity, val);
+        }
+        else if (key == "TEMP") { TEMP_TO_STRING(wReadings.temp, val); }
+        else if (key == "HUMI") { HUMI_TO_STRING(wReadings.humidity, val); }
+        else if (key == "TEMP_CLR")     val = phSettings->weatherSettings.chartColors.temp;
+        else if (key == "HUMI_CLR")     val = phSettings->weatherSettings.chartColors.humi;
+        else if (gr == phSettings->weatherSettings.graphRange && key.startsWith("WG")) val = "selected";
+        else return false;
+        return true;
+      #else
+        (void)key; (void)val; // Avoid compiler warning
+        return false;
+      #endif
+    }
 
     bool mapWeatherReadings(const String& key, String& val) {
       #if defined(HAS_WEATHER_SENSOR)
@@ -341,12 +358,18 @@ namespace PHWebUI {
         phApp->appScreens.aqiGraphScreen->selectBuffer(phSettings->aqiSettings.graphRange);
 #endif
 #if defined(HAS_WEATHER_SENSOR)
-        phSettings->weatherSettings.tempCorrection = WebUI::arg("tempCorrection").toFloat();
+        float tempCorrection = WebUI::arg("tempCorrection").toFloat();
+        phSettings->weatherSettings.tempCorrection = wtApp->settings->uiOptions.useMetric ?
+            tempCorrection : Basics::delta_f_to_c(tempCorrection);
         phSettings->weatherSettings.humiCorrection = WebUI::arg("humiCorrection").toFloat();
         phSettings->weatherSettings.chartColors.temp = WebUI::arg("tempColor");
         phSettings->weatherSettings.chartColors.humi = WebUI::arg("humiColor");
         phSettings->weatherSettings.graphRange = WebUI::arg("weatherGraphRange").toInt();
         phApp->appScreens.weatherGraphScreen->selectBuffer(phSettings->weatherSettings.graphRange);
+        phApp->weatherMgr.setAttributes(
+          phSettings->weatherSettings.tempCorrection,
+          phSettings->weatherSettings.humiCorrection,
+          WebThing::settings.elevation);
 #endif
         phSettings->write();
 
