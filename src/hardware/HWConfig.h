@@ -63,34 +63,40 @@
 #define GUI_DSPLY   PRESENT
 #define AQI_SENSOR  PRESENT
 #define BME_SENSOR  PRESENT
-
+// #define CTRL_BTNS   PRESENT
 
 // #define BaseConfig  Config_ESP32Mini
 // #define GUI_DSPLY   PRESENT
 // #define AQI_SENSOR  PRESENT
 // #define BME_SENSOR  PRESENT
+// #define CTRL_BTNS   PRESENT
 
 // #define BaseConfig  Config_PH2_Board
 // // #define GUI_DSPLY   PRESENT
 // #define BME_SENSOR  PRESENT
 // #define AQI_SENSOR  PRESENT
+// #define CTRL_BTNS   PRESENT
 
 // #define BaseConfig  Config_D1Mini_Enc
 // #define GUI_DSPLY   PRESENT
 // #define BME_SENSOR  PRESENT
+// #define CTRL_BTNS   PRESENT
 
 // #define BaseConfig  Config_D1Mini_JAWS
 // #define BME_SENSOR  PRESENT
+// #define CTRL_BTNS   PRESENT
 
 // #define BaseConfig  Config_ESP8266WithOLED
 // #define GUI_DSPLY   PRESENT
 // #define BME_SENSOR  PRESENT
 // // #define AQI_SENSOR  PRESENT
+// #define CTRL_BTNS   PRESENT
 
 // #define BaseConfig  Config_ESP32WithOLED
 // #define GUI_DSPLY   PRESENT
 // #define BME_SENSOR  PRESENT
 // // #define AQI_SENSOR  PRESENT
+// #define CTRL_BTNS   PRESENT
 
 
 //------------------------------------------------------------------------------

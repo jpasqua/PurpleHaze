@@ -33,7 +33,11 @@
   #endif
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { D4, D7 };
+  #if (CTRL_BTNS == PRESENT)
+    constexpr Basics::Pin physicalButtons[] = { 27, 14 };
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+  #endif
   constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
 
   // ----- Air Quality Sensor
@@ -90,8 +94,12 @@
   #endif
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
-  constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
+  #if (CTRL_BTNS == PRESENT)
+    #error Config says CTRL_BTNS are present, but this HW has none
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+    constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
+  #endif
 
   // ----- Air Quality Sensor
   #define USE_SW_SERIAL 1
@@ -144,8 +152,13 @@
   #endif
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { D6, Basics::UnusedPin };
-  constexpr Basics::Pin syntheticGrounds[] = { D8 };
+  #if (CTRL_BTNS == PRESENT)
+    constexpr Basics::Pin physicalButtons[] = { D6, Basics::UnusedPin };
+    constexpr Basics::Pin syntheticGrounds[] = { D8 };
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+    constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
+  #endif
 
   // ----- Air Quality Sensor
   #define USE_SW_SERIAL 1
@@ -196,8 +209,13 @@
   #endif
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
-  constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
+  #if (CTRL_BTNS == PRESENT)
+    constexpr Basics::Pin physicalButtons[] = { D6, Basics::UnusedPin };
+    constexpr Basics::Pin syntheticGrounds[] = { D8 };
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+    constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
+  #endif
 
   // ----- Air Quality Sensor
   #define USE_SW_SERIAL 1
@@ -246,7 +264,11 @@
   constexpr uint8_t DISPLAY_I2C_ADDRESS = 0x3c;
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { D3, Basics::UnusedPin };
+  #if (CTRL_BTNS == PRESENT)
+    constexpr Basics::Pin physicalButtons[] = { D3, Basics::UnusedPin };
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+  #endif
   constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
 
   // ----- Air Quality Sensor
@@ -291,7 +313,11 @@
   constexpr uint8_t DISPLAY_I2C_ADDRESS = 0x3c;
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { 25, 13 };
+  #if (CTRL_BTNS == PRESENT)
+    constexpr Basics::Pin physicalButtons[] = { 25, 13 };
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+  #endif
   constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
 
   // ----- Air Quality Sensor
@@ -338,7 +364,11 @@
   #endif
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { 13, Basics::UnusedPin };
+  #if (CTRL_BTNS == PRESENT)
+    constexpr Basics::Pin physicalButtons[] = { 13, Basics::UnusedPin };
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+  #endif
   constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
 
 
@@ -372,7 +402,7 @@
 #elif (BaseConfig == Config_PH2_ESP32)
   /*------------------------------------------------------------------------------
    *
-   * Config for an ESP32 D1 Mini built up with discrete components
+   * Config for an ESP32 D1 Mini (or dev board)
    *
    *----------------------------------------------------------------------------*/
   #define PROCESSOR_ASSERT PROCESSOR_ESP32
@@ -391,8 +421,12 @@
   #endif
 
   // ----- Buttons
-  constexpr Basics::Pin physicalButtons[] = { 27, 14 };
-  constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
+  #if (CTRL_BTNS == PRESENT)
+      #error Config says CTRL_BTNS are present, but this HW has none
+  #else
+    constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
+    constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
+  #endif
 
 
   // ----- Air Quality Sensor
