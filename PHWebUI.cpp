@@ -124,6 +124,10 @@ namespace PHWebUI {
   if (isnan(wReadings.temp)) s = "N/A";                           \
   else s = String(Output::temp(t), 1) + Output::tempUnits();      \
 }
+#define TEMP_SPREAD_TO_STRING(t, s) {                             \
+  if (isnan(wReadings.temp)) s = "N/A";                           \
+  else s = String(Output::tempSpread(t), 1) + Output::tempUnits();\
+}
 #define HUMI_TO_STRING(h, s) {                                    \
   if (isnan(wReadings.humidity)) s = "N/A";                       \
   else s = String(wReadings.humidity, 1) + '%';                   \
@@ -175,7 +179,7 @@ namespace PHWebUI {
         else if (key == "RELP") { BARO_TO_STRING(wReadings.relPressure, val); }
         else if (key == "HTIN") { TEMP_TO_STRING(wReadings.heatIndex, val); }
         else if (key == "DWPT") { TEMP_TO_STRING(wReadings.dewPointTemp, val); }
-        else if (key == "DPSP") { TEMP_TO_STRING(wReadings.dewPointSpread, val); }
+        else if (key == "DPSP") { TEMP_SPREAD_TO_STRING(wReadings.dewPointSpread, val); }
         else if (key == "W_TMST")
           val = Output::formattedTime(Basics::wallClockFromMillis(wReadings.timestamp));
         else return false;
