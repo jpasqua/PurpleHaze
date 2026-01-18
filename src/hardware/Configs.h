@@ -422,7 +422,8 @@
 
   // ----- Buttons
   #if (CTRL_BTNS == PRESENT)
-      #error Config says CTRL_BTNS are present, but this HW has none
+    constexpr Basics::Pin physicalButtons[] = { 27, 14 };
+    constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };
   #else
     constexpr Basics::Pin physicalButtons[] = { Basics::UnusedPin, Basics::UnusedPin };
     constexpr Basics::Pin syntheticGrounds[] = { Basics::UnusedPin };

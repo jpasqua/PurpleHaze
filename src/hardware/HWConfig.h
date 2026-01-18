@@ -63,7 +63,7 @@
 #define GUI_DSPLY   PRESENT
 #define AQI_SENSOR  PRESENT
 #define BME_SENSOR  PRESENT
-// #define CTRL_BTNS   PRESENT
+#define CTRL_BTNS   PRESENT
 
 // #define BaseConfig  Config_ESP32Mini
 // #define GUI_DSPLY   PRESENT
